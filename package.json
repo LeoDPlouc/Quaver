@@ -16,9 +16,6 @@
     "url": "https://github.com/LeoDPlouc/Quaver/issues"
   },
   "homepage": "https://github.com/LeoDPlouc/Quaver#readme",
-  "devDependencies": {
-    "typescript": "^4.3.5"
-  },
   "dependencies": {
     "express": "^4.17.1"
   }
