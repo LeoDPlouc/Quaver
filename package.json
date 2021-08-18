@@ -1,0 +1,25 @@
+{
+  "name": "quaver",
+  "version": "1.0.0",
+  "description": "Music Streaming Service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeoDPlouc/Quaver.git"
+  },
+  "author": "",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/LeoDPlouc/Quaver/issues"
+  },
+  "homepage": "https://github.com/LeoDPlouc/Quaver#readme",
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
