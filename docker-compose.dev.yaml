@@ -1,0 +1,12 @@
+version: "3"
+services: 
+  quaver:
+    build:
+      context: .
+      args: 
+        DEV_ENV: 1
+    volumes: 
+      - ./:/app
+    environment: 
+      - DEV_ENV=1
+    command: npm run dev
