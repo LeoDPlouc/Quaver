@@ -5,20 +5,26 @@ const { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONGO_PORT } = require("./config/c
 const app = express()
 
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`
-mongoose
+
+const waitForDb = () => {
+    mongoose
     .connect(mongoUrl, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false
     })
     .then(() => console.log("Successfully connected to database"))
-    .catch((e) => console.log(e))
+    .catch((e) => {
+        console.log(e)
+        setTimeout(waitForDb, 5000)
+    })
+}
 
-
+waitForDb()
 
 app.get("/", (req, res) => {
-    res.send(`<h1>Db status ${e}<h1/>`)
-})
+    res.send(`<h1>Hello wurld<h1/>`)
+    })
 
 const port = process.env.PORT || 3000
 
