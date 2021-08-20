@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONGO_PORT } = require("./config/config")
 
 const songRouter = require("./routes/songRoute")
+const userRouter = require("./routes/userRoute")
 
 const app = express()
 
@@ -31,6 +32,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/song", songRouter)
+app.use("/api/user", userRouter)
 
 const port = process.env.PORT || 3000
 
