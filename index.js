@@ -1,9 +1,13 @@
 const express = require("express")
 const mongoose = require("mongoose")
-const { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONGO_PORT } = require("./config/config")
+const session = require("express-session")
+
+const { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONGO_PORT, SESSION_SECRET } = require("./config/config")
 
 const songRouter = require("./routes/songRoute")
 const userRouter = require("./routes/userRoute")
+const albumRouter = require("./routes/albumRoute")
+const artistRouter = require("./routes/artistRoute")
 
 const app = express()
 
@@ -25,6 +29,17 @@ const waitForDb = () => {
 
 waitForDb()
 
+app.use(session({
+    secret: SESSION_SECRET,
+    cookie: {
+        secure: false,
+        resave: false,
+        saveUninitialized: false,
+        httpOnly: true,
+        maxAge: 2600000000
+    }
+}))
+
 app.use(express.json())
 
 app.get("/", (req, res) => {
@@ -33,6 +48,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
+app.use("/api/album", albumRouter)
+app.use("/api/artist", artistRouter)
 
 const port = process.env.PORT || 3000
 

@@ -1,12 +1,13 @@
 version: "3"
 services: 
-  quaver:
+  quaver-api:
     build:
       context: .
       args: 
         DEV_ENV: 1
     volumes: 
       - ./:/app
+      - ./music/:/music
     environment: 
       - DEV_ENV=1
     command: npm run dev

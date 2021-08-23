@@ -1,16 +1,16 @@
 const express = require("express")
+
 const songController = require("../controllers/songController")
+const protect = require("../middleware/authMiddleware")
 
 const router = express.Router()
 
 
 router.route("/")
-    .get(songController.getAllSongs)
-    .post(songController.createSong)
+    .get(protect, songController.getAllSongs)
 
 router.route("/:id")
-    .get(songController.getOneSong)
-    .patch(songController.updateSong)
-    .delete(songController.deleteSong)
+    .get(protect, songController.getOneSong)
+    .patch(protect, songController.updateSong)
 
 module.exports = router

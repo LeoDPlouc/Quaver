@@ -5,9 +5,12 @@ const User = require("../models/userModel")
 exports.signUp = async (req, res, next) => {
     try {
         var { username, password } = req.body
-        var hashpass = await bcrypt.hash(password)
+        var hashpass = await bcrypt.hash(password, 5)
 
-        const user = User.create({ username, hashpassword })
+        const user = await User.create({
+            "username": username,
+            "password": hashpass
+        })
 
         res.status(200).json({
             status: "sucess",
@@ -16,6 +19,7 @@ exports.signUp = async (req, res, next) => {
             }
         })
     } catch (e) {
+        console.log(e)
         res.status(400).json({
             status: "fail"
         })
@@ -28,13 +32,22 @@ exports.signIn = async (req, res, next) => {
 
         var user = await User.findOne({ username })
 
-        if (!user)
-            res.status(400)
+        if (!user) {
+            res.status(400).json({
+                status: "fail"
+            })
+            return
+        }
 
         var checked = await bcrypt.compare(password, user.password)
-        if (!checked)
-            res.status(400)
+        if (!checked) {
+            res.status(400).json({
+                status: "fail"
+            })
+            return
+        }
 
+        req.session.user = user
         res.status(200).json({
             status: "sucess"
         })

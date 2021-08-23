@@ -1,14 +1,14 @@
-const Song = require("../models/songModel")
+const Artist = require("../models/artistModel")
 
-exports.getAllSongs = async (req, res, next) => {
+exports.getAllArtists = async (req, res, next) => {
     try {
-        const songs = await Song.find()
+        const artists = await Artist.find()
 
         res.status(200).json({
             status: "succes",
             results: songs.length,
             data: {
-                songs
+                artists
             }
         })
 
@@ -19,14 +19,14 @@ exports.getAllSongs = async (req, res, next) => {
     }
 }
 
-exports.getOneSong = async (req, res, next) => {
+exports.getOneArtist = async (req, res, next) => {
     try {
-        const song = await Song.findById(req.params.id)
+        const artist = await Artist.findById(req.params.id)
 
         res.status(200).json({
             status: "succes",
             data: {
-                song
+                artist
             }
         })
 
@@ -37,9 +37,9 @@ exports.getOneSong = async (req, res, next) => {
     }
 }
 
-exports.updateSong = async (req, res, next) => {
+exports.updateArtist = async (req, res, next) => {
     try {
-        const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
+        const artist = await Artist.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true
         })
@@ -47,7 +47,7 @@ exports.updateSong = async (req, res, next) => {
         res.status(200).json({
             status: "succes",
             data: {
-                song
+                artist
             }
         })
 

@@ -1,6 +1,6 @@
 version: "3"
 services: 
-  quaver:
+  quaver-api:
     build: .
     ports: 
       - 3000:3000
@@ -8,6 +8,7 @@ services:
       - PORT=3000
       - MONGO_USER=quaver
       - MONGO_PASSWORD=quaver
+      - SESSION_SECRET=quaver
     depends_on: 
       - mongo
 

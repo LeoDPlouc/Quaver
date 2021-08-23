@@ -1,14 +1,14 @@
-const Song = require("../models/songModel")
+const Album = require("../models/albumModel")
 
-exports.getAllSongs = async (req, res, next) => {
+exports.getAllAlbums = async (req, res, next) => {
     try {
-        const songs = await Song.find()
+        const albums = await Album.find()
 
         res.status(200).json({
             status: "succes",
             results: songs.length,
             data: {
-                songs
+                albums
             }
         })
 
@@ -19,14 +19,14 @@ exports.getAllSongs = async (req, res, next) => {
     }
 }
 
-exports.getOneSong = async (req, res, next) => {
+exports.getOneAlbum = async (req, res, next) => {
     try {
-        const song = await Song.findById(req.params.id)
+        const album = await Album.findById(req.params.id)
 
         res.status(200).json({
             status: "succes",
             data: {
-                song
+                album
             }
         })
 
@@ -37,9 +37,9 @@ exports.getOneSong = async (req, res, next) => {
     }
 }
 
-exports.updateSong = async (req, res, next) => {
+exports.updateAlbum = async (req, res, next) => {
     try {
-        const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
+        const album = await Album.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true
         })
@@ -47,7 +47,7 @@ exports.updateSong = async (req, res, next) => {
         res.status(200).json({
             status: "succes",
             data: {
-                song
+                album
             }
         })
 
