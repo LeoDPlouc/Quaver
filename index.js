@@ -8,6 +8,7 @@ const songRouter = require("./routes/songRoute")
 const userRouter = require("./routes/userRoute")
 const albumRouter = require("./routes/albumRoute")
 const artistRouter = require("./routes/artistRoute")
+const appRouter = require("./routes/appRoute")
 
 const app = express()
 
@@ -42,9 +43,8 @@ app.use(session({
 
 app.use(express.json())
 
-app.get("/", (req, res) => {
-    res.send(`<h1>Hello wurld<h1/>`)
-})
+app.use("/", appRouter)
+
 
 app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
@@ -54,3 +54,4 @@ app.use("/api/artist", artistRouter)
 const port = process.env.PORT || 3000
 
 app.listen(port, () => console.log(`listening on port ${port}`))
+
