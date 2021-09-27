@@ -1,13 +1,10 @@
 const mongoose = require("mongoose")
 
 const albumSchema = new mongoose.Schema({
-    songs: {
-        type: Array
-    },
     title: {
         type: String
     },
-    Artist: {
+    artist: {
         type: String
     },
     cover: {

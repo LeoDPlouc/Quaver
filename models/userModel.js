@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        require: [true, "User need a password"]
+        require: [true, "User needs a password"]
     }
 })
 

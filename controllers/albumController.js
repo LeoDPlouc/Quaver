@@ -6,13 +6,14 @@ exports.getAllAlbums = async (req, res, next) => {
 
         res.status(200).json({
             status: "succes",
-            results: songs.length,
+            results: albums.length,
             data: {
                 albums
             }
         })
 
     } catch (e) {
+        console.debug(e)
         res.status(400).json({
             status: "fail"
         })

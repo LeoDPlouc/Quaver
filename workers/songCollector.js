@@ -1,4 +1,4 @@
-const fs = require("fs")
+const fs = require("fs/promises")
 const path = require("path")
 
 const songProcessor = require("../processing/songProcessor")
@@ -7,32 +7,36 @@ const Song = require("../models/songModel")
 const musicPath = "/music"
 
 const collect = async (libPath) => {
-    try {
-        fs.readdir(libPath, { withFileTypes: true }, (err, files) => {
-            files.forEach((file) => {
-                var fullPath = path.join(libPath, file.name)
+    var paths = await fs.readdir(libPath, { withFileTypes: true })
+    for (var i = 0; i < paths.length; i++) {
+        var fullPath = path.join(libPath, paths[i].name)
 
-                if (file.isDirectory())
-                    collect(fullPath)
+        if (paths[i].isDirectory())
+            await collect(fullPath)
 
-                if (file.isFile())
-                    registerSong(fullPath)
-            })
-        })
-    } catch (e) {
-        console.log(e)
+        if (paths[i].isFile())
+            await registerSong(fullPath)
     }
 }
 
 const registerSong = async (songPath) => {
-    songs = await Song.find({ path: songPath })
-    
-    if (songs.length == 0 && path.extname(songPath) === ".mp3") {
-        const songInfo = await songProcessor.getSong(songPath)
-        
-        const song = new Song(songInfo)
-        song.save().then(() => console.log(`Find new song ${songPath}`))
+    var song = await Song.findOne({ path: songPath })
+
+    if (!song && path.extname(songPath) === ".mp3") {
+        const songInfo = await songProcessor.getMetadata(songPath)
+
+        song = new Song(songInfo)
+        await song.save().then(() => console.log(`Found new song ${songPath}`))
     }
+
+    song = await Song.findOne({ path: songPath })
+    if (!song)
+        return
+    var album = await songProcessor.getAlbum(song)
+    await album.save()
+
+    song.albumId = album._id
+    await song.save()
 }
 
 

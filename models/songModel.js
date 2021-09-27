@@ -16,7 +16,13 @@ const songSchema = new mongoose.Schema({
     artist: {
         type: String
     },
+    artistId: {
+        type: String
+    },
     album: {
+        type: String
+    },
+    albumId: {
         type: String
     },
     path: {
