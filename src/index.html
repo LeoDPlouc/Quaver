@@ -143,10 +143,11 @@
         methods: {
             formatDuration(duration) {
                 try {
-                    duration = Number(duration) / 60
-                    duration = String(duration).split(".")
-                    duration[1] = duration[1].substring(0, 2)
-                    return duration.join(":")
+                    seconds = Number(duration) % 60
+                    seconds = String(seconds).split(".")[0]
+                    minutes = Number(duration) / 60
+                    minutes = String(minutes).split(".")[0]
+                    return `${minutes}:${seconds}`
                 } catch (error) { }
                 return duration
             }
