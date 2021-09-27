@@ -10,6 +10,8 @@ const albumRouter = require("./routes/albumRoute")
 const artistRouter = require("./routes/artistRoute")
 const appRouter = require("./routes/appRoute")
 
+const songCollector = require("./workers/songCollector")
+
 const app = express()
 
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`
@@ -50,6 +52,8 @@ app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
 app.use("/api/album", albumRouter)
 app.use("/api/artist", artistRouter)
+
+songCollector()
 
 const port = process.env.PORT || 3000
 

@@ -1,41 +1,18 @@
-const mp3tag = require("mp3tag")
-const mp3Duration = require("mp3-duration")
-
-const extractFrame = (tagData, frameName) => {
-
-    var buffer = tagData.getFrame(frameName)
-
-    if (buffer)
-        return tagData.decoder.decodeString(buffer.data.source).replace("\x00", "")
-    return ""
-}
-
-const getSongTags = async (songPath) => {
-    tagData = await mp3tag.readHeader(songPath)
-
-    const song = {
-        title: extractFrame(tagData, "TIT2"),
-        n: extractFrame(tagData, "TRCK").split("/")[0],
-        artist: extractFrame(tagData, "TPE1"),
-        album: extractFrame(tagData, "TALB"),
-        year: extractFrame(tagData, "TORY")
-    }
-
-
-    return song
-}
+const mm = require("music-metadata")
 
 module.exports.getSong = async (songPath) => {
-    var song = await getSongTags(songPath)
+    var tag = await mm.parseFile(songPath)
 
-    await mp3Duration(songPath, (err, duration) => {
-        if (err)
-            console.log(err)
-        else
-            song.duration = duration
-    })
-    song.like = 0
-    song.path = songPath
+    const song = {
+        title: tag.common.title,
+        n: tag.common.track.no,
+        artist: tag.common.albumartist,
+        album: tag.common.album,
+        year: tag.common.year,
+        duration: tag.format.duration,
+        like: 0,
+        path: songPath
+    }
 
     return song
 }
