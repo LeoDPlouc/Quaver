@@ -1,10 +1,11 @@
-version: "3"
+version: "3.4"
 services: 
   quaver:
     build:
       context: .
       args: 
         DEV_ENV: 1
+      network: host
     volumes: 
       - ./:/app
       - ./music/:/music

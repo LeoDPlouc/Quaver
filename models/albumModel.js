@@ -7,6 +7,9 @@ const albumSchema = new mongoose.Schema({
     artist: {
         type: String
     },
+    artistId: {
+        type: String
+    },
     cover: {
         type: String
     }

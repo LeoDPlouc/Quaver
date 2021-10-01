@@ -1,5 +1,6 @@
 const fs = require("fs/promises")
 const path = require("path")
+const mime = require("mime")
 
 const songProcessor = require("../processing/songProcessor")
 const Song = require("../models/songModel")
@@ -20,9 +21,12 @@ const collect = async (libPath) => {
 }
 
 const registerSong = async (songPath) => {
+    if (path.extname(songPath) != ".mp3")
+        return
+
     var song = await Song.findOne({ path: songPath })
 
-    if (!song && path.extname(songPath) === ".mp3") {
+    if (!song) {
         const songInfo = await songProcessor.getMetadata(songPath)
 
         song = new Song(songInfo)
@@ -30,19 +34,28 @@ const registerSong = async (songPath) => {
     }
 
     song = await Song.findOne({ path: songPath })
-    if (!song)
-        return
     var album = await songProcessor.getAlbum(song)
     await album.save()
 
     song.albumId = album._id
     await song.save()
+
+    var artist = await songProcessor.getArtist(song)
+    await artist.save()
+
+    song.artistId = artist._id
+    await song.save()
+
+    album = await songProcessor.getAlbum(song)
+    artist = await songProcessor.getArtist(song)
+    album.artistId = artist._id
+    await album.save()
 }
 
 
 const doWork = async () => {
 
-    console.log("Worker Started")
+    console.log("Song collection Started")
 
     while (true) {
         collect(musicPath)

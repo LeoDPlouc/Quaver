@@ -1,6 +1,7 @@
 const mm = require("music-metadata")
 
 const Album = require("../models/albumModel")
+const Artist = require("../models/artistModel")
 
 module.exports.getMetadata = async (songPath) => {
     var tag = await mm.parseFile(songPath)
@@ -36,4 +37,22 @@ module.exports.getAlbum = async (song) => {
     }
 
     return album
+}
+
+module.exports.getArtist = async (song) => {
+    var artist = null
+    if (song.artistId)
+        artist = await Artist.findById(song.artistId)
+    else
+        artist = await Artist.findOne({ name: song.artist })
+
+    if (!artist) {
+        artist = new Artist({
+            name: song.artist
+        })
+
+        console.log(`Found new artist ${artist.name}`)
+    }
+
+    return artist
 }
