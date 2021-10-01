@@ -6,7 +6,7 @@ exports.getAllArtists = async (req, res, next) => {
 
         res.status(200).json({
             status: "succes",
-            results: songs.length,
+            results: artists.length,
             data: {
                 artists
             }
