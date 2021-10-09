@@ -1,6 +1,6 @@
-const mongoose = require("mongoose")
+import { Schema, model } from "mongoose"
 
-const albumSchema = new mongoose.Schema({
+const albumSchema = new Schema({
     title: {
         type: String
     },
@@ -15,5 +15,5 @@ const albumSchema = new mongoose.Schema({
     }
 })
 
-const Album = mongoose.model("Album", albumSchema)
-module.exports = Album
+const Album = model("Album", albumSchema)
+export = Album

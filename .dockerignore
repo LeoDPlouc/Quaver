@@ -1,4 +1,4 @@
-node_modules
+#node_modules
 Dockerfile
 .dockerignore
 .git
@@ -6,3 +6,4 @@ Dockerfile
 LICENSE
 README.MD
 docker-compose*
+#build

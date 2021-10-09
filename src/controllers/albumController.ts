@@ -1,6 +1,8 @@
-const Album = require("../models/albumModel")
+import { Request, Response, NextFunction } from "express"
 
-exports.getAllAlbums = async (req, res, next) => {
+import Album from "../models/albumModel"
+
+export async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
     try {
         const albums = await Album.find()
 
@@ -18,6 +20,8 @@ exports.getAllAlbums = async (req, res, next) => {
             status: "fail"
         })
     }
+
+    next()
 }
 
 exports.getOneAlbum = async (req, res, next) => {

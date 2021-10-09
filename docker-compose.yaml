@@ -1,9 +1,13 @@
 version: "3.4"
 services: 
   quaver:
-    build: .
+    build: 
+      context: .
+      network: host
     ports: 
       - 3000:3000
+    volumes:
+      - ./music/:/music
     environment: 
       - PORT=3000
       - MONGO_USER=quaver

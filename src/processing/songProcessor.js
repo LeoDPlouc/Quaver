@@ -1,7 +1,7 @@
 const mm = require("music-metadata")
 
-const Album = require("../models/albumModel")
-const Artist = require("../models/artistModel")
+const Album = require("../src/models/albumModel")
+const Artist = require("../src/models/artistModel")
 
 module.exports.getMetadata = async (songPath) => {
     var tag = await mm.parseFile(songPath)
