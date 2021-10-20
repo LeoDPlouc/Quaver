@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express"
 
-import Album from "../models/albumModel"
+import { Album } from "../models/albumModel"
 
-export async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
+async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
     try {
         const albums = await Album.find()
 
@@ -20,11 +20,9 @@ export async function getAllAlbums(req: Request, res: Response, next: NextFuncti
             status: "fail"
         })
     }
-
-    next()
 }
 
-exports.getOneAlbum = async (req, res, next) => {
+async function getOneAlbum(req: Request, res: Response, next: NextFunction) {
     try {
         const album = await Album.findById(req.params.id)
 
@@ -42,7 +40,7 @@ exports.getOneAlbum = async (req, res, next) => {
     }
 }
 
-exports.updateAlbum = async (req, res, next) => {
+async function updateAlbum(req: Request, res: Response, next: NextFunction) {
     try {
         const album = await Album.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -62,3 +60,5 @@ exports.updateAlbum = async (req, res, next) => {
         })
     }
 }
+
+export { getAllAlbums, getOneAlbum, updateAlbum }

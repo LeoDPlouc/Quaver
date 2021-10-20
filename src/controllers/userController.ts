@@ -1,17 +1,19 @@
-const bcrypt = require("bcryptjs")
+import bcrypt from "bcryptjs"
+import { Request, Response, NextFunction } from "express"
 
-const User = require("../models/userModel")
+import { User } from "../models/userModel"
 
-exports.signUp = async (req, res, next) => {
+export async function signUp(req: Request, res: Response, next: NextFunction) {
     try {
         var { username, password } = req.body
         var hashpass = await bcrypt.hash(password, 5)
 
-        const user = await User.create({
+        const user = new User({
             "username": username,
             "password": hashpass
         })
-
+        await user.save()
+        
         res.status(200).json({
             status: "sucess",
             data: {
@@ -26,7 +28,7 @@ exports.signUp = async (req, res, next) => {
     }
 }
 
-exports.signIn = async (req, res, next) => {
+export async function signIn(req: Request, res: Response, next: NextFunction) {
     try {
         var { username, password } = req.body
 

@@ -1,10 +1,14 @@
 import { Schema, model } from "mongoose"
 
-const artistSchema = new Schema({
+interface IArtist {
+    name?: string
+}
+
+const artistSchema = new Schema<IArtist>({
     name: {
         type: String
     }
 })
+const Artist = model<IArtist>("Artist", artistSchema)
 
-const Artist = model("Artist", artistSchema)
-export = Artist
+export { Artist, IArtist }

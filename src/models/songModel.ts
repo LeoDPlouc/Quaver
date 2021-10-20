@@ -1,6 +1,20 @@
 import { Schema, model } from "mongoose"
 
-const songSchema = new Schema({
+interface ISong {
+    title?: string,
+    n?: number,
+    duration?: Number,
+    like?: Number,
+    artist?: string,
+    artistId?: string,
+    album?: string,
+    albumId?: string,
+    path: string,
+    acoustid?: string,
+    year?: number
+}
+
+const songSchema = new Schema<ISong>({
     title: {
         type: String
     },
@@ -31,8 +45,11 @@ const songSchema = new Schema({
     },
     acoustid: {
         type: String
+    },
+    year: {
+        type: Number
     }
 })
+const Song = model<ISong>("Song", songSchema)
 
-const Song = model("Song", songSchema)
-export = Song
+export { Song, ISong }

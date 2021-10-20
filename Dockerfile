@@ -1,17 +1,21 @@
 FROM node:16-alpine
 WORKDIR /app
 
+RUN npm install -g typescript
+
 COPY package.json .
-#RUN npm install
-COPY node_modules ./node_modules
+RUN npm install
 
-#RUN "npm install -g typescript"
-
-#COPY src/ ./src
 COPY tsconfig.json .
-COPY build .
+COPY src ./src
 
-#RUN "tsc"
+RUN tsc
+RUN mv build/* .
+
+RUN rm -r build
+RUN rm -r src/
+
+COPY res ./res
 
 ENV PORT 3000
 EXPOSE $PORT

@@ -1,4 +1,6 @@
-const protect = (req, res, next) => {
+import { Request, Response, NextFunction } from "express"
+
+function protect(req: Request, res: Response, next: NextFunction) {
     const { user } = req.session
     /*
         if (!user) {
@@ -10,4 +12,4 @@ const protect = (req, res, next) => {
     next()
 }
 
-module.exports = protect
+export { protect }

@@ -5,5 +5,7 @@
         "target": "ES5",
         "esModuleInterop": true,
     },
-    "include": ["./src/**/*"]
+    "include": [
+        "./src/**/*"
+    ]
 }

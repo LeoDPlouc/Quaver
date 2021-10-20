@@ -1,13 +1,13 @@
-const fs = require("fs/promises")
-const path = require("path")
-const mime = require("mime")
+import fs from "fs/promises"
+import path from "path"
+import mime from "mime"
 
-const songProcessor = require("../processing/songProcessor")
-const Song = require("../models/songModel")
+import { getAlbum, getArtist, getMetadata } from "../processing/songProcessor"
+import { Song } from "../models/songModel"
 
 const musicPath = "/music"
 
-const collect = async (libPath) => {
+async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true })
     for (var i = 0; i < paths.length; i++) {
         var fullPath = path.join(libPath, paths[i].name)
@@ -20,40 +20,40 @@ const collect = async (libPath) => {
     }
 }
 
-const registerSong = async (songPath) => {
+async function registerSong(songPath: string) {
     if (path.extname(songPath) != ".mp3")
         return
 
     var song = await Song.findOne({ path: songPath })
 
     if (!song) {
-        const songInfo = await songProcessor.getMetadata(songPath)
+        const songInfo = await getMetadata(songPath)
 
         song = new Song(songInfo)
         await song.save().then(() => console.log(`Found new song ${songPath}`))
     }
 
     song = await Song.findOne({ path: songPath })
-    var album = await songProcessor.getAlbum(song)
+    var album = await getAlbum(song)
     await album.save()
 
     song.albumId = album._id
     await song.save()
 
-    var artist = await songProcessor.getArtist(song)
+    var artist = await getArtist(song)
     await artist.save()
 
     song.artistId = artist._id
     await song.save()
 
-    album = await songProcessor.getAlbum(song)
-    artist = await songProcessor.getArtist(song)
+    album = await getAlbum(song)
+    artist = await getArtist(song)
     album.artistId = artist._id
     await album.save()
 }
 
 
-const doWork = async () => {
+async function doWork() {
 
     console.log("Song collection Started")
 
@@ -63,4 +63,4 @@ const doWork = async () => {
     }
 }
 
-module.exports = doWork
+export = doWork

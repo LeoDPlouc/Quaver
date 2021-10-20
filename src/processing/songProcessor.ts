@@ -1,12 +1,14 @@
-const mm = require("music-metadata")
+import { IAudioMetadata, parseFile } from "music-metadata"
+import { Document } from "mongoose"
 
-const Album = require("../src/models/albumModel")
-const Artist = require("../src/models/artistModel")
+import { Album, IAlbum } from "../models/albumModel"
+import { Artist, IArtist } from "../models/artistModel"
+import { ISong } from "../models/songModel"
 
-module.exports.getMetadata = async (songPath) => {
-    var tag = await mm.parseFile(songPath)
+async function getMetadata(songPath: string): Promise<ISong> {
+    var tag = await parseFile(songPath)
 
-    const song = {
+    const song: ISong = {
         title: tag.common.title,
         n: tag.common.track.no,
         artist: tag.common.albumartist,
@@ -20,8 +22,9 @@ module.exports.getMetadata = async (songPath) => {
     return song
 }
 
-module.exports.getAlbum = async (song) => {
-    var album = null
+async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any, IAlbum>> {
+    var album: IAlbum & Document<any, any, IAlbum> = null
+
     if (song.albumId)
         album = await Album.findById(song.albumId)
     else
@@ -39,8 +42,8 @@ module.exports.getAlbum = async (song) => {
     return album
 }
 
-module.exports.getArtist = async (song) => {
-    var artist = null
+async function getArtist(song: ISong): Promise<IArtist & Document<any, any, IArtist>> {
+    var artist: IArtist & Document<any, any, IArtist> = null
     if (song.artistId)
         artist = await Artist.findById(song.artistId)
     else
@@ -56,3 +59,5 @@ module.exports.getArtist = async (song) => {
 
     return artist
 }
+
+export { getArtist, getAlbum, getMetadata }
