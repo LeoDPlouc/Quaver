@@ -1,10 +1,27 @@
 import { Request, Response, NextFunction } from "express"
+import { Document } from "mongoose"
 
-import { Album } from "../models/albumModel"
+import { Album, IAlbum } from "../models/albumModel"
+
+function cleanOne(data: IAlbum & Document<any, any, IAlbum>): any {
+    var cleanedData = {
+        id: data._id,
+        title: data.title,
+        artist: data.artist,
+        artistId: data.artistId
+    }
+    return cleanedData
+}
+
+function cleanMany(datas: (IAlbum & Document<any, any, IAlbum>)[]): any[] {
+    var cleaned = []
+    datas.forEach((data, i) => cleaned.push(cleanOne(data)))
+    return cleaned
+}
 
 async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
     try {
-        const albums = await Album.find()
+        const albums = cleanMany(await Album.find())
 
         res.status(200).json({
             status: "succes",
@@ -24,7 +41,7 @@ async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
 
 async function getOneAlbum(req: Request, res: Response, next: NextFunction) {
     try {
-        const album = await Album.findById(req.params.id)
+        const album = cleanOne(await Album.findById(req.params.id))
 
         res.status(200).json({
             status: "succes",
