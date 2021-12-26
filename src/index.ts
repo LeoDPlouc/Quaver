@@ -9,6 +9,7 @@ import userRouter from "./routes/userRoute"
 import albumRouter from "./routes/albumRoute"
 import artistRouter from "./routes/artistRoute"
 import appRouter from "./routes/appRoute"
+import imageRouter from "./routes/imageRoute"
 
 import songCollector from "./workers/songCollector"
 
@@ -41,6 +42,7 @@ app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
 app.use("/api/album", albumRouter)
 app.use("/api/artist", artistRouter)
+app.use("/api/image", imageRouter)
 
 async function waitForDb() {
     await mongoose
