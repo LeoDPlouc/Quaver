@@ -25,7 +25,7 @@ function cleanMany(datas: (ISong & Document<any, any, ISong>)[]): any[] {
     return cleaned
 }
 
-export async function getAllSongs(req: Request, res: Response, next: NextFunction) {
+export async function getAllSongsInfo(req: Request, res: Response, next: NextFunction) {
     try {
         const songs = cleanMany(await Song.find())
 
@@ -44,7 +44,7 @@ export async function getAllSongs(req: Request, res: Response, next: NextFunctio
     }
 }
 
-export async function getOneSong(req: Request, res: Response, next: NextFunction) {
+export async function getOneSongInfo(req: Request, res: Response, next: NextFunction) {
     try {
         const song = cleanOne(await Song.findById(req.params.id))
 
@@ -62,7 +62,7 @@ export async function getOneSong(req: Request, res: Response, next: NextFunction
     }
 }
 
-export async function updateSong(req: Request, res: Response, next: NextFunction) {
+export async function updateSongInfo(req: Request, res: Response, next: NextFunction) {
     try {
         const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -78,6 +78,19 @@ export async function updateSong(req: Request, res: Response, next: NextFunction
 
     } catch (e) {
         res.status(400).json({
+            status: "fail"
+        })
+    }
+}
+
+export async function getSongStream(req: Request, res: Response, next: NextFunction) {
+    try {
+        const song = await Song.findById(req.params.id)
+
+        res.sendFile(song.path)
+
+    } catch (e) {
+        res.json({
             status: "fail"
         })
     }
