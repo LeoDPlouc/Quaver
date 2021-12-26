@@ -14,7 +14,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
         })
         await user.save()
         
-        res.status(200).json({
+        res.json({
             status: "sucess",
             data: {
                 user: user
@@ -22,7 +22,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
         })
     } catch (e) {
         console.log(e)
-        res.status(400).json({
+        res.json({
             status: "fail"
         })
     }
@@ -35,7 +35,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
         var user = await User.findOne({ username })
 
         if (!user) {
-            res.status(400).json({
+            res.json({
                 status: "fail"
             })
             return
@@ -43,19 +43,19 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
 
         var checked = await bcrypt.compare(password, user.password)
         if (!checked) {
-            res.status(400).json({
+            res.json({
                 status: "fail"
             })
             return
         }
 
         req.session.user = user
-        res.status(200).json({
+        res.json({
             status: "sucess"
         })
 
     } catch (e) {
-        res.status(404).json({
+        res.json({
             status: "fail"
         })
     }

@@ -23,7 +23,7 @@ async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
     try {
         const albums = cleanMany(await Album.find())
 
-        res.status(200).json({
+        res.json({
             status: "succes",
             results: albums.length,
             data: {
@@ -33,7 +33,7 @@ async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
 
     } catch (e) {
         console.debug(e)
-        res.status(400).json({
+        res.json({
             status: "fail"
         })
     }
@@ -43,7 +43,7 @@ async function getOneAlbum(req: Request, res: Response, next: NextFunction) {
     try {
         const album = cleanOne(await Album.findById(req.params.id))
 
-        res.status(200).json({
+        res.json({
             status: "succes",
             data: {
                 album
@@ -51,7 +51,7 @@ async function getOneAlbum(req: Request, res: Response, next: NextFunction) {
         })
 
     } catch (e) {
-        res.status(400).json({
+        res.json({
             status: "fail"
         })
     }
@@ -64,7 +64,7 @@ async function updateAlbum(req: Request, res: Response, next: NextFunction) {
             runValidators: true
         })
 
-        res.status(200).json({
+        res.json({
             status: "succes",
             data: {
                 album
@@ -72,7 +72,7 @@ async function updateAlbum(req: Request, res: Response, next: NextFunction) {
         })
 
     } catch (e) {
-        res.status(400).json({
+        res.json({
             status: "fail"
         })
     }

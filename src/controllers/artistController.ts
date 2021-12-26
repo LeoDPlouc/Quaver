@@ -21,7 +21,7 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
     try {
         const artists = cleanMany(await Artist.find())
 
-        res.status(200).json({
+        res.json({
             status: "succes",
             results: artists.length,
             data: {
@@ -30,7 +30,7 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
         })
 
     } catch (e) {
-        res.status(400).json({
+        res.json({
             status: "fail"
         })
     }
@@ -40,7 +40,7 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
     try {
         const artist = cleanOne(await Artist.findById(req.params.id))
 
-        res.status(200).json({
+        res.json({
             status: "succes",
             data: {
                 artist
@@ -48,7 +48,7 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
         })
 
     } catch (e) {
-        res.status(400).json({
+        res.json({
             status: "fail"
         })
     }
@@ -61,7 +61,7 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
             runValidators: true
         })
 
-        res.status(200).json({
+        res.json({
             status: "succes",
             data: {
                 artist
@@ -69,7 +69,7 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
         })
 
     } catch (e) {
-        res.status(400).json({
+        res.json({
             status: "fail"
         })
     }
