@@ -5,7 +5,7 @@ import mime from "mime"
 import { getAlbum, getArtist, getMetadata } from "../processing/songProcessor"
 import { Song } from "../models/songModel"
 
-const musicPath = "/music"
+import {MUSIC_PATH} from "../config/config"
 
 async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true })
@@ -58,7 +58,7 @@ async function doWork() {
     console.log("Song collection Started")
 
     while (true) {
-        collect(musicPath)
+        collect(MUSIC_PATH)
         await new Promise(resolve => setTimeout(resolve, 30000))
     }
 }

@@ -6,4 +6,4 @@ Dockerfile
 LICENSE
 README.MD
 docker-compose*
-#build
+build

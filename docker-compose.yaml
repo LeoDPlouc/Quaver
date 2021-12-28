@@ -13,6 +13,7 @@ services:
       - MONGO_USER=quaver
       - MONGO_PASSWORD=quaver
       - SESSION_SECRET=quaver
+      - MUSIC_PATH=/music
     depends_on: 
       - mongo
 

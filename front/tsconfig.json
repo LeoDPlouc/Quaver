@@ -2,11 +2,15 @@
     "compilerOptions": {
         "outDir": "./build",
         "allowJs": true,
-        "target": "ES5",
+        "target": "ES6",
         "esModuleInterop": true,
         "moduleResolution": "node"
     },
+    "files": [
+        "./src/sfc.d.ts"
+    ],
     "include": [
-        "./src/**/*"
+        "./src/**/*.ts",
+        "./src/**/*.vue"
     ]
 }
