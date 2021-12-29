@@ -2,10 +2,8 @@
   <div class="songItem">
     <div class="songItemProp songItemLike">{{ song.like }}</div>
     <div class="songItemProp songItemN">{{ song.n }}</div>
-    <div class="songItemProp songItemTitle">{{ song.title }}</div>
-    <div class="songItemProp songItemDuration">
-      {{ formatDuration(song.duration) }}
-    </div>
+    <div class="songItemProp songItemTitle" @click="songItemTitleClicked">{{ song.title }}</div>
+    <div class="songItemProp songItemDuration">{{ formatDuration(song.duration) }}</div>
     <div class="songItemProp songItemArtist">{{ song.artist }}</div>
     <div class="songItemProp songItemAlbum">{{ song.album }}</div>
     <div class="songItemProp songItemYear">{{ song.year }}</div>
@@ -14,21 +12,28 @@
 
 <script lang='ts'>
 import { defineComponent } from "vue";
-import { Song } from "../model"
+import { Song } from "../models"
+import { SongItemTitleClickedEventArgs } from "../eventArgs";
 
 export default defineComponent({
-  props: {song: Song},
+  props: { song: Song },
+
+  emits: ["song-item-title-clicked"],
+
   methods: {
-    formatDuration(duration: number):string {
+    formatDuration(duration: number): string {
       try {
         var seconds = Number(duration) % 60;
         var secondsString = String(seconds).split(".")[0];
         var minutes = Number(duration) / 60;
         var minutesString = String(minutes).split(".")[0];
         return `${minutesString}:${secondsString}`;
-      } catch (error) {}
+      } catch (error) { }
       return String(duration);
     },
+    songItemTitleClicked(e: MouseEvent) {
+      this.$emit("song-item-title-clicked", new SongItemTitleClickedEventArgs(this.song))
+    }
   },
 })
 </script>

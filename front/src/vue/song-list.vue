@@ -1,18 +1,22 @@
 <template>
     <div v-for="(song, index) in songs" :key="index">
-        <song-item :song="song"></song-item>
+        <song-item :song="song" @song-item-title-clicked="songChanged"></song-item>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Song } from "../model";
+import { SongChangedEventArgs, SongItemTitleClickedEventArgs } from "../eventArgs";
+import { Song } from "../models";
 import songItemVue from "./song-item.vue";
 
 export default defineComponent({
     components: {
         "song-item": songItemVue
     },
+
+    emits: ["song-changed"],
+
     async created() {
         this.songs = await this.getAllSongs()
     },
@@ -21,6 +25,7 @@ export default defineComponent({
             songs: []
         }
     },
+
     methods: {
         async getAllSongs(): Promise<Song[]> {
             var res = await fetch("/api/song")
@@ -46,9 +51,11 @@ export default defineComponent({
                     return -1
             })
             return songs
+        },
+        songChanged(e: SongItemTitleClickedEventArgs) {
+            this.$emit("song-changed", new SongChangedEventArgs(e.song))
         }
     }
-
 })
 </script>
 
