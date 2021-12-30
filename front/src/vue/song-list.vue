@@ -1,6 +1,6 @@
 <template>
     <div v-for="(song, index) in songs" :key="index">
-        <song-item :song="song" @song-item-title-clicked="songChanged"></song-item>
+        <song-item :song="song" :index="index" @song-item-title-clicked="songChanged"></song-item>
     </div>
 </template>
 
@@ -53,7 +53,7 @@ export default defineComponent({
             return songs
         },
         songChanged(e: SongItemTitleClickedEventArgs) {
-            this.$emit("song-changed", new SongChangedEventArgs(e.song))
+            this.$emit("song-changed", new SongChangedEventArgs(e.song, e.index, this.songs))
         }
     }
 })

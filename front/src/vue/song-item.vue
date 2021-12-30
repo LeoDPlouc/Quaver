@@ -16,7 +16,7 @@ import { Song } from "../models"
 import { SongItemTitleClickedEventArgs } from "../eventArgs";
 
 export default defineComponent({
-  props: { song: Song },
+  props: { song: Song, index: Number },
 
   emits: ["song-item-title-clicked"],
 
@@ -32,7 +32,7 @@ export default defineComponent({
       return String(duration);
     },
     songItemTitleClicked(e: MouseEvent) {
-      this.$emit("song-item-title-clicked", new SongItemTitleClickedEventArgs(this.song))
+      this.$emit("song-item-title-clicked", new SongItemTitleClickedEventArgs(this.song, this.index))
     }
   },
 })

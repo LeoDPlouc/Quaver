@@ -14,7 +14,9 @@ import { Song } from "../models"
 export default defineComponent({
     data() {
         return {
-            player: new Howl({})
+            player: new Howl({}),
+            songIndex: 0,
+            playList: []
         }
     },
     methods: {
@@ -30,7 +32,7 @@ export default defineComponent({
                 console.error(e)
             }
         },
-        loadSong(song: Song) {
+        loadSong(song: Song, index: Number, playList: Song[]) {
             try {
                 (this.player as Howl).unload()
             }
@@ -38,8 +40,15 @@ export default defineComponent({
                 console.error(e)
             }
 
-            this.player = new Howl({ src: '/api/song/' + song.id + '/stream', html5: true, format: [song.format] });
+            this.playList = playList
+            this.index = index
+
+            this.player = new Howl({ src: '/api/song/' + song.id + '/stream', html5: true, format: [song.format], onend: this.nextSong });
             (this.player as Howl).play()
+        },
+        nextSong() {
+            this.index += 1
+            this.loadSong(this.playList[this.index], this.index, this.playList)
         }
     }
 })
