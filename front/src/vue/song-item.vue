@@ -25,8 +25,11 @@ export default defineComponent({
       try {
         var seconds = Number(duration) % 60;
         var secondsString = String(seconds).split(".")[0];
+        if (secondsString.length == 1) secondsString = secondsString + "0"
+        if (secondsString.length == 1) secondsString = "00"
         var minutes = Number(duration) / 60;
         var minutesString = String(minutes).split(".")[0];
+        if (minutesString.length == 0) minutesString = "0"
         return `${minutesString}:${secondsString}`;
       } catch (error) { }
       return String(duration);
