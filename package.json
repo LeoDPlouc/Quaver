@@ -35,6 +35,7 @@
     "@vue/compiler-sfc": "^3.2.26",
     "css-loader": "^6.5.1",
     "howler": "^2.2.3",
+    "mime-types": "^2.1.34",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.4",
     "vue-loader": "^17.0.0",

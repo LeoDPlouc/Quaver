@@ -14,7 +14,8 @@ function cleanOne(data: ISong & Document<any, any, ISong>): any {
         duration: data.duration,
         like: data.like,
         albumId: data.albumId,
-        artistId: data.artistId
+        artistId: data.artistId,
+        format: data.format
     }
     return cleanedData
 }

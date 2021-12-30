@@ -1,5 +1,6 @@
 import { IAudioMetadata, parseFile } from "music-metadata"
 import { Document } from "mongoose"
+import Path from "path"
 
 import { Album, IAlbum } from "../models/albumModel"
 import { Artist, IArtist } from "../models/artistModel"
@@ -7,6 +8,8 @@ import { ISong } from "../models/songModel"
 
 async function getMetadata(songPath: string): Promise<ISong> {
     var tag = await parseFile(songPath)
+
+    var format = Path.extname(songPath)
 
     const song: ISong = {
         title: tag.common.title,
@@ -16,7 +19,8 @@ async function getMetadata(songPath: string): Promise<ISong> {
         year: tag.common.year,
         duration: tag.format.duration,
         like: 0,
-        path: songPath
+        path: songPath,
+        format: format
     }
 
     return song

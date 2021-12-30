@@ -11,7 +11,8 @@ interface ISong {
     albumId?: string,
     path: string,
     acoustid?: string,
-    year?: number
+    year?: number,
+    format?: string
 }
 
 const songSchema = new Schema<ISong>({
@@ -48,6 +49,9 @@ const songSchema = new Schema<ISong>({
     },
     year: {
         type: Number
+    },
+    format: {
+        type: String
     }
 })
 const Song = model<ISong>("Song", songSchema)

@@ -38,7 +38,7 @@ export default defineComponent({
                 console.error(e)
             }
 
-            this.player = new Howl({ src: '/api/song/' + song.id + '/stream', html5: true, format: [".mp3"] });
+            this.player = new Howl({ src: '/api/song/' + song.id + '/stream', html5: true, format: [song.format] });
             (this.player as Howl).play()
         }
     }

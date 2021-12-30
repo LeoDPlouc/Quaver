@@ -1,11 +1,11 @@
 import fs from "fs/promises"
 import path from "path"
-import mime from "mime"
+import mm from "mime-types"
 
 import { getAlbum, getArtist, getMetadata } from "../processing/songProcessor"
 import { Song } from "../models/songModel"
 
-import {MUSIC_PATH} from "../config/config"
+import { MUSIC_PATH } from "../config/config"
 
 async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true })
@@ -21,7 +21,8 @@ async function collect(libPath: string) {
 }
 
 async function registerSong(songPath: string) {
-    if (path.extname(songPath) != ".mp3")
+
+    if (!(mm.lookup(path.extname(songPath)) as string).match("audio"))
         return
 
     var song = await Song.findOne({ path: songPath })
