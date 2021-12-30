@@ -1,8 +1,9 @@
 <template>
     <div class="playerButtons">
-        <button>Previous</button>
+        <button @click="previousSong">Previous</button>
         <button @click="play">Play</button>
-        <button>Next</button>
+        <button @click="nextSong">Next</button>
+        <input type="range" min="0" max="100" v-model="volume" @input="changeVolume" />
     </div>
 </template>
 
@@ -16,7 +17,8 @@ export default defineComponent({
         return {
             player: new Howl({}),
             songIndex: 0,
-            playList: []
+            playList: [],
+            volume: 75
         }
     },
     methods: {
@@ -43,12 +45,19 @@ export default defineComponent({
             this.playList = playList
             this.index = index
 
-            this.player = new Howl({ src: '/api/song/' + song.id + '/stream', html5: true, format: [song.format], onend: this.nextSong });
+            this.player = new Howl({ src: '/api/song/' + song.id + '/stream', html5: true, format: [song.format], onend: this.nextSong, volume: this.volume });
             (this.player as Howl).play()
         },
         nextSong() {
             this.index += 1
             this.loadSong(this.playList[this.index], this.index, this.playList)
+        },
+        previousSong() {
+            this.index -= 1
+            this.loadSong(this.playList[this.index], this.index, this.playList)
+        },
+        changeVolume(e: Event) {
+            (this.player as Howl).volume(this.volume / 100)
         }
     }
 })
