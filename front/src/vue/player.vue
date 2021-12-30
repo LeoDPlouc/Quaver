@@ -1,9 +1,9 @@
 <template>
     <div class="playerButtons">
-        <button @click="previousSong">Previous</button>
-        <button @click="play">Play</button>
-        <button @click="nextSong">Next</button>
-        <input type="range" min="0" max="100" v-model="volume" @input="changeVolume" />
+        <button class="prevButton" @click="previousSong">Previous</button>
+        <button class="playButton" @click="play">Play</button>
+        <button class="nextButton" @click="nextSong">Next</button>
+        <input class="volumeSlider" type="range" min="0" max="100" v-model="volume" @input="changeVolume" />
     </div>
 </template>
 
@@ -65,7 +65,19 @@ export default defineComponent({
 
 <style>
 .playerButtons {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 2fr 7fr 1fr 1fr 1fr 7fr 2fr
+}
+.prevButton {
+    grid-column: 3;
+}
+.playButton {
+    grid-column: 4;
+}
+.nextButton {
+    grid-column: 5;
+}
+.volumeSlider {
+    grid-column: 7;
 }
 </style>
