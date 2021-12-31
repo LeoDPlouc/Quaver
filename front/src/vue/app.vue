@@ -19,8 +19,6 @@ export default defineComponent({
 
     methods: {
         changeSong(e: SongChangedEventArgs) {
-            console.log(e.index)
-            console.log(e.playlist.length)
             this.$refs.player.loadSong(e.song, e.index, e.playlist)
         }
     }

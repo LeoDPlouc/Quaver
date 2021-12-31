@@ -96,3 +96,22 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
         })
     }
 }
+
+export async function updateLike(req: Request, res: Response, next: NextFunction) {
+    try {
+        const song = await Song.findById(req.params.id)
+
+        song.like = Number(req.body.like)
+        await song.save()
+
+        res.json({
+            status: "succes"
+        })
+    }
+    catch (e) {
+        console.log(e)
+        res.json({
+            status: "fail"
+        })
+    }
+}

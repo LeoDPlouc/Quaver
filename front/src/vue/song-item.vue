@@ -1,6 +1,6 @@
 <template>
   <div class="songItem">
-    <div class="songItemProp songItemLike">{{ song.like }}</div>
+    <div class="songItemProp songItemLike" @click="likeSong" @dblclick="dislikeSong">{{ song.like }}</div>
     <div class="songItemProp songItemN">{{ song.n }}</div>
     <div class="songItemProp songItemTitle" @click="songItemTitleClicked">{{ song.title }}</div>
     <div class="songItemProp songItemDuration">{{ formatDuration(song.duration) }}</div>
@@ -34,8 +34,45 @@ export default defineComponent({
       } catch (error) { }
       return String(duration);
     },
-    songItemTitleClicked(e: MouseEvent) {
+    songItemTitleClicked() {
       this.$emit("song-item-title-clicked", new SongItemTitleClickedEventArgs(this.song, this.index))
+    },
+    async likeSong() {
+      var like: Number
+
+      switch (this.song.like) {
+        case 1:
+          like = 0
+          break;
+        case 0:
+          like = 1
+          break;
+        case -1:
+          like = 0
+          break;
+      }
+
+      var res = fetch("/api/song/" + this.song.id + "/like", { method: "PATCH", body: JSON.stringify({ like: like }), headers: { "Content-Type": "application/json" } })
+        .then(res => {
+          if (res.ok) {
+            res.json()
+              .then(resJson => {
+                if (resJson.status == "succes") this.song.like = like
+              })
+          }
+        })
+    },
+    dislikeSong() {
+      fetch("/api/song/" + this.song.id + "/like", { method: "PATCH", body: JSON.stringify({ like: -1 }) })
+        .then(res => {
+          if (res.ok) {
+
+            res.json()
+              .then(resJson => {
+                if (resJson.status == "succes") this.song.like = -1
+              })
+          }
+        })
     }
   },
 })

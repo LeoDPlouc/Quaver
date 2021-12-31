@@ -41,8 +41,6 @@ export default defineComponent({
             catch (e) {
                 console.error(e)
             }
-            console.log(index)
-            console.log(playList.length)
 
             this.playList = playList
             this.index = index

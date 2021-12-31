@@ -55,8 +55,6 @@ export default defineComponent({
             return songs
         },
         songChanged(e: SongItemTitleClickedEventArgs) {
-            console.log(e.index)
-            console.log(this.songs.length)
             this.$emit("song-changed", new SongChangedEventArgs(e.song, e.index, this.songs))
         }
     }

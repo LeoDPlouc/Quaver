@@ -1,6 +1,6 @@
 import { Router } from "express"
 
-import { getAllSongsInfo, getOneSongInfo, updateSongInfo, getSongStream } from "../controllers/songController"
+import { getAllSongsInfo, getOneSongInfo, updateSongInfo, getSongStream, updateLike } from "../controllers/songController"
 import { protect } from "../middleware/authMiddleware"
 
 const router = Router()
@@ -14,5 +14,8 @@ router.route("/:id")
 
 router.route("/:id/stream")
     .get(protect, getSongStream)
+
+router.route("/:id/like")
+    .patch(updateLike)
 
 export = router
