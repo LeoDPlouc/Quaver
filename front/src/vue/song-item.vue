@@ -44,8 +44,8 @@ export default defineComponent({
 <style>
 .songItem {
   border: 1px solid var(--misc);
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1em 2em auto 3em 20% 25% 3em;
 }
 
 .songItemProp {
@@ -57,30 +57,30 @@ export default defineComponent({
 }
 
 .songItemLike {
-  width: 1%;
+  grid-column: 1;
 }
 
 .songItemN {
-  width: 2%;
+  grid-column: 2;
 }
 
 .songItemTitle {
-  width: 50%;
+  grid-column: 3;
 }
 
 .songItemDuration {
-  width: 2%;
+  grid-column: 4;
 }
 
 .songItemArtist {
-  width: 20%;
+  grid-column: 5;
 }
 
 .songItemAlbum {
-  width: 25%;
+  grid-column: 6;
 }
 
 .songItemYear {
-  width: 3%;
+  grid-column: 7;
 }
 </style>
