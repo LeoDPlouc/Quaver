@@ -16,7 +16,7 @@ export default defineComponent({
     data() {
         return {
             player: new Howl({}),
-            songIndex: 0,
+            index: 0,
             playList: [],
             volume: 75
         }
@@ -41,19 +41,21 @@ export default defineComponent({
             catch (e) {
                 console.error(e)
             }
+            console.log(index)
+            console.log(playList.length)
 
             this.playList = playList
             this.index = index
 
-            this.player = new Howl({ src: '/api/song/' + song.id + '/stream', html5: true, format: [song.format], onend: this.nextSong, volume: this.volume });
+            this.player = new Howl({ src: '/api/song/' + song.id + '/stream', html5: true, format: [song.format], onend: this.nextSong, volume: this.volume / 100 });
             (this.player as Howl).play()
         },
         nextSong() {
-            this.index += 1
+            this.index++
             this.loadSong(this.playList[this.index], this.index, this.playList)
         },
         previousSong() {
-            this.index -= 1
+            this.index--
             this.loadSong(this.playList[this.index], this.index, this.playList)
         },
         changeVolume(e: Event) {

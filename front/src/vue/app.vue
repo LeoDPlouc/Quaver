@@ -1,6 +1,8 @@
 <template>
-    <song-list @song-changed="changeSong" />
-    <player ref="player" />
+    <div class="appContainer">
+        <song-list class="songList" @song-changed="changeSong" />
+        <player class="player" ref="player" />
+    </div>
 </template>
 
 <script lang="ts">
@@ -17,6 +19,8 @@ export default defineComponent({
 
     methods: {
         changeSong(e: SongChangedEventArgs) {
+            console.log(e.index)
+            console.log(e.playlist.length)
             this.$refs.player.loadSong(e.song, e.index, e.playlist)
         }
     }
@@ -29,7 +33,6 @@ export default defineComponent({
     --misc: #5514c8;
     --foreground: #8863c7;
 }
-
 body {
     margin: 0;
     padding: 0;
@@ -37,5 +40,16 @@ body {
     width: 100vw;
     background-color: var(--background);
     color: var(--foreground);
+}
+.appContainer {
+    display: grid;
+    grid-template-rows: 95vh 5vh;
+}
+.songList {
+    grid-row: 1;
+    overflow: scroll;
+}
+.player {
+    grid-row: 2;
 }
 </style>
