@@ -1,9 +1,25 @@
 <template>
     <div class="playerButtons">
+        <input
+            class="progressBar"
+            type="range"
+            min="0"
+            max="100"
+            step="0.1"
+            v-model="progress"
+            @input="changeProgress"
+        />
         <button class="prevButton" @click="previousSong">Previous</button>
         <button class="playButton" @click="play">Play</button>
         <button class="nextButton" @click="nextSong">Next</button>
-        <input class="volumeSlider" type="range" min="0" max="100" v-model="volume" @input="changeVolume" />
+        <input
+            class="volumeSlider"
+            type="range"
+            min="0"
+            max="100"
+            v-model="volume"
+            @input="changeVolume"
+        />
     </div>
 </template>
 
@@ -13,12 +29,16 @@ import { Howl, Howler } from "howler"
 import { Song } from "../models"
 
 export default defineComponent({
+    mounted() {
+        setInterval(() => this.progress = 100 * (this.player as Howl).seek() / (this.player as Howl).duration())
+    },
     data() {
         return {
             player: new Howl({}),
             index: 0,
             playList: [],
-            volume: 75
+            volume: 75,
+            progress: 0
         }
     },
     methods: {
@@ -58,6 +78,9 @@ export default defineComponent({
         },
         changeVolume(e: Event) {
             (this.player as Howl).volume(this.volume / 100)
+        },
+        changeProgress(e: Event) {
+            (this.player as Howl).seek((this.progress / 100) * (this.player as Howl).duration())
         }
     }
 })
@@ -66,18 +89,27 @@ export default defineComponent({
 <style>
 .playerButtons {
     display: grid;
-    grid-template-columns: 2fr 7fr 1fr 1fr 1fr 7fr 2fr
+    grid-template-columns: 2fr 7fr 1fr 1fr 1fr 7fr 2fr;
+    grid-template-rows: 10px auto;
 }
 .prevButton {
     grid-column: 3;
+    grid-row: 2;
 }
 .playButton {
     grid-column: 4;
+    grid-row: 2;
 }
 .nextButton {
     grid-column: 5;
+    grid-row: 2;
 }
 .volumeSlider {
     grid-column: 7;
+    grid-row: 2;
+}
+.progressBar {
+    grid-column: 1/8;
+    grid-row: 1;
 }
 </style>
