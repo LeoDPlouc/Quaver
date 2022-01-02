@@ -22,4 +22,20 @@ export class Song {
         this.albumId = albumId
         this.format = format
     }
-} 
+}
+
+export class Album {
+    id: string
+    title: string
+    artist: string
+    artistId: string
+    cover: string
+
+    constructor(id: string, title: string, artist: string, artistId: string, cover: string) {
+        this.id = id
+        this.title = title
+        this.artist = artist
+        this.artistId = artistId
+        this.cover = cover
+    }
+}

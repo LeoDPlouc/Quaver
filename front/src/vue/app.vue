@@ -1,6 +1,7 @@
 <template>
     <div class="appContainer">
-        <song-list class="songList" @song-changed="changeSong" />
+        <!-- <song-list class="view" @song-changed="changeSong" /> -->
+        <album-list class="view"></album-list>
         <player class="player" ref="player" />
     </div>
 </template>
@@ -10,10 +11,12 @@ import { defineComponent } from "vue";
 import songListVue from "./song-list.vue";
 import playerVue from "./player.vue";
 import { SongChangedEventArgs } from "../eventArgs";
+import albumListVue from "./album-list.vue";
 
 export default defineComponent({
     components: {
         "song-list": songListVue,
+        "album-list": albumListVue,
         "player": playerVue
     },
 
@@ -43,7 +46,7 @@ body {
     display: grid;
     grid-template-rows: 95vh 5vh;
 }
-.songList {
+.view {
     grid-row: 1;
     overflow: scroll;
 }

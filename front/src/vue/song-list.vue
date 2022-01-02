@@ -1,8 +1,12 @@
 <template>
     <div>
-        <div v-for="(song, index) in songs" :key="index">
-            <song-item :song="song" :index="index" @song-item-title-clicked="songChanged"></song-item>
-        </div>
+        <song-item
+            v-for="(song, index) in songs"
+            :key="index"
+            :song="song"
+            :index="index"
+            @song-item-title-clicked="songChanged"
+        ></song-item>
     </div>
 </template>
 

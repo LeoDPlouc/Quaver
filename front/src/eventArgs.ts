@@ -1,4 +1,4 @@
-import { Song } from "./models";
+import { Album, Song } from "./models";
 
 export class SongItemTitleClickedEventArgs {
     song: Song
@@ -19,5 +19,13 @@ export class SongChangedEventArgs {
         this.song = song
         this.index = index
         this.playlist = playlist
+    }
+}
+
+export class AlbumClickedEventArgs {
+    album: Album
+
+    constructor(album: Album) {
+        this.album = album
     }
 }
