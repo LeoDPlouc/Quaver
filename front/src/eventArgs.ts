@@ -21,11 +21,3 @@ export class SongChangedEventArgs {
         this.playlist = playlist
     }
 }
-
-export class AlbumClickedEventArgs {
-    album: Album
-
-    constructor(album: Album) {
-        this.album = album
-    }
-}
