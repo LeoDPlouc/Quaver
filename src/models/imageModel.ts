@@ -1,13 +1,8 @@
 import { Schema, model } from "mongoose"
 
-enum ImageType {
-    albumCover = "ALBUMCOVER"
-}
-
 interface IImage {
     path: string,
     resolution: string,
-    type: ImageType
 }
 
 const imageSchema = new Schema<IImage>({
@@ -17,12 +12,8 @@ const imageSchema = new Schema<IImage>({
     },
     resolution: {
         type: String
-    },
-    type: {
-        type: String,
-        enum: ImageType
     }
 })
 const Image = model<IImage>("Image", imageSchema)
 
-export { Image, IImage, ImageType }
+export { Image, IImage }

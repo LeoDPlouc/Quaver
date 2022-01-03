@@ -7,7 +7,6 @@ function cleanOne(data: IImage & Document<any, any, IImage>): any {
     var cleanedData = {
         id: data._id,
         resolution: data.resolution,
-        type: data.type
     }
     return cleanedData
 }

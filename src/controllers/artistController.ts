@@ -6,7 +6,8 @@ import { Artist, IArtist } from "../models/artistModel"
 function cleanOne(data: IArtist & Document<any, any, IArtist>): any {
     var cleanedData = {
         id: data._id,
-        name: data.name
+        name: data.name,
+        cover: data.cover
     }
     return cleanedData
 }
