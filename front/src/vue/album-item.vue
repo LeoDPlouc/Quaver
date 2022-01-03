@@ -6,6 +6,7 @@
     />
     <div class="albumItemProp">{{ album.title }}</div>
     <div class="albumItemProp">{{ album.artist }}</div>
+    <div class="albumItemProp">{{ album.year }}</div>
   </div>
 </template>
 
@@ -31,7 +32,7 @@ export default defineComponent({
 .albumItem {
   border: 1px solid var(--misc);
   display: grid;
-  grid-template-rows: 10vw 3em 2em;
+  grid-template-rows: 10vw 3em 2em 2em;
   width: 10vw;
   height: fit-content;
 }

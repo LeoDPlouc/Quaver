@@ -37,7 +37,8 @@ async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any, IAlbum
     if (!album) {
         album = new Album({
             title: song.album,
-            artist: song.artist
+            artist: song.artist,
+            year: song.year
         })
 
         console.log(`Found new album ${album.title}`)

@@ -4,7 +4,8 @@ interface IAlbum{
     title?: String,
     artist?: String,
     artistId?: String,
-    cover?: String
+    cover?: String,
+    year?: string
 }
 
 const albumSchema = new Schema<IAlbum>({
@@ -18,6 +19,9 @@ const albumSchema = new Schema<IAlbum>({
         type: String
     },
     cover: {
+        type: String
+    },
+    year: {
         type: String
     }
 })

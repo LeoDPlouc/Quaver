@@ -8,7 +8,8 @@ function cleanOne(data: IAlbum & Document<any, any, IAlbum>): any {
         id: data._id,
         title: data.title,
         artist: data.artist,
-        artistId: data.artistId
+        artistId: data.artistId,
+        year: data.year
     }
     return cleanedData
 }

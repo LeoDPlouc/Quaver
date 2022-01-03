@@ -30,12 +30,14 @@ export class Album {
     artist: string
     artistId: string
     cover: string
+    year: string
 
-    constructor(id: string, title: string, artist: string, artistId: string, cover: string) {
+    constructor(id: string, title: string, artist: string, artistId: string, cover: string, year: string) {
         this.id = id
         this.title = title
         this.artist = artist
         this.artistId = artistId
         this.cover = cover
+        this.year = year
     }
 }
