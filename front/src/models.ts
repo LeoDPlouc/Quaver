@@ -41,3 +41,15 @@ export class Album {
         this.year = year
     }
 }
+
+export class Artist {
+    id: string
+    name: string
+    cover: string
+
+    constructor(id: string, name: string, cover: string) {
+        this.id = id
+        this.name = name
+        this.cover = cover
+    }
+}

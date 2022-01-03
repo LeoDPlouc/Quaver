@@ -1,7 +1,8 @@
 <template>
     <div class="appContainer">
         <!-- <song-list class="view" @song-changed="changeSong" /> -->
-        <album-list class="view"></album-list>
+        <!-- <album-list class="view" /> -->
+        <artist-list/>
         <player class="player" ref="player" />
     </div>
 </template>
@@ -12,11 +13,13 @@ import songListVue from "./song-list.vue";
 import playerVue from "./player.vue";
 import { SongChangedEventArgs } from "../eventArgs";
 import albumListVue from "./album-list.vue";
+import artistListVue from "./artist-list.vue";
 
 export default defineComponent({
     components: {
         "song-list": songListVue,
         "album-list": albumListVue,
+        "artist-list": artistListVue,
         "player": playerVue
     },
 
