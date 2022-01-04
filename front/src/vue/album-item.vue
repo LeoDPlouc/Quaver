@@ -26,6 +26,7 @@ export default defineComponent({
   grid-template-rows: 10vw 3em 2em 2em;
   width: 10vw;
   height: fit-content;
+  margin-bottom: 10px;
 }
 .cover {
   height: 10vw;
