@@ -1,8 +1,11 @@
 <template>
     <div class="appContainer">
-        <!-- <song-list class="view" @song-changed="changeSong" /> -->
-        <!-- <album-list class="view" /> -->
-        <artist-list/>
+        <div class="appButtons">
+            <router-link to="/song">Song</router-link>
+            <router-link to="/album">Album</router-link>
+            <router-link to="/artist">Artist</router-link>
+        </div>
+        <router-view class="view" @song-changed="changeSong"/>
         <player class="player" ref="player" />
     </div>
 </template>
@@ -45,15 +48,21 @@ body {
     background-color: var(--background);
     color: var(--foreground);
 }
+.appButtons {
+    display: flex;
+    flex-direction: row;
+}
 .appContainer {
+    grid-row: 1;
     display: grid;
-    grid-template-rows: 95vh 5vh;
+    grid-template-rows: 3em auto 5vh;
+    height: 100vh;
 }
 .view {
-    grid-row: 1;
+    grid-row: 2;
     overflow: scroll;
 }
 .player {
-    grid-row: 2;
+    grid-row: 3;
 }
 </style>
