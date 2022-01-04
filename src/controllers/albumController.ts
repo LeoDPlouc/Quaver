@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
 
 import { Album, IAlbum } from "../models/albumModel"
+import { Song } from "../models/songModel"
+import { cleanManySongs } from "./songController"
 
-function cleanOne(data: IAlbum & Document<any, any, IAlbum>): any {
+export function cleanOneAlbum(data: IAlbum & Document<any, any, IAlbum>): any {
     var cleanedData = {
         id: data._id,
         title: data.title,
@@ -14,15 +16,15 @@ function cleanOne(data: IAlbum & Document<any, any, IAlbum>): any {
     return cleanedData
 }
 
-function cleanMany(datas: (IAlbum & Document<any, any, IAlbum>)[]): any[] {
+export function cleanManyAlbums(datas: (IAlbum & Document<any, any, IAlbum>)[]): any[] {
     var cleaned = []
-    datas.forEach((data, i) => cleaned.push(cleanOne(data)))
+    datas.forEach((data, i) => cleaned.push(cleanOneAlbum(data)))
     return cleaned
 }
 
 async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
     try {
-        const albums = cleanMany(await Album.find())
+        const albums = cleanManyAlbums(await Album.find())
 
         res.json({
             status: "succes",
@@ -42,7 +44,7 @@ async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
 
 async function getOneAlbum(req: Request, res: Response, next: NextFunction) {
     try {
-        const album = cleanOne(await Album.findById(req.params.id))
+        const album = cleanOneAlbum(await Album.findById(req.params.id))
 
         res.json({
             status: "succes",
@@ -73,6 +75,25 @@ async function updateAlbum(req: Request, res: Response, next: NextFunction) {
         })
 
     } catch (e) {
+        res.json({
+            status: "fail"
+        })
+    }
+}
+
+export async function getAlbumSongs(req: Request, res: Response, next: NextFunction) {
+    try {
+        const songs = await Song.find({ artistId: req.params.id })
+        var cleanedSongs = cleanManySongs(songs)
+
+        res.json({
+            status: "succes",
+            results: cleanedSongs.length,
+            data: {
+                cleanedSongs
+            }
+        })
+    } catch {
         res.json({
             status: "fail"
         })

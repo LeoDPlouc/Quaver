@@ -3,7 +3,7 @@ import { Document } from "mongoose"
 
 import { Image, IImage } from "../models/imageModel"
 
-function cleanOne(data: IImage & Document<any, any, IImage>): any {
+export function cleanOneImage(data: IImage & Document<any, any, IImage>): any {
     var cleanedData = {
         id: data._id,
         resolution: data.resolution,
@@ -11,15 +11,15 @@ function cleanOne(data: IImage & Document<any, any, IImage>): any {
     return cleanedData
 }
 
-function cleanMany(datas: (IImage & Document<any, any, IImage>)[]): any[] {
+export function cleanManyImages(datas: (IImage & Document<any, any, IImage>)[]): any[] {
     var cleaned = []
-    datas.forEach((data, i) => cleaned.push(cleanOne(data)))
+    datas.forEach((data, i) => cleaned.push(cleanOneImage(data)))
     return cleaned
 }
 
 export async function getAllImagesInfo(req: Request, res: Response, next: NextFunction) {
     try {
-        const images = cleanMany(await Image.find())
+        const images = cleanManyImages(await Image.find())
 
         res.json({
             status: "succes",
@@ -38,7 +38,7 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
 
 export async function getOneImageInfo(req: Request, res: Response, next: NextFunction) {
     try {
-        const image = cleanOne(await Image.findById(req.params.id))
+        const image = cleanOneImage(await Image.findById(req.params.id))
 
         res.json({
             status: "succes",

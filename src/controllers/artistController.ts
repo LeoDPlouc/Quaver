@@ -3,7 +3,7 @@ import { Document } from "mongoose"
 
 import { Artist, IArtist } from "../models/artistModel"
 
-function cleanOne(data: IArtist & Document<any, any, IArtist>): any {
+export function cleanOneArtist(data: IArtist & Document<any, any, IArtist>): any {
     var cleanedData = {
         id: data._id,
         name: data.name,
@@ -12,15 +12,15 @@ function cleanOne(data: IArtist & Document<any, any, IArtist>): any {
     return cleanedData
 }
 
-function cleanMany(datas: (IArtist & Document<any, any, IArtist>)[]): any[] {
+export function cleanManyArtists(datas: (IArtist & Document<any, any, IArtist>)[]): any[] {
     var cleaned = []
-    datas.forEach((data, i) => cleaned.push(cleanOne(data)))
+    datas.forEach((data, i) => cleaned.push(cleanOneArtist(data)))
     return cleaned
 }
 
 export async function getAllArtists(req: Request, res: Response, next: NextFunction) {
     try {
-        const artists = cleanMany(await Artist.find())
+        const artists = cleanManyArtists(await Artist.find())
 
         res.json({
             status: "succes",
@@ -39,7 +39,7 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
 
 export async function getOneArtist(req: Request, res: Response, next: NextFunction) {
     try {
-        const artist = cleanOne(await Artist.findById(req.params.id))
+        const artist = cleanOneArtist(await Artist.findById(req.params.id))
 
         res.json({
             status: "succes",
