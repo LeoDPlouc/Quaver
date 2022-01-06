@@ -1,11 +1,12 @@
 import { Router } from "express"
+import Path from "path"
 
 const router = Router()
 
 router.route("/")
-    .get((req, res) => res.sendFile("/app/src/index.html"))
+    .get((req, res) => res.sendFile(Path.join(__dirname, "../src/index.html")))
 
 router.route("/src/:res")
-    .get((req, res) => res.sendFile(`/app/src/${req.params.res}`))
+    .get((req, res) => res.sendFile(Path.join(__dirname, `../src/${req.params.res}`)))
 
 export = router

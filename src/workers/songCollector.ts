@@ -16,7 +16,7 @@ async function collect(libPath: string) {
             await collect(fullPath)
 
         if (paths[i].isFile())
-            await registerSong(fullPath)
+            await registerSong(path.resolve(fullPath))
     }
 }
 

@@ -1,24 +1,27 @@
 version: "3.4"
-services: 
+services:
   quaver:
-    build: 
+    build:
       context: .
       network: host
-    ports: 
+    ports:
       - 3000:3000
     volumes:
       - ./music/:/music
-    environment: 
+      - ./dist/src/:/app/src
+    environment:
       - PORT=3000
       - MONGO_USER=quaver
       - MONGO_PASSWORD=quaver
       - SESSION_SECRET=quaver
       - MUSIC_PATH=/music
-    depends_on: 
+    depends_on:
       - mongo
 
   mongo:
     image: mongo
-    environment: 
+    ports: 
+      - 27017:27017
+    environment:
       - MONGO_INITDB_ROOT_USERNAME=quaver
       - MONGO_INITDB_ROOT_PASSWORD=quaver
