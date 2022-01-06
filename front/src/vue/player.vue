@@ -30,7 +30,11 @@ import { Song } from "../models"
 
 export default defineComponent({
     mounted() {
-        setInterval(() => this.progress = 100 * (this.player as Howl).seek() / (this.player as Howl).duration())
+        setInterval(() => {
+            try {
+                this.progress = 100 * (this.player as Howl).seek() / (this.player as Howl).duration()
+            } catch { }
+        })
     },
     data() {
         return {
@@ -80,7 +84,10 @@ export default defineComponent({
             (this.player as Howl).volume(this.volume / 100)
         },
         changeProgress(e: Event) {
-            (this.player as Howl).seek((this.progress / 100) * (this.player as Howl).duration())
+            try {
+                (this.player as Howl).seek((this.progress / 100) * (this.player as Howl).duration())
+            }
+            catch { }
         }
     }
 })
