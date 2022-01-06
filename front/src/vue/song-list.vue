@@ -13,6 +13,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { SongChangedEventArgs, SongItemTitleClickedEventArgs } from "../eventArgs";
+import { getAlbumSongs, getAllSongs } from "../fetch";
 import { Song } from "../models";
 import songItemVue from "./song-item.vue";
 
@@ -24,40 +25,19 @@ export default defineComponent({
     emits: ["song-changed"],
 
     async created() {
-        this.songs = await this.getAllSongs()
+        if (this.$route.params.id)
+            this.songs = await getAlbumSongs(this.$route.params.id)
+        else
+            this.songs = await getAllSongs()
+
     },
     data() {
         return {
-            songs: []
+            songs: [] as Song[]
         }
     },
 
     methods: {
-        async getAllSongs(): Promise<Song[]> {
-            var res = await fetch("/api/song")
-            var body = await res.json()
-            var songs = body.data.songs as Song[]
-
-            songs.sort((song1, song2) => {
-                if (song1.artist > song2.artist)
-                    return 1
-                else if (song1.artist == song2.artist) {
-                    if (song1.album > song2.album)
-                        return 1
-                    else if (song1.album == song2.album) {
-                        if (song1.n > song2.n)
-                            return 1
-                        else
-                            return -1
-                    }
-                    else
-                        return -1
-                }
-                else
-                    return -1
-            })
-            return songs
-        },
         songChanged(e: SongItemTitleClickedEventArgs) {
             this.$emit("song-changed", new SongChangedEventArgs(e.song, e.index, this.songs))
         }

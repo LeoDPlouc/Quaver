@@ -83,14 +83,14 @@ async function updateAlbum(req: Request, res: Response, next: NextFunction) {
 
 export async function getAlbumSongs(req: Request, res: Response, next: NextFunction) {
     try {
-        const songs = await Song.find({ artistId: req.params.id })
+        const songs = await Song.find({ albumId: req.params.id })
         var cleanedSongs = cleanManySongs(songs)
 
         res.json({
             status: "succes",
             results: cleanedSongs.length,
             data: {
-                cleanedSongs
+                songs: cleanedSongs
             }
         })
     } catch {

@@ -91,6 +91,7 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
         res.sendFile(song.path)
 
     } catch (e) {
+        console.error(e)
         res.json({
             status: "fail"
         })

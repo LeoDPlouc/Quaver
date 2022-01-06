@@ -1,5 +1,5 @@
 <template>
-  <div class="albumItem">
+  <div class="albumItem" @click="openPresentation()">
     <img
       class="cover"
       src="https://ia902305.us.archive.org/31/items/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1-30810216800_thumb250.jpg"
@@ -12,10 +12,17 @@
 
 <script lang='ts'>
 import { defineComponent } from "vue";
+import { router } from "../app";
 import { Album } from "../models"
 
 export default defineComponent({
-  props: { album: Album }
+  props: { album: Album },
+
+  methods: {
+    openPresentation() {
+      router.push({ path: "/album/" + this.album.id })
+    }
+  }
 })
 </script>
 

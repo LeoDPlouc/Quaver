@@ -17,12 +17,14 @@ import playerVue from "./player.vue";
 import { SongChangedEventArgs } from "../eventArgs";
 import albumListVue from "./album-list.vue";
 import artistListVue from "./artist-list.vue";
+import albumPresentationVue from "./album-presentation.vue";
 
 export default defineComponent({
     components: {
         "song-list": songListVue,
         "album-list": albumListVue,
         "artist-list": artistListVue,
+        "album-presentation": albumPresentationVue,
         "player": playerVue
     },
 
