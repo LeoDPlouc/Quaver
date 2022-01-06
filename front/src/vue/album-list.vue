@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { getAllAlbums } from "../fetch";
+import { getAllAlbums, getArtistAlbums } from "../fetch";
 import { Album } from "../models";
 import albumItemVue from "./album-item.vue";
 
@@ -16,7 +16,8 @@ export default defineComponent({
     },
 
     async created() {
-        this.albums = await getAllAlbums()
+        if (this.$route.params.id) this.albums = await getArtistAlbums(this.$route.params.id)
+        else this.albums = await getAllAlbums()
     },
     data() {
         return {

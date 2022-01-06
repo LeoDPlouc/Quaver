@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
+import { Album } from "../models/albumModel"
 
 import { Artist, IArtist } from "../models/artistModel"
+import { Song } from "../models/songModel"
+import { cleanManyAlbums } from "./albumController"
+import { cleanManySongs } from "./songController"
 
 export function cleanOneArtist(data: IArtist & Document<any, any, IArtist>): any {
     var cleanedData = {
@@ -70,6 +74,44 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
         })
 
     } catch (e) {
+        res.json({
+            status: "fail"
+        })
+    }
+}
+
+export async function getArtistSongs(req: Request, res: Response, next: NextFunction) {
+    try {
+        const songs = await Song.find({ artistId: req.params.id })
+        const cleanedSongs = cleanManySongs(songs)
+
+        res.json({
+            status: "succes",
+            data: {
+                songs: cleanedSongs
+            }
+        })
+    }
+    catch {
+        res.json({
+            status: "fail"
+        })
+    }
+}
+
+export async function getArtistAlbums(req: Request, res: Response, next: NextFunction) {
+    try {
+        const albums = await Album.find({ artistId: req.params.id })
+        const cleanedAlbums = cleanManyAlbums(albums)
+
+        res.json({
+            status: "succes",
+            data: {
+                albums: cleanedAlbums
+            }
+        })
+    }
+    catch {
         res.json({
             status: "fail"
         })

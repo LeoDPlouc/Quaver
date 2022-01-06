@@ -1,5 +1,5 @@
 <template>
-  <div class="artistItem">
+  <div class="artistItem" @click="openPresentation()">
     <img
       class="cover"
       src="https://ia902305.us.archive.org/31/items/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1-30810216800_thumb250.jpg"
@@ -10,10 +10,17 @@
 
 <script lang='ts'>
 import { defineComponent } from "vue";
+import { router } from "../app";
 import { Artist } from "../models"
 
 export default defineComponent({
-  props: { artist: Artist }
+  props: { artist: Artist },
+
+  methods: {
+    openPresentation() {
+      router.push({ path: "/artist/" + this.artist.id })
+    }
+  }
 })
 </script>
 

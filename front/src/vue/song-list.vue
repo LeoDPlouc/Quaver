@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { SongChangedEventArgs, SongItemTitleClickedEventArgs } from "../eventArgs";
-import { getAlbumSongs, getAllSongs } from "../fetch";
+import { getAlbumSongs, getAllSongs, getArtistSongs } from "../fetch";
 import { Song } from "../models";
 import songItemVue from "./song-item.vue";
 
@@ -25,10 +25,9 @@ export default defineComponent({
     emits: ["song-changed"],
 
     async created() {
-        if (this.$route.params.id)
-            this.songs = await getAlbumSongs(this.$route.params.id)
-        else
-            this.songs = await getAllSongs()
+        if (this.$route.fullPath.match("/album/")) this.songs = await getAlbumSongs(this.$route.params.id)
+        else if (this.$route.fullPath.match("/artist/")) this.songs = await getArtistSongs(this.$route.params.id)
+        else this.songs = await getAllSongs()
 
     },
     data() {

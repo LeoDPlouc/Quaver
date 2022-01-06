@@ -39,6 +39,19 @@ export async function getAlbumSongs(id: string): Promise<Song[]> {
     return songs
 }
 
+export async function getArtistSongs(id: string): Promise<Song[]> {
+    var res = await fetch("/api/artist/" + id + "/songs")
+    var body = await res.json()
+    var songs = body.data.songs as Song[]
+
+    songs.sort((song1, song2) => {
+        if (song1.n > song2.n)
+            return 1
+        else return -1
+    })
+    return songs
+}
+
 export async function getAllArtists(): Promise<Artist[]> {
     var res = await fetch("/api/artist")
     var body = await res.json()
@@ -50,6 +63,12 @@ export async function getAllArtists(): Promise<Artist[]> {
         else return -1
     })
     return artists
+}
+
+export async function getArtist(id: string): Promise<Artist> {
+    var res = await fetch("/api/artist/" + id)
+    var body = await res.json()
+    return body.data.artist as Artist
 }
 
 export async function getAllAlbums(): Promise<Album[]> {
@@ -69,4 +88,17 @@ export async function getAlbum(id: string): Promise<Album> {
     var res = await fetch("/api/album/" + id)
     var body = await res.json()
     return body.data.album as Album
+}
+
+export async function getArtistAlbums(id: string): Promise<Album[]> {
+    var res = await fetch("/api/artist/" + id + "/albums")
+    var body = await res.json()
+    var albums = body.data.albums as Album[]
+
+    albums.sort((album1, album2) => {
+        if (album1.title > album2.title)
+            return 1
+        else return -1
+    })
+    return albums
 }

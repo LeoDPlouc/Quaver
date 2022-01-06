@@ -6,12 +6,14 @@ import SongList from './vue/song-list.vue'
 import AlbumList from './vue/album-list.vue'
 import ArtistList from './vue/artist-list.vue'
 import AlbumPresentation from './vue/album-presentation.vue'
+import ArtistPresentation from './vue/artist-presentation.vue'
 
 const routes = [
     { path: "/", component: SongList },
     { path: "/song", component: SongList },
     { path: "/album/:id", component: AlbumPresentation },
     { path: "/album", component: AlbumList },
+    { path: "/artist/:id", component: ArtistPresentation },
     { path: "/artist", component: ArtistList }
 ]
 
