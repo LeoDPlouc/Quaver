@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { SongChangedEventArgs, SongItemTitleClickedEventArgs } from "../eventArgs";
 import { Album } from "../models";
 import albumItemVue from "./album-item.vue";
 
