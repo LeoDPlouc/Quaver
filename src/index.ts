@@ -15,6 +15,7 @@ import songCollector from "./workers/songCollector"
 
 import { IUser } from "./models/userModel"
 
+//Declare the objects stored in session
 declare module 'express-session' {
     interface SessionData {
         user: IUser & mongoose.Document<any, any, IUser>
@@ -22,9 +23,9 @@ declare module 'express-session' {
 }
 
 const app = express()
-
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`
 
+//Init session
 app.use(session({
     secret: SESSION_SECRET,
     cookie: {
@@ -34,8 +35,10 @@ app.use(session({
     }
 }))
 
+//Parse request's body to json
 app.use(express.json())
 
+//Declare routes
 app.use("/", appRouter)
 
 app.use("/api/song", songRouter)
@@ -44,6 +47,7 @@ app.use("/api/album", albumRouter)
 app.use("/api/artist", artistRouter)
 app.use("/api/image", imageRouter)
 
+//Connect to the db
 async function waitForDb() {
     await mongoose
         .connect(mongoUrl, {
@@ -55,12 +59,15 @@ async function waitForDb() {
         .then(() => console.log("Successfully connected to database"))
         .catch((e) => {
             console.log(e)
+            //retry connection
             setTimeout(waitForDb, 5000)
         })
 }
 
 waitForDb().then(() => {
+    //Start collection of the songs
     songCollector()
     
+    //Open server
     app.listen(APP_PORT, () => console.log(`listening on port ${APP_PORT}`))
 })

@@ -6,8 +6,10 @@ import { User } from "../models/userModel"
 export async function signUp(req: Request, res: Response, next: NextFunction) {
     try {
         var { username, password } = req.body
+        //Hash the password with salt
         var hashpass = await bcrypt.hash(password, 5)
 
+        //Create a new user
         const user = new User({
             "username": username,
             "password": hashpass
@@ -34,6 +36,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
 
         var user = await User.findOne({ username })
 
+        //If the no user have the username requested, fail
         if (!user) {
             res.json({
                 status: "fail"
@@ -41,6 +44,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        //If the password is wrong, fail
         var checked = await bcrypt.compare(password, user.password)
         if (!checked) {
             res.json({
@@ -49,6 +53,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        //Store the user in session
         req.session.user = user
         res.json({
             status: "sucess"

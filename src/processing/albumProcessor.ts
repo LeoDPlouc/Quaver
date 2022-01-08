@@ -5,6 +5,8 @@ import { IAlbum } from "../models/albumModel"
 
 async function getArtist(album: IAlbum) {
     var artist: IArtist & Document<any, any, IArtist> = null
+
+    //If the artist doesn't already exist, creates it
     if (album.artistId)
         artist = await Artist.findById(album.artistId)
     else {

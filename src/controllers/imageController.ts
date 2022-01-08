@@ -19,6 +19,7 @@ export function cleanManyImages(datas: (IImage & Document<any, any, IImage>)[]):
 
 export async function getAllImagesInfo(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search all images in the db and clean the output
         const images = cleanManyImages(await Image.find())
 
         res.json({
@@ -38,6 +39,7 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
 
 export async function getOneImageInfo(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search an image by id and clean the output
         const image = cleanOneImage(await Image.findById(req.params.id))
 
         res.json({
@@ -56,6 +58,7 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
 
 export async function getImage(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search an image by id and send the file
         const image = await Image.findById(req.params.id)
 
         res.sendFile(image.path)

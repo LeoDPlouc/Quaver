@@ -13,6 +13,7 @@ async function getAcoustid(songPath: string): Promise<string> {
     const fp = promisify(fpcalc)
     var fingerprint
 
+    //If fpcalc isn't in PATH, use fpcalc with its path
     if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH })
     else fingerprint = await fp(songPath)
 
@@ -45,6 +46,7 @@ export async function getMetadata(songPath: string): Promise<ISong> {
 export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any, IAlbum>> {
     var album: IAlbum & Document<any, any, IAlbum> = null
 
+    //If the artist doesn't already exist, creates it
     if (song.albumId)
         album = await Album.findById(song.albumId)
     else
@@ -65,6 +67,8 @@ export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any,
 
 export async function getArtist(song: ISong): Promise<IArtist & Document<any, any, IArtist>> {
     var artist: IArtist & Document<any, any, IArtist> = null
+
+    //If the artist doesn't already exist, creates it
     if (song.artistId)
         artist = await Artist.findById(song.artistId)
     else

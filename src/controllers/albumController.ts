@@ -24,6 +24,7 @@ export function cleanManyAlbums(datas: (IAlbum & Document<any, any, IAlbum>)[]):
 
 async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search all albums in the db and clean the output
         const albums = cleanManyAlbums(await Album.find())
 
         res.json({
@@ -44,6 +45,7 @@ async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
 
 async function getOneAlbum(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search an album by id and clean the output
         const album = cleanOneAlbum(await Album.findById(req.params.id))
 
         res.json({
@@ -83,6 +85,7 @@ async function updateAlbum(req: Request, res: Response, next: NextFunction) {
 
 export async function getAlbumSongs(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search songs by albumid in the db and clean the output
         const songs = await Song.find({ albumId: req.params.id })
         var cleanedSongs = cleanManySongs(songs)
 

@@ -28,6 +28,7 @@ export function cleanManySongs(datas: (ISong & Document<any, any, ISong>)[]): an
 
 export async function getAllSongsInfo(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search all songs in the db and clean the output
         const songs = cleanManySongs(await Song.find())
 
         res.json({
@@ -47,6 +48,7 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
 
 export async function getOneSongInfo(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search a song by id and clean the output
         const song = cleanOneSong(await Song.findById(req.params.id))
 
         res.json({
@@ -86,6 +88,7 @@ export async function updateSongInfo(req: Request, res: Response, next: NextFunc
 
 export async function getSongStream(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search a song by id and and send the file
         const song = await Song.findById(req.params.id)
 
         res.sendFile(song.path)
@@ -100,8 +103,10 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
 
 export async function updateLike(req: Request, res: Response, next: NextFunction) {
     try {
+        //Search a song by id
         const song = await Song.findById(req.params.id)
 
+        //Update the like field
         song.like = Number(req.body.like)
         await song.save()
 
