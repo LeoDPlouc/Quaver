@@ -5,5 +5,6 @@ module.exports = {
     MONGO_PASSWORD: process.env.MONGO_PASSWORD,
     SESSION_SECRET: process.env.SESSION_SECRET,
     APP_PORT: process.env.PORT || 3000,
-    MUSIC_PATH: process.env.MUSIC_PATH || "./music"
+    MUSIC_PATH: process.env.MUSIC_PATH || "./music",
+    FPCALC_PATH: null
 }

@@ -59,7 +59,7 @@ async function doWork() {
     console.log("Song collection Started")
 
     while (true) {
-        collect(MUSIC_PATH)
+        await collect(MUSIC_PATH)
         await new Promise(resolve => setTimeout(resolve, 30000))
     }
 }

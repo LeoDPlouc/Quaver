@@ -49,7 +49,8 @@ async function waitForDb() {
         .connect(mongoUrl, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            useFindAndModify: false
+            useFindAndModify: false,
+            dbName: "quaver"
         })
         .then(() => console.log("Successfully connected to database"))
         .catch((e) => {

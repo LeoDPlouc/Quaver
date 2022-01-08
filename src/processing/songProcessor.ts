@@ -1,15 +1,30 @@
-import { IAudioMetadata, parseFile } from "music-metadata"
+import { parseFile } from "music-metadata"
 import { Document } from "mongoose"
 import Path from "path"
+import fpcalc from "fpcalc"
+import { promisify } from "util"
 
 import { Album, IAlbum } from "../models/albumModel"
 import { Artist, IArtist } from "../models/artistModel"
 import { ISong } from "../models/songModel"
+import { FPCALC_PATH } from "../config/config"
 
-async function getMetadata(songPath: string): Promise<ISong> {
+async function getAcoustid(songPath: string): Promise<string> {
+    const fp = promisify(fpcalc)
+    var fingerprint
+
+    if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH })
+    else fingerprint = await fp(songPath)
+
+    return fingerprint.fingerprint as string
+
+}
+
+export async function getMetadata(songPath: string): Promise<ISong> {
     var tag = await parseFile(songPath)
 
     var format = Path.extname(songPath)
+    var fp = await getAcoustid(songPath)
 
     const song: ISong = {
         title: tag.common.title,
@@ -20,13 +35,14 @@ async function getMetadata(songPath: string): Promise<ISong> {
         duration: tag.format.duration,
         like: 0,
         path: songPath,
-        format: format
+        format: format,
+        acoustid: fp
     }
 
     return song
 }
 
-async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any, IAlbum>> {
+export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any, IAlbum>> {
     var album: IAlbum & Document<any, any, IAlbum> = null
 
     if (song.albumId)
@@ -47,7 +63,7 @@ async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any, IAlbum
     return album
 }
 
-async function getArtist(song: ISong): Promise<IArtist & Document<any, any, IArtist>> {
+export async function getArtist(song: ISong): Promise<IArtist & Document<any, any, IArtist>> {
     var artist: IArtist & Document<any, any, IArtist> = null
     if (song.artistId)
         artist = await Artist.findById(song.artistId)
@@ -64,5 +80,3 @@ async function getArtist(song: ISong): Promise<IArtist & Document<any, any, IArt
 
     return artist
 }
-
-export { getArtist, getAlbum, getMetadata }
