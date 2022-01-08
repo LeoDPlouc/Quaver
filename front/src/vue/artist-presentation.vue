@@ -55,7 +55,7 @@ export default defineComponent({
     margin-left: 10px;
 }
 .artistPresentationAlbumList {
-    height: calc(10vw + 3em + 2em + 2em);
+    height: calc(10vw + 9em);
     overflow: scroll;
 }
 .artistPresentationSongList {
