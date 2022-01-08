@@ -1,7 +1,7 @@
-FROM node:16-alpine
+FROM node:17
 WORKDIR /app
 
-RUN apt install libchromaprint-tools 
+RUN apt update && apt -y install libchromaprint-tools 
 
 COPY package.json .
 RUN npm install --only=prod
