@@ -5,16 +5,15 @@ services:
       context: .
       network: host
     ports:
-      - 3000:3000
+      - 8080:8080
     volumes:
       - ./music/:/music
       - ./dist/src/:/app/src
     environment:
-      - PORT=3000
-      - MONGO_USER=quaver
-      - MONGO_PASSWORD=quaver
-      - SESSION_SECRET=quaver
-      - MUSIC_PATH=/music
+      - QUAVER_DB_USER=quaver
+      - QUAVER_DB_PASSWORD=quaver
+      - QUAVER_SESSION_SECRET=quaver
+      - QUAVER_MUSIC_PATH=/music
     depends_on:
       - mongo
 

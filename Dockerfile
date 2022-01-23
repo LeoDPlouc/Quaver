@@ -8,6 +8,6 @@ RUN npm install --only=prod
 
 COPY ./dist .
 
-ENV PORT 3000
+ENV PORT 8080
 EXPOSE $PORT
 CMD ["node", "index.js"]
