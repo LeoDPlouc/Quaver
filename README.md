@@ -83,7 +83,7 @@ Make sure to replace those fields
     - QUAVER_SESSION_SECRET: The secret used to sign the session ID cookie
     - QUAVER_PORT: The port used to access Quaver (Optional if you want to use the default port: 8080)
     - QUAVER_MUSIC_PATH: The path to your music library (You may also link the path in ```dist/```, in wich case this variable is optional)
-    - QUAVER_FPCALC_PATH: The path to chromaprint (Optional if chromaprint is in you ```PATH```)
+    - QUAVER_FPCALC_PATH: The path to chromaprint (Optional if chromaprint is in your ```PATH```)
 
 - Go to http://localhost:8080 (Change the port according to your configuration)
 
