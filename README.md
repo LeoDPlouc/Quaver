@@ -15,7 +15,6 @@ Quaver is made to run in a docker container but can be installed bare metal. It 
 - Research songs in the frontend
 - And more...
   
----  
 ## Installation
 ### Docker
 ```shell
