@@ -7,7 +7,7 @@ Quaver is made to run in a docker container but can be installed bare metal. It 
 - Visualisation of your library, songs, albums, artists
 - Like/dislike songs
 
-## Planned Features
+## Planned Features
 - Automatic fetching of album covers
 - Automatic fetching of songs metadata
 - Import folder and upload from the frontend
@@ -16,7 +16,7 @@ Quaver is made to run in a docker container but can be installed bare metal. It 
 - And more...
   
 ---  
-## Installation
+## Installation
 ### Docker
 ```shell
 #Start a MongoDb container
