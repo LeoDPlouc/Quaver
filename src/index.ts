@@ -2,7 +2,7 @@ import express from "express"
 import mongoose from "mongoose"
 import session from "express-session"
 
-import { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONGO_PORT, SESSION_SECRET, APP_PORT } from "./config/config"
+import { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONGO_PORT, SESSION_SECRET, APP_PORT, HEADLESS } from "./config/config"
 
 import songRouter from "./routes/songRoute"
 import userRouter from "./routes/userRoute"
@@ -39,7 +39,9 @@ app.use(session({
 app.use(express.json())
 
 //Declare routes
-app.use("/", appRouter)
+//Dont declare the root path if in headless mode
+if (HEADLESS)
+    app.use("/", appRouter)
 
 app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
@@ -67,7 +69,7 @@ async function waitForDb() {
 waitForDb().then(() => {
     //Start collection of the songs
     songCollector()
-    
+
     //Open server
     app.listen(APP_PORT, () => console.log(`listening on port ${APP_PORT}`))
 })
