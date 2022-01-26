@@ -85,6 +85,6 @@ Make sure to replace those fields
     - QUAVER_MUSIC_PATH: The path to your music library (You may also link the path in ```dist/```, in wich case this variable is optional)
     - QUAVER_FPCALC_PATH: The path to chromaprint (Optional if chromaprint is in your ```PATH```)
 
-- Go to http://localhost:8080 (Change the port according to your configuration)
+- Go to http://localhost:8080 (Change the address and the port according to your configuration)
 
 For more advanced configuration refere to the wiki (WIP)
