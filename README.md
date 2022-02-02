@@ -87,4 +87,4 @@ Make sure to replace those fields
 
 - Go to http://localhost:8080 (Change the address and the port according to your configuration)
 
-For more advanced configuration refere to the wiki (WIP)
+For more advanced configuration refere to the [wiki](https://github.com/LeoDPlouc/Quaver/wiki)
