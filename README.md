@@ -1,4 +1,8 @@
-# Quaver
+<div style="display:flex; wrap-direction:row;margin:0 auto;width:fit-content;">
+<img src="logo.svg" height="150">
+<h1 style="align-self:center;">Quaver</h1>
+</div>
+
 Quaver is an open-source self-hostable music player and music library manager. It's meant to be used via the browser but exposes an API so alternative frontends like smartphone or desktop app can use it.
 Quaver is made to run in a docker container but can be installed bare metal. It runs with NodeJs and therefore is cross-plateform.
 

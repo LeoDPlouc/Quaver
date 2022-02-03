@@ -1,3 +1,6 @@
 background : 14052e
 misc : 8863c7
 foreground : 5514C8
+
+Main Purple : #CC01E0
+Main Blue : #0B9FE0
