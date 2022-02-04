@@ -14,6 +14,7 @@
 import { Document } from "mongoose";
 import { DbInfo, IDbInfo } from "../models/dbInfoModel";
 import { DB_VERSION } from "../config/dbConfig"
+import { migration0 } from "./migrationScripts/migration0";
 
 export interface IMigration {
     up: () => void
@@ -21,7 +22,7 @@ export interface IMigration {
 }
 
 const migrations: IMigration[] = [
-
+    migration0
 ]
 
 async function FetchDbInfo(): Promise<Document<any, any, IDbInfo> & IDbInfo> {
