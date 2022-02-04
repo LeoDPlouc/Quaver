@@ -1,0 +1,13 @@
+CHANGELOG
+
+====================================================
+0.1.0-beta
+
+Server:
+- Changed environnement variables names
+- Added headless mode
+
+API:
+
+
+FrontEnd:
