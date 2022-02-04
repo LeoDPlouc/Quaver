@@ -1,5 +1,5 @@
 <div style="display:flex; wrap-direction:row;margin:0 auto;width:fit-content;">
-<img src="front/src/img/logo.svg" height="150">
+<img src="logo.svg" height="150">
 <h1 style="align-self:center;">Quaver</h1>
 </div>
 
