@@ -9,6 +9,7 @@ tsc -b --verbose
 mv -v ./build/* dist/
 
 npx webpack --config webpack.config.js 
-mv -v ./build/ dist/src
+mkdir -v dist/src
+mv -v ./build/ dist/src/js
 cp -v ./front/index.html ./dist/src
 cp -vr ./front/img ./dist/src
