@@ -17,11 +17,14 @@
 <template>
     <div class="appContainer">
         <div class="appButtons">
+            <router-link to="/">
+                <img class="logo" src="/img/logo.svg" />
+            </router-link>
             <router-link to="/song">Song</router-link>
             <router-link to="/album">Album</router-link>
             <router-link to="/artist">Artist</router-link>
         </div>
-        <router-view class="view" @song-changed="changeSong"/>
+        <router-view class="view" @song-changed="changeSong" />
         <player class="player" ref="player" />
     </div>
 </template>
@@ -82,5 +85,8 @@ body {
 }
 .player {
     grid-row: 3;
+}
+.logo {
+    height: 7vh;
 }
 </style>
