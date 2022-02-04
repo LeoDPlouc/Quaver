@@ -31,6 +31,7 @@ import songCollector from "./workers/songCollector"
 
 import { IUser } from "./models/userModel"
 import { waitForDb } from "./db/initdb"
+import { Migrate } from "./db/migration"
 
 //Declare the objects stored in session
 declare module 'express-session' {
@@ -66,7 +67,10 @@ app.use("/api/artist", artistRouter)
 app.use("/api/image", imageRouter)
 
 //Connect to the db
-waitForDb().then(() => {
+waitForDb()
+.then(async () => {
+    await Migrate()    
+
     //Start collection of the songs
     songCollector()
 

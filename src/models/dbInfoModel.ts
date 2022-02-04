@@ -14,14 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module.exports = {
-    MONGO_IP: process.env.QUAVER_DB_IP || "mongo",
-    MONGO_PORT: process.env.QUAVER_DB_PORT || 27017,
-    MONGO_USER: process.env.QUAVER_DB_USER,
-    MONGO_PASSWORD: process.env.QUAVER_DB_PASSWORD,
-    SESSION_SECRET: process.env.QUAVER_SESSION_SECRET,
-    APP_PORT: process.env.QUAVER_PORT || 8080,
-    MUSIC_PATH: process.env.QUAVER_MUSIC_PATH || "./music",
-    FPCALC_PATH: process.env.QUAVER_FPCALC_PATH,
-    HEADLESS: process.env.QUAVER_HEADLESS || false
+import { Schema, model } from "mongoose"
+
+interface IDbInfo {
+    version: number
 }
+
+const dbInfoSchema = new Schema<IDbInfo>({
+    version: {
+        type: Number,
+        require: [true, "Db must have a version"]
+    }
+})
+const DbInfo = model<IDbInfo>("DbInfo", dbInfoSchema)
+
+export { DbInfo, IDbInfo }
