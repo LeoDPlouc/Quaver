@@ -56,7 +56,7 @@ app.use(express.json())
 
 //Declare routes
 //Dont declare the root path if in headless mode
-if (HEADLESS)
+if (!HEADLESS)
     app.use("/", appRouter)
 
 app.use("/api/song", songRouter)

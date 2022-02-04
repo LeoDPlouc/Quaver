@@ -23,5 +23,5 @@ module.exports = {
     APP_PORT: process.env.QUAVER_PORT || 8080,
     MUSIC_PATH: process.env.QUAVER_MUSIC_PATH || "./music",
     FPCALC_PATH: process.env.QUAVER_FPCALC_PATH,
-    HEADLESS: process.env.QUAVER_HEADLESS || true
+    HEADLESS: process.env.QUAVER_HEADLESS || false
 }
