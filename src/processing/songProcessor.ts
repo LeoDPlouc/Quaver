@@ -35,7 +35,7 @@ export async function getAcoustid(songPath: string): Promise<string> {
 
 }
 
-export async function getMetadata(songPath: string): Promise<ISong> {
+export async function getMetadataFromFile(songPath: string): Promise<ISong> {
     var tag = await parseFile(songPath)
 
     var format = Path.extname(songPath)

@@ -1,33 +1,34 @@
-    // Quaver is a self-hostable music player and music library manager
-    // Copyright (C) 2022  DPlouc
+// Quaver is a self-hostable music player and music library manager
+// Copyright (C) 2022  DPlouc
 
-    // This program is free software: you can redistribute it and/or modify
-    // it under the terms of the GNU General Public License as published by
-    // the Free Software Foundation, either version 3 of the License, or
-    // (at your option) any later version.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 
-    // This program is distributed in the hope that it will be useful,
-    // but WITHOUT ANY WARRANTY; without even the implied warranty of
-    // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    // GNU General Public License for more details.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 
-    // You should have received a copy of the GNU General Public License
-    // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import fs from "fs/promises"
 import path from "path"
 import mm from "mime-types"
 
-import { getAlbum, getArtist, getMetadata } from "../processing/songProcessor"
+import { getAlbum, getArtist, getMetadataFromFile } from "../processing/songProcessor"
 import { Song } from "../models/songModel"
 
 import { MUSIC_PATH } from "../config/config"
+import { getAlbumMBId } from "../processing/albumProcessor"
 
 async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true })
     for (var i = 0; i < paths.length; i++) {
         var fullPath = path.join(libPath, paths[i].name)
-        
+
         if (paths[i].isDirectory())
             await collect(fullPath)
 
@@ -46,15 +47,21 @@ async function registerSong(songPath: string) {
 
     //If the song doesn't already exist, extract its metadata and create a new song
     if (!song) {
-        const songInfo = await getMetadata(songPath)
+        const songInfo = await getMetadataFromFile(songPath)
 
         song = new Song(songInfo)
         await song.save().then(() => console.log(`Found new song ${songPath}`))
     }
 
-    //Fetch the song's album
     song = await Song.findOne({ path: songPath })
+
+    //Fetch the song's album
     var album = await getAlbum(song)
+
+    //Fetch album's MBId
+    var albumMbId = await getAlbumMBId(album)
+    //album.mbid = albumMbId
+
     await album.save()
 
     //Save the albumId in the song
