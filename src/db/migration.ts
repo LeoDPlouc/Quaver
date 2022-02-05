@@ -13,8 +13,9 @@
 
 import { Document } from "mongoose";
 import { DbInfo, IDbInfo } from "../models/dbInfoModel";
-import { DB_VERSION } from "../config/dbConfig"
+import { DB_VERSION } from "../config/appConfig"
 import { migration0 } from "./migrationScripts/migration0";
+import { migration1 } from "./migrationScripts/migration1";
 
 export interface IMigration {
     up: () => void
@@ -22,7 +23,8 @@ export interface IMigration {
 }
 
 const migrations: IMigration[] = [
-    migration0
+    migration0,
+    migration1
 ]
 
 async function FetchDbInfo(): Promise<Document<any, any, IDbInfo> & IDbInfo> {
@@ -46,16 +48,16 @@ export async function Migrate() {
     console.log(`Application schema version : ${app_ver}`)
 
     if (db_ver > app_ver) {
-        for (var i = db_ver; i < app_ver; i--) {
+        for (var i = db_ver; i > app_ver; i--) {
             await migrations[i].down()
-            info.version = i
+            info.version--
             await info.save()
         }
     }
-    if (db_ver > app_ver) {
-        for (var i = db_ver; i > app_ver; i++) {
+    if (db_ver < app_ver) {
+        for (var i = db_ver; i < app_ver; i++) {
             await migrations[i].up()
-            info.version = i
+            info.version++
             await info.save()
         }
     }
