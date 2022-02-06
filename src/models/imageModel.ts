@@ -17,8 +17,7 @@
 import { Schema, model } from "mongoose"
 
 interface IImage {
-    path: string,
-    resolution: string,
+    path: string
 }
 
 const imageSchema = new Schema<IImage>({

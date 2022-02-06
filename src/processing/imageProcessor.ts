@@ -11,13 +11,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IMigration } from "../migration"
+import { v4 } from "uuid"
+import fs from "fs/promises"
 
-export const migration1: IMigration = {
-    async up() {
+export async function saveImage(data: string, extension: string): Promise<string> {
+    var filename = v4() + extension
 
-    },
-    async down() {
+    await fs.writeFile(filename, data)
 
-    }
+    return filename
 }
