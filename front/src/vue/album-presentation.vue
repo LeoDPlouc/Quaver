@@ -17,10 +17,7 @@
 <template>
     <div>
         <div class="albumPresentationHeader">
-            <img
-                class="albumPresentationCover"
-                src="https://ia902305.us.archive.org/31/items/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1-30810216800_thumb250.jpg"
-            />
+            <img class="albumPresentationCover" :src="getCoverURL()" />
             <div class="albumPresentationInfos">
                 <div class="albumPresentationInfo">{{ album.title }}</div>
                 <div class="albumPresentationInfo">{{ album.artist }}</div>
@@ -49,6 +46,12 @@ export default defineComponent({
     data() {
         return {
             album: {} as Album
+        }
+    },
+
+    methods: {
+        getCoverURL() {
+            return `/api/image/${this.album.cover}/file`
         }
     }
 })

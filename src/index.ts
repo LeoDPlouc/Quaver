@@ -55,25 +55,25 @@ app.use(session({
 //Parse request's body to json
 app.use(express.json())
 
-//Declare routes
-//Dont declare the root path if in headless mode
-if (!HEADLESS)
-    app.use("/", appRouter)
-
 app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
 app.use("/api/album", albumRouter)
 app.use("/api/artist", artistRouter)
 app.use("/api/image", imageRouter)
 
+//Declare routes
+//Dont declare the root path if in headless mode
+if (!HEADLESS)
+    app.use("/", appRouter)
+
 //Connect to the db
 waitForDb()
-.then(async () => {
-    await Migrate()    
+    .then(async () => {
+        await Migrate()
 
-    //Start collection of the songs
-    songCollector()
+        //Start collection of the songs
+        songCollector()
 
-    //Open server
-    app.listen(APP_PORT, () => console.log(`listening on port ${APP_PORT}`))
-})
+        //Open server
+        app.listen(APP_PORT, () => console.log(`listening on port ${APP_PORT}`))
+    })
