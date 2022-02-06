@@ -18,8 +18,9 @@ import { IMAGES_PATH } from "../config/config"
 
 export async function saveImage(data: string, extension: string): Promise<string> {
     var filename = v4() + extension
+    var p = path.resolve(IMAGES_PATH, filename)
 
-    await fs.writeFile(path.resolve(IMAGES_PATH, filename), data, { encoding: "binary" })
+    await fs.writeFile(p, data, { encoding: "binary" })
 
-    return filename
+    return p
 }
