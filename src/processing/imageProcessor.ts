@@ -15,6 +15,7 @@ import { v4 } from "uuid"
 import fs from "fs/promises"
 import path from "path"
 import { IMAGES_PATH } from "../config/config"
+import { IImage } from "../models/imageModel"
 
 export async function saveImage(data: string, extension: string): Promise<string> {
     var filename = v4() + extension
@@ -23,4 +24,8 @@ export async function saveImage(data: string, extension: string): Promise<string
     await fs.writeFile(p, data, { encoding: "binary" })
 
     return p
+}
+
+export async function deleteImage(image: IImage): Promise<void> {
+    return await fs.rm(image.path)
 }

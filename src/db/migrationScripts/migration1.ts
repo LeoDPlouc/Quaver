@@ -11,13 +11,42 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Album } from "../../models/albumModel"
+import { getAlbumCover, getAlbumMBId } from "../../processing/albumProcessor"
 import { IMigration } from "../migration"
 
 export const migration1: IMigration = {
     async up() {
+        var albums = await Album.find()
 
+        for (var i = 0; i < albums.length; i++) {
+            var a = albums[i]
+
+            if (!a.cover) {
+                console.log(`Migration 1 -> 2 album ${a.id}`)
+
+                var cover = await getAlbumCover(a)
+                if (cover) {
+                    await cover.save()
+
+                    a.cover = cover.id
+                    await a.save()
+                }
+            }
+        }
     },
     async down() {
+        var albums = await Album.find()
 
+        for (var i = 0; i < albums.length; i++) {
+            var a = albums[i]
+
+            if (!a.mbid) {
+                console.log(`Migration 1 -> 0 album ${a.id}`)
+
+                a.mbid = await getAlbumMBId(a)
+                await a.save()
+            }
+        }
     }
 }

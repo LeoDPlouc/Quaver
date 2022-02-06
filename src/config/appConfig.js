@@ -12,6 +12,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module.exports = {
-    DB_VERSION: 1,
+    DB_VERSION: 2,
     APP_VERSION: "0.1.0-beta"
 }

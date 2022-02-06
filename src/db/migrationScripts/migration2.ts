@@ -12,25 +12,31 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Album } from "../../models/albumModel"
-import { getAlbumMBId } from "../../processing/albumProcessor"
+import { getAlbumCover, getAlbumMBId } from "../../processing/albumProcessor"
 import { IMigration } from "../migration"
+import { Image } from "../../models/imageModel"
+import { deleteImage } from "../../processing/imageProcessor"
 
-export const migration0: IMigration = {
+export const migration2: IMigration = {
     async up() {
+    },
+    async down() {
         var albums = await Album.find()
 
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
 
-            if (!a.mbid) {
-                console.log(`Migration 0 -> 1 album ${a.id}`)
+            if (a.cover) {
+                console.log(`Migration 2 -> 1 album ${a.id}`)
 
-                a.mbid = await getAlbumMBId(a)
+                var cover = await Image.findById(a.cover)
+
+                deleteImage(cover)
+                cover.delete()
+
+                a.cover = undefined
                 await a.save()
             }
         }
-    },
-    async down() {
-
     }
 }
