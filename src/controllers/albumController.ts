@@ -27,7 +27,8 @@ export function cleanOneAlbum(data: IAlbum & Document<any, any, IAlbum>): any {
         title: data.title,
         artist: data.artist,
         artistId: data.artistId,
-        year: data.year
+        year: data.year,
+        cover: data.cover
     }
     return cleanedData
 }
