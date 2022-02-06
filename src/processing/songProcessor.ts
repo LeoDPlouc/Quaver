@@ -18,11 +18,12 @@ import { parseFile } from "music-metadata"
 import { Document } from "mongoose"
 import Path from "path"
 import fp from "fpcalc-async"
-
+import { Image } from "../models/imageModel"
 import { Album, IAlbum } from "../models/albumModel"
 import { Artist, IArtist } from "../models/artistModel"
 import { ISong } from "../models/songModel"
 import { FPCALC_PATH } from "../config/config"
+import { getAlbumCover, getAlbumMBId } from "./albumProcessor"
 
 export async function getAcoustid(songPath: string): Promise<string> {
     var fingerprint
@@ -74,6 +75,22 @@ export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any,
         })
 
         console.log(`Found new album ${album.title}`)
+
+        //Fetch album's MBId
+        var albumMbId = await getAlbumMBId(album)
+        album.mbid = albumMbId
+
+        var albumCover = await getAlbumCover(album)
+        if (albumCover) {
+            await albumCover.save()
+
+            console.log(`Found new cover for ${album.title}`)
+
+            albumCover = await Image.findOne({ path: albumCover.path })
+            album.cover = albumCover.id
+        } else console.log(`No cover found for ${album.title}`)
+
+        await album.save()
     }
 
     return album

@@ -20,9 +20,7 @@ import mm from "mime-types"
 
 import { getAlbum, getArtist, getMetadataFromFile } from "../processing/songProcessor"
 import { Song } from "../models/songModel"
-import { Image } from "../models/imageModel"
 import { MUSIC_PATH } from "../config/config"
-import { getAlbumCover, getAlbumMBId } from "../processing/albumProcessor"
 
 async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true })
@@ -59,17 +57,6 @@ async function registerSong(songPath: string) {
 
     //Fetch the song's album
     var album = await getAlbum(song)
-
-    //Fetch album's MBId
-    var albumMbId = await getAlbumMBId(album)
-    album.mbid = albumMbId
-
-    var albumCover = await getAlbumCover(album)
-    await albumCover.save()
-    albumCover = await Image.findOne({ path: albumCover.path })
-    album.cover = albumCover.id
-
-    await album.save()
 
     //Save the albumId in the song
     song.albumId = album._id

@@ -48,10 +48,13 @@ export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<an
         })
     })
 
-    var { image, extension } = await p
-    var path = await saveImage(image, extension)
+    try {
+        var { image, extension } = await p
+        var path = await saveImage(image, extension)
 
-    return new Image({ path })
+        return new Image({ path })
+    }
+    catch { return null }
 }
 
 export async function getArtist(album: IAlbum) {
