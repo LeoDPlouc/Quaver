@@ -17,6 +17,9 @@ import { Artist, IArtist } from "../models/artistModel"
 import { IAlbum } from "../models/albumModel"
 import { IReleaseList, MusicBrainzApi } from "musicbrainz-api"
 import { APP_VERSION } from "../config/appConfig"
+import { IImage, Image } from "../models/imageModel"
+import coverart from "coverart"
+import { saveImage } from "./imageProcessor"
 
 const mbApi = new MusicBrainzApi({
     appName: "Quaver",
@@ -24,17 +27,34 @@ const mbApi = new MusicBrainzApi({
     appContactInfo: "https://github.com/LeoDPlouc/Quaver"
 })
 
+const ca = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
+
 export async function getAlbumMBId(album: IAlbum): Promise<string> {
 
     var query = `release:${album.title as string}`
 
     if (album.artist) query += ` and artist:${album.artist}`
 
-    var result = await mbApi.search<IReleaseList>("release-group", { query })
-    return result["release-groups"][0].id
+    var result = await mbApi.search<IReleaseList>("release", { query })
+    return result.releases[0].id
 }
 
-async function getArtist(album: IAlbum) {
+export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<any, any, IImage>> {
+
+    var p = new Promise<any>((resolve, reject) => {
+        ca.release(album.mbid, { piece: "front" }, (err, data) => {
+            if (err) reject(err)
+            resolve(data)
+        })
+    })
+
+    var { image, extension } = await p
+    var path = await saveImage(image, extension)
+
+    return new Image({ path })
+}
+
+export async function getArtist(album: IAlbum) {
     var artist: IArtist & Document<any, any, IArtist> = null
 
     //If the artist doesn't already exist, creates it
@@ -50,5 +70,3 @@ async function getArtist(album: IAlbum) {
 
     return artist
 }
-
-export { getArtist }

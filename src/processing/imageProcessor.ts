@@ -13,11 +13,13 @@
 
 import { v4 } from "uuid"
 import fs from "fs/promises"
+import path from "path"
+import { IMAGES_PATH } from "../config/config"
 
 export async function saveImage(data: string, extension: string): Promise<string> {
     var filename = v4() + extension
 
-    await fs.writeFile(filename, data)
+    await fs.writeFile(path.resolve(IMAGES_PATH, filename), data)
 
     return filename
 }

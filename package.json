@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "startdev": "QUAVER_DB_IP=127.0.0.1 QUAVER_DB_USER=quaver QUAVER_DB_PASSWORD=quaver QUAVER_SESSION_SECRET=quaver QUAVER_PORT=8080 node dist/index.js",
+    "startdev": "QUAVER_DB_IP=127.0.0.1 QUAVER_DB_USER=quaver QUAVER_DB_PASSWORD=quaver QUAVER_SESSION_SECRET=quaver node dist/index.js",
     "build": "./scripts/build.sh",
     "publish": "./scripts/publish.sh"
   },
@@ -21,12 +21,14 @@
   "homepage": "https://github.com/LeoDPlouc/Quaver#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "coverart": "0.0.1",
     "express": "^4.17.2",
     "express-session": "^1.17.2",
     "fpcalc-async": "^1.0.9",
     "mongoose": "^5.13.14",
     "music-metadata": "^7.11.4",
     "musicbrainz-api": "^0.7.2",
+    "uuid": "^8.3.2",
     "vue": "^3.2.26"
   },
   "devDependencies": {
