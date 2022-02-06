@@ -46,12 +46,14 @@ async function registerSong(songPath: string) {
     var song = await Song.findOne({ path: songPath })
 
     //If the song doesn't already exist, extract its metadata and create a new song
-    if (!song) {
-        const songInfo = await getMetadataFromFile(songPath)
+    if (song)
+        return
 
-        song = new Song(songInfo)
-        await song.save().then(() => console.log(`Found new song ${songPath}`))
-    }
+    const songInfo = await getMetadataFromFile(songPath)
+
+    song = new Song(songInfo)
+    await song.save().then(() => console.log(`Found new song ${songPath}`))
+
 
     song = await Song.findOne({ path: songPath })
 
