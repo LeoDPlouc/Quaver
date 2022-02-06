@@ -11,24 +11,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Album } from "../../models/albumModel"
 import { IMigration } from "../migration"
 
-export const migration1: IMigration = {
+export const migration0: IMigration = {
     async up() {
-
 
     },
     async down() {
-        var albums = await Album.find()
 
-        for (var i = 0; i < albums.length; i++) {
-            var a = albums[i]
-
-            console.log(`Migration 1 -> 0 album ${a.id}`)
-
-            a.mbid = undefined
-            await a.save()
-        }
     }
 }
