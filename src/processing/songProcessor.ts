@@ -111,6 +111,8 @@ export async function getArtist(song: ISong): Promise<IArtist & Document<any, an
         })
 
         console.log(`Found new artist ${artist.name}`)
+
+        await artist.save()
     }
 
     return artist

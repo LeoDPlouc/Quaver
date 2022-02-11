@@ -52,28 +52,22 @@ async function registerSong(songPath: string) {
     song = new Song(songInfo)
     await song.save().then(() => console.log(`Found new song ${songPath}`))
 
-
-    song = await Song.findOne({ path: songPath })
-
     //Fetch the song's album
     var album = await getAlbum(song)
 
     //Save the albumId in the song
-    song.albumId = album._id
+    song.albumId = album.id
     await song.save()
 
     //Fetch the song's artist
     var artist = await getArtist(song)
-    await artist.save()
 
     //Save the artistId in the song
-    song.artistId = artist._id
+    song.artistId = artist.id
     await song.save()
 
     //Save the artistid in the album
-    album = await getAlbum(song)
-    artist = await getArtist(song)
-    album.artistId = artist._id
+    album.artistId = artist.id
     await album.save()
 }
 
