@@ -21,8 +21,8 @@ module.exports = {
     MONGO_PASSWORD: process.env.QUAVER_DB_PASSWORD,
     SESSION_SECRET: process.env.QUAVER_SESSION_SECRET,
     APP_PORT: process.env.QUAVER_PORT || 8080,
-    MUSIC_PATH: process.env.QUAVER_MUSIC_PATH || "./music",
+    MUSIC_PATH: process.env.QUAVER_MUSIC_PATH || "/music",
     FPCALC_PATH: process.env.QUAVER_FPCALC_PATH,
     HEADLESS: process.env.QUAVER_HEADLESS || false,
-    IMAGES_PATH: process.env.QUAVER_IMAGES_PATH || "./images"
+    IMAGES_PATH: process.env.QUAVER_IMAGES_PATH || "/images"
 }
