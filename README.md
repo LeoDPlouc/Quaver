@@ -10,11 +10,11 @@ Quaver is made to run in a docker container but can be installed bare metal. It 
 - Music player
 - Visualisation of your library, songs, albums, artists
 - Like/dislike songs
+- Automatic fetching of album covers
 
 ### Planned Features
-- Automatic fetching of album covers
 - Automatic fetching of songs metadata
-- Import folder and upload from the frontend
+- Upload from the frontend
 - Automatic update of the metadatas
 - Research songs in the frontend
 - And more...
@@ -26,7 +26,7 @@ Quaver is made to run in a docker container but can be installed bare metal. It 
 docker run -d --name DB_NAME -v DB_PATH:/data/db -e MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD mongo
 
 #Start Quaver
-docker run -d --name quaver -p 8080:8080 -v $MUSIC_PATH:/music -e QUAVER_DB_USER=$MONGO_USERNAME -e QUAVER_DB_PASSWORD=$MONGO_PASSWORD -e QUAVER_SESSION_SECRET=$SESSION_SECRET -e QUAVER_MUSIC_PATH=/music dplouc/ --link $DB_NAME:mongo quaver
+docker run -d --name quaver -p 8080:8080 -v $MUSIC_PATH:/music -v $MUSIC_IMAGES:/images -e QUAVER_DB_USER=$MONGO_USERNAME -e QUAVER_DB_PASSWORD=$MONGO_PASSWORD -e QUAVER_SESSION_SECRET=$SESSION_SECRET --link $DB_NAME:mongo dplouc/quaver
 ```
 Make sure to replace those fields
 - $DB_NAME: The name of the MongoDb container
@@ -34,6 +34,7 @@ Make sure to replace those fields
 - $MONGO_USERNAME: The username for the root user of the database
 - $MONGO_PASSWORD: The password for the root user of the database
 - $MUSIC_PATH: The path to your music library in the host
+- $MUSIC_IMAGES: The path where the album's cover will be stored
 - $SESSION_SECRET: The secret used to sign the session ID cookie
 
 Note that "--link" is a depreciated feature of docker. You may want to use [docker networking](https://docs.docker.com/network/).
@@ -50,11 +51,11 @@ services:
       - 8080:8080
     volumes:
       - $MUSIC_PATH:/music
+      - $IMAGES_PATH:/images
     environment:
       - QUAVER_DB_USER=$MONGO_USERNAME
       - QUAVER_DB_PASSWORD=$MONGO_PASSWORD
       - QUAVER_SESSION_SECRET=$SESSION_SECRET
-      - QUAVER_MUSIC_PATH=/music
     depends_on:
       - mongo
 
@@ -68,6 +69,7 @@ services:
 ```
 Make sure to replace those fields
 - $MUSIC_PATH: The path to your music library in the host
+- $MUSIC_IMAGES: The path where the album's cover will be stored
 - $MONGO_USERNAME: The username for the root user of the database
 - $MONGO_PASSWORD: The password for the root user of the database
 - $SESSION_SECRET: The secret used to sign the session ID cookie
@@ -86,7 +88,8 @@ Make sure to replace those fields
     - QUAVER_DB_PASSWORD: The password for the root user of the database
     - QUAVER_SESSION_SECRET: The secret used to sign the session ID cookie
     - QUAVER_PORT: The port used to access Quaver (Optional if you want to use the default port: 8080)
-    - QUAVER_MUSIC_PATH: The path to your music library (You may also link the path in ```dist/```, in wich case this variable is optional)
+    - QUAVER_MUSIC_PATH: The path to your music library
+    - QUAVER_IMAGES_PATH: The path where the album covers will be stored
     - QUAVER_FPCALC_PATH: The path to chromaprint (Optional if chromaprint is in your ```PATH```)
 
 - Go to http://localhost:8080 (Change the address and the port according to your configuration)
