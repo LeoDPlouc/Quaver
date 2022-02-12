@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Album } from "../migrationModels/albumMigrationModel"
+import { Album } from "../../models/albumModel"
 import { IMigration } from "../migration"
 
 export const migration3: IMigration = {

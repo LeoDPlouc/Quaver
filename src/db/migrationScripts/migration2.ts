@@ -11,11 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Album } from "../migrationModels/albumMigrationModel"
 import { IMigration } from "../migration"
-import { Image } from "../migrationModels/imageMigrationModel"
 import { deleteImage } from "../../processing/imageProcessor"
 import { getAlbumMBId } from "../../processing/albumProcessor"
+import { Album } from "../../models/albumModel"
+import { Image } from "../../models/imageModel"
 
 export const migration2: IMigration = {
     async up() {
