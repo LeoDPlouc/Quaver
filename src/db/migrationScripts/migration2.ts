@@ -15,9 +15,24 @@ import { Album } from "../migrationModels/albumMigrationModel"
 import { IMigration } from "../migration"
 import { Image } from "../migrationModels/imageMigrationModel"
 import { deleteImage } from "../../processing/imageProcessor"
+import { getAlbumMBId } from "../../processing/albumProcessor"
 
 export const migration2: IMigration = {
     async up() {
+        var albums = await Album.find()
+
+        for (var i = 0; i < albums.length; i++) {
+            var a = albums[i]
+
+            if (!a.mbids) {
+                console.log(`Migration 2 -> 3 album ${a.id}`)
+
+                a.mbids = await getAlbumMBId(a)
+                a.mbid = undefined
+
+                await a.save()
+            }
+        }
     },
     async down() {
         var albums = await Album.find()

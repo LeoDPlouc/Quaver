@@ -78,7 +78,7 @@ export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any,
 
         //Fetch album's MBId
         var albumMbId = await getAlbumMBId(album)
-        album.mbid = albumMbId
+        album.mbids = albumMbId
 
         var albumCover = await getAlbumCover(album)
         if (albumCover) {

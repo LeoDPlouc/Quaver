@@ -15,28 +15,27 @@ import { Document } from "mongoose"
 
 import { Artist, IArtist } from "../models/artistModel"
 import { IAlbum } from "../models/albumModel"
-import { IReleaseList, MusicBrainzApi } from "musicbrainz-api"
+import { IReleaseList } from "musicbrainz-api"
 import { APP_VERSION } from "../config/appConfig"
 import { IImage, Image } from "../models/imageModel"
 import coverart from "coverart"
 import { saveImage } from "./imageProcessor"
-
-const mbApi = new MusicBrainzApi({
-    appName: "Quaver",
-    appVersion: APP_VERSION,
-    appContactInfo: "https://github.com/LeoDPlouc/Quaver"
-})
+import { mbApi } from "../apis/mbApi"
 
 const ca = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
 
-export async function getAlbumMBId(album: IAlbum): Promise<string> {
+export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
 
     var query = `release:${album.title as string}`
 
     if (album.artist) query += ` and artist:${album.artist}`
 
     var result = await mbApi.search<IReleaseList>("release", { query })
-    return result.releases[0].id
+
+    var releases = result.releases.filter(release => release.score == 100)
+    var ids = releases.map(release => release.id)
+
+    return ids
 }
 
 export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<any, any, IImage>> {

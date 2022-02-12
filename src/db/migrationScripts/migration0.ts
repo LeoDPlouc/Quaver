@@ -11,9 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Album } from "../migrationModels/albumMigrationModel"
-import { getAlbumMBId } from "../../processing/albumProcessor"
+import { Album, IAlbum } from "../migrationModels/albumMigrationModel"
 import { IMigration } from "../migration"
+import { IReleaseList } from "musicbrainz-api"
+import { mbApi } from "../../apis/mbApi"
 
 export const migration0: IMigration = {
     async up() {
@@ -33,4 +34,14 @@ export const migration0: IMigration = {
     async down() {
 
     }
+}
+
+export async function getAlbumMBId(album: IAlbum): Promise<string> {
+
+    var query = `release:${album.title as string}`
+
+    if (album.artist) query += ` and artist:${album.artist}`
+
+    var result = await mbApi.search<IReleaseList>("release", { query })
+    return result.releases[0].id
 }

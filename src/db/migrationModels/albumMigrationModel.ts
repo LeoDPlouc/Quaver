@@ -22,7 +22,8 @@ interface IAlbum {
     artistId?: String,
     cover?: String,
     year?: string,
-    mbid?: string
+    mbid?: string,
+    mbids?: string[]
 }
 
 const albumSchema = new Schema<IAlbum>({
@@ -43,6 +44,9 @@ const albumSchema = new Schema<IAlbum>({
     },
     mbid: {
         type: String
+    },
+    mbids: {
+        type: [String]
     }
 })
 const Album = model<IAlbum>("Album", albumSchema)
