@@ -18,6 +18,7 @@ import { Album } from "../../models/albumModel"
 import { Image } from "../../models/imageModel"
 
 export const migration2: IMigration = {
+    //Remove single MB ID and fetch all fiting MB IDs 
     async up() {
         var albums = await Album.find()
 
@@ -32,6 +33,8 @@ export const migration2: IMigration = {
             await a.save()
         }
     },
+
+    //Remove album covers
     async down() {
         var albums = await Album.find()
 

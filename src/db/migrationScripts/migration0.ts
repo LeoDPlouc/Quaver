@@ -16,6 +16,7 @@ import { getAlbumMBIdLegacy } from "../legacy/legacyCode"
 import { Album } from "../../models/albumModel"
 
 export const migration0: IMigration = {
+    //Add MB ID to albums
     async up() {
         var albums = await Album.find()
 

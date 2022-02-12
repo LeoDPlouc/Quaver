@@ -19,6 +19,7 @@ export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {
 
     var query = `release:${album.title as string}`
 
+    //Add more info to the query if available
     if (album.artist) query += ` and artist:${album.artist}`
 
     var result = await mbApi.search<IReleaseList>("release", { query })

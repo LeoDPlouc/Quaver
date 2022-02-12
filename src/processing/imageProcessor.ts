@@ -18,6 +18,7 @@ import { IMAGES_PATH } from "../config/config"
 import { IImage } from "../models/imageModel"
 
 export async function saveImage(data: string, extension: string): Promise<string> {
+    //Create an UUID for the name of the file
     var filename = v4() + extension
     var p = path.resolve(IMAGES_PATH, filename)
 

@@ -43,6 +43,7 @@ async function FetchDbInfo(): Promise<Document<any, any, IDbInfo> & IDbInfo> {
 
 export async function Migrate() {
 
+    //Fetch db version
     var info = await FetchDbInfo()
 
     var db_ver = info.version
@@ -51,6 +52,7 @@ export async function Migrate() {
     console.log(`Database schema version : ${db_ver}`)
     console.log(`Application schema version : ${app_ver}`)
 
+    //Compare db version with app version and apply migration
     if (db_ver > app_ver) {
         for (var i = db_ver; i > app_ver; i--) {
             await migrations[i].down()

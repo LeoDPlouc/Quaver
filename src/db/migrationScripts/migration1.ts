@@ -17,6 +17,7 @@ import { getAlbumMBIdLegacy } from "../legacy/legacyCode"
 import { Album } from "../../models/albumModel"
 
 export const migration1: IMigration = {
+    //Download album covers
     async up() {
         var albums = await Album.find()
 
@@ -36,6 +37,8 @@ export const migration1: IMigration = {
             }
         }
     },
+
+    //Remove MB IDs
     async down() {
         var albums = await Album.find()
 

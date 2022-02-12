@@ -12,7 +12,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose"
-
 import { Artist, IArtist } from "../models/artistModel"
 import { IAlbum } from "../models/albumModel"
 import { IReleaseList } from "musicbrainz-api"
@@ -26,12 +25,14 @@ const ca = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/
 
 export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
 
+    //Build query with available info
     var query = `release:${album.title as string}`
 
     if (album.artist) query += ` and artist:${album.artist}`
 
     var result = await mbApi.search<IReleaseList>("release", { query })
 
+    //Only keep ids of the release with score 100
     var releases = result.releases.filter(release => release.score == 100)
     var ids = releases.map(release => release.id)
 
@@ -43,10 +44,11 @@ export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<an
     var cover
     var ext
 
-
     var i = 0
+    //Try fetching cover art for every MB ID
     while (!image && i < album.mbids.length) {
         try {
+            //Fetch Cover art
             var p = new Promise<any>((resolve, reject) => {
                 ca.release(album.mbids[i], { piece: "front" }, (err, data) => {
                     if (err) reject(err)
@@ -62,6 +64,7 @@ export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<an
     }
 
     if (image) {
+        //Save the image cover on the hard drive
         var path = await saveImage(image, extension)
 
         return new Image({ path })

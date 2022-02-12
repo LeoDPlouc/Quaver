@@ -80,19 +80,18 @@ export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any,
         var albumMbId = await getAlbumMBId(album)
         album.mbids = albumMbId
 
+        //Fetch album's cover
         var albumCover = await getAlbumCover(album)
         if (albumCover) {
             await albumCover.save()
 
             console.log(`Found new cover for ${album.title}`)
 
-            albumCover = await Image.findOne({ path: albumCover.path })
             album.cover = albumCover.id
         } else console.log(`No cover found for ${album.title}`)
 
         await album.save()
     }
-
     return album
 }
 

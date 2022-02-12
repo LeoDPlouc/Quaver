@@ -17,6 +17,8 @@ import { IMigration } from "../migration"
 export const migration3: IMigration = {
     async up() {
     },
+
+    //Remove MB ID list and keep only one
     async down() {
         var albums = await Album.find()
 

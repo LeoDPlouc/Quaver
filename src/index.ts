@@ -55,13 +55,13 @@ app.use(session({
 //Parse request's body to json
 app.use(express.json())
 
+//Declare routes
 app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
 app.use("/api/album", albumRouter)
 app.use("/api/artist", artistRouter)
 app.use("/api/image", imageRouter)
 
-//Declare routes
 //Dont declare the root path if in headless mode
 if (!HEADLESS)
     app.use("/", appRouter)
@@ -69,6 +69,7 @@ if (!HEADLESS)
 //Connect to the db
 waitForDb()
     .then(async () => {
+        //Apply database migration
         await Migrate()
 
         //Start collection of the songs
