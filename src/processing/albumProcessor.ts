@@ -40,20 +40,33 @@ export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
 
 export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<any, any, IImage>> {
 
-    var p = new Promise<any>((resolve, reject) => {
-        ca.release(album.mbid, { piece: "front" }, (err, data) => {
-            if (err) reject(err)
-            resolve(data)
-        })
-    })
+    var cover
+    var ext
 
-    try {
-        var { image, extension } = await p
+
+    var i = 0
+    while (!image && i < album.mbids.length) {
+        try {
+            var p = new Promise<any>((resolve, reject) => {
+                ca.release(album.mbids[i], { piece: "front" }, (err, data) => {
+                    if (err) reject(err)
+                    resolve(data)
+                })
+            })
+            var { image, extension } = await p
+            cover = image
+            ext = extension
+        }
+        catch { }
+        finally { i++ }
+    }
+
+    if (image) {
         var path = await saveImage(image, extension)
 
         return new Image({ path })
     }
-    catch { return null }
+    return null
 }
 
 export async function getArtist(album: IAlbum) {
