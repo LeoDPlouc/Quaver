@@ -12,11 +12,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { DbInfo, IDbInfo } from "./migrationModels/dbInfoModel";
 import { DB_VERSION } from "../config/appConfig"
+import { DbInfo, IDbInfo } from "../models/dbInfoModel";
 import { migration0 } from "./migrationScripts/migration0";
 import { migration1 } from "./migrationScripts/migration1";
 import { migration2 } from "./migrationScripts/migration2";
+import { migration3 } from "./migrationScripts/migration3";
 
 export interface IMigration {
     up: () => void
@@ -26,7 +27,8 @@ export interface IMigration {
 const migrations: IMigration[] = [
     migration0,
     migration1,
-    migration2
+    migration2,
+    migration3
 ]
 
 async function FetchDbInfo(): Promise<Document<any, any, IDbInfo> & IDbInfo> {

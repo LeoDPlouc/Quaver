@@ -24,14 +24,12 @@ export const migration2: IMigration = {
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
 
-            if (!a.mbids) {
-                console.log(`Migration 2 -> 3 album ${a.id}`)
+            console.log(`Migration 2 -> 3 album ${a.id}`)
 
-                a.mbids = await getAlbumMBId(a)
-                a.mbid = undefined
+            a.mbids = await getAlbumMBId(a)
+            a.mbid = undefined
 
-                await a.save()
-            }
+            await a.save()
         }
     },
     async down() {

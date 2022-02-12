@@ -1,26 +1,31 @@
 // Quaver is a self-hostable music player and music library manager
 // Copyright (C) 2022  DPlouc
+
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IReleaseList } from "musicbrainz-api"
-import { mbApi } from "../../apis/mbApi"
-import { IAlbum } from "../../models/albumModel"
+import { Schema, model } from "mongoose"
 
-export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {
-
-    var query = `release:${album.title as string}`
-
-    if (album.artist) query += ` and artist:${album.artist}`
-
-    var result = await mbApi.search<IReleaseList>("release", { query })
-    return result.releases[0].id
+interface IDbInfo {
+    version: number
 }
+
+const dbInfoSchema = new Schema<IDbInfo>({
+    version: {
+        type: Number,
+        require: [true, "Db must have a version"]
+    }
+})
+const DbInfo = model<IDbInfo>("DbInfo", dbInfoSchema)
+
+export { DbInfo, IDbInfo } 
