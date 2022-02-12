@@ -7,19 +7,19 @@ services:
     ports:
       - 8080:8080
     volumes:
+      - ./images/:/images
       - ./music/:/music
       - ./dist/src/:/app/src
     environment:
       - QUAVER_DB_USER=quaver
       - QUAVER_DB_PASSWORD=quaver
       - QUAVER_SESSION_SECRET=quaver
-      - QUAVER_MUSIC_PATH=/music
     depends_on:
       - mongo
 
   mongo:
     image: mongo
-    ports: 
+    ports:
       - 27017:27017
     environment:
       - MONGO_INITDB_ROOT_USERNAME=quaver

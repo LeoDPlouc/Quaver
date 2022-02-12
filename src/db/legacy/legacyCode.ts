@@ -11,21 +11,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { IReleaseList } from "musicbrainz-api"
+import { mbApi } from "../../apis/mbApi"
+import { IAlbum } from "../../models/albumModel"
 
-interface IArtist {
-    name?: string
-    cover?: string
+export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {
+
+    var query = `release:${album.title as string}`
+
+    //Add more info to the query if available
+    if (album.artist) query += ` and artist:${album.artist}`
+
+    var result = await mbApi.search<IReleaseList>("release", { query })
+    return result.releases[0].id
 }
-
-const artistSchema = new Schema<IArtist>({
-    name: {
-        type: String
-    },
-    cover: {
-        type: String
-    }
-})
-const Artist = model<IArtist>("Artist", artistSchema)
-
-export { Artist, IArtist }

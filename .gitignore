@@ -128,3 +128,5 @@ music/
 build/
 dist/
 publish/
+.vscode/
+images/

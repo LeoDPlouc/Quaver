@@ -11,21 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { MusicBrainzApi } from "musicbrainz-api";
+import { APP_VERSION } from "../config/appConfig";
 
-interface IArtist {
-    name?: string
-    cover?: string
-}
-
-const artistSchema = new Schema<IArtist>({
-    name: {
-        type: String
-    },
-    cover: {
-        type: String
-    }
+export const mbApi = new MusicBrainzApi({
+    appName: "Quaver",
+    appVersion: APP_VERSION,
+    appContactInfo: "https://github.com/LeoDPlouc/Quaver"
 })
-const Artist = model<IArtist>("Artist", artistSchema)
-
-export { Artist, IArtist }

@@ -11,21 +11,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { v4 } from "uuid"
+import fs from "fs/promises"
+import path from "path"
+import { IMAGES_PATH } from "../config/config"
+import { IImage } from "../models/imageModel"
 
-interface IArtist {
-    name?: string
-    cover?: string
+export async function saveImage(data: string, extension: string): Promise<string> {
+    //Create an UUID for the name of the file
+    var filename = v4() + extension
+    var p = path.resolve(IMAGES_PATH, filename)
+
+    await fs.writeFile(p, data, { encoding: "binary" })
+
+    return p
 }
 
-const artistSchema = new Schema<IArtist>({
-    name: {
-        type: String
-    },
-    cover: {
-        type: String
-    }
-})
-const Artist = model<IArtist>("Artist", artistSchema)
-
-export { Artist, IArtist }
+export async function deleteImage(image: IImage): Promise<void> {
+    return await fs.rm(image.path)
+}

@@ -1,24 +1,24 @@
-    // Quaver is a self-hostable music player and music library manager
-    // Copyright (C) 2022  DPlouc
+// Quaver is a self-hostable music player and music library manager
+// Copyright (C) 2022  DPlouc
 
-    // This program is free software: you can redistribute it and/or modify
-    // it under the terms of the GNU General Public License as published by
-    // the Free Software Foundation, either version 3 of the License, or
-    // (at your option) any later version.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 
-    // This program is distributed in the hope that it will be useful,
-    // but WITHOUT ANY WARRANTY; without even the implied warranty of
-    // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    // GNU General Public License for more details.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 
-    // You should have received a copy of the GNU General Public License
-    // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import express from "express"
 import mongoose from "mongoose"
 import session from "express-session"
 
-import { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONGO_PORT, SESSION_SECRET, APP_PORT, HEADLESS } from "./config/config"
+import { SESSION_SECRET, APP_PORT, HEADLESS } from "./config/config"
 
 import songRouter from "./routes/songRoute"
 import userRouter from "./routes/userRoute"
@@ -30,6 +30,8 @@ import imageRouter from "./routes/imageRoute"
 import songCollector from "./workers/songCollector"
 
 import { IUser } from "./models/userModel"
+import { waitForDb } from "./db/initdb"
+import { Migrate } from "./db/migration"
 
 //Declare the objects stored in session
 declare module 'express-session' {
@@ -39,7 +41,6 @@ declare module 'express-session' {
 }
 
 const app = express()
-const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`
 
 //Init session
 app.use(session({
@@ -55,37 +56,25 @@ app.use(session({
 app.use(express.json())
 
 //Declare routes
-//Dont declare the root path if in headless mode
-if (HEADLESS)
-    app.use("/", appRouter)
-
 app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
 app.use("/api/album", albumRouter)
 app.use("/api/artist", artistRouter)
 app.use("/api/image", imageRouter)
 
+//Dont declare the root path if in headless mode
+if (!HEADLESS)
+    app.use("/", appRouter)
+
 //Connect to the db
-async function waitForDb() {
-    await mongoose
-        .connect(mongoUrl, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-            dbName: "quaver"
-        })
-        .then(() => console.log("Successfully connected to database"))
-        .catch((e) => {
-            console.log(e)
-            //retry connection
-            setTimeout(waitForDb, 5000)
-        })
-}
+waitForDb()
+    .then(async () => {
+        //Apply database migration
+        await Migrate()
 
-waitForDb().then(() => {
-    //Start collection of the songs
-    songCollector()
+        //Start collection of the songs
+        songCollector()
 
-    //Open server
-    app.listen(APP_PORT, () => console.log(`listening on port ${APP_PORT}`))
-})
+        //Open server
+        app.listen(APP_PORT, () => console.log(`listening on port ${APP_PORT}`))
+    })

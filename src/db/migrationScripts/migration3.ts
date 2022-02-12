@@ -11,21 +11,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { Album } from "../../models/albumModel"
+import { IMigration } from "../migration"
 
-interface IArtist {
-    name?: string
-    cover?: string
-}
-
-const artistSchema = new Schema<IArtist>({
-    name: {
-        type: String
+export const migration3: IMigration = {
+    async up() {
     },
-    cover: {
-        type: String
-    }
-})
-const Artist = model<IArtist>("Artist", artistSchema)
 
-export { Artist, IArtist }
+    //Remove MB ID list and keep only one
+    async down() {
+        var albums = await Album.find()
+
+        for (var i = 0; i < albums.length; i++) {
+            var a = albums[i]
+
+            if (a.mbids) {
+                console.log(`Migration 3 -> 2 album ${a.id}`)
+
+                a.mbid = a.mbids[0]
+                a.mbids = undefined
+
+                await a.save()
+            }
+        }
+    }
+}

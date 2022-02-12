@@ -1,32 +1,31 @@
-    // Quaver is a self-hostable music player and music library manager
-    // Copyright (C) 2022  DPlouc
+// Quaver is a self-hostable music player and music library manager
+// Copyright (C) 2022  DPlouc
 
-    // This program is free software: you can redistribute it and/or modify
-    // it under the terms of the GNU General Public License as published by
-    // the Free Software Foundation, either version 3 of the License, or
-    // (at your option) any later version.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 
-    // This program is distributed in the hope that it will be useful,
-    // but WITHOUT ANY WARRANTY; without even the implied warranty of
-    // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    // GNU General Public License for more details.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 
-    // You should have received a copy of the GNU General Public License
-    // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { parseFile } from "music-metadata"
 import { Document } from "mongoose"
 import Path from "path"
-import fpcalc from "fpcalc"
-import { promisify } from "util"
-
+import fp from "fpcalc-async"
+import { Image } from "../models/imageModel"
 import { Album, IAlbum } from "../models/albumModel"
 import { Artist, IArtist } from "../models/artistModel"
 import { ISong } from "../models/songModel"
 import { FPCALC_PATH } from "../config/config"
+import { getAlbumCover, getAlbumMBId } from "./albumProcessor"
 
-async function getAcoustid(songPath: string): Promise<string> {
-    const fp = promisify(fpcalc)
+export async function getAcoustid(songPath: string): Promise<string> {
     var fingerprint
 
     //If fpcalc isn't in PATH, use fpcalc with its path
@@ -37,7 +36,7 @@ async function getAcoustid(songPath: string): Promise<string> {
 
 }
 
-export async function getMetadata(songPath: string): Promise<ISong> {
+export async function getMetadataFromFile(songPath: string): Promise<ISong> {
     var tag = await parseFile(songPath)
 
     var format = Path.extname(songPath)
@@ -76,8 +75,23 @@ export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any,
         })
 
         console.log(`Found new album ${album.title}`)
-    }
 
+        //Fetch album's MBId
+        var albumMbId = await getAlbumMBId(album)
+        album.mbids = albumMbId
+
+        //Fetch album's cover
+        var albumCover = await getAlbumCover(album)
+        if (albumCover) {
+            await albumCover.save()
+
+            console.log(`Found new cover for ${album.title}`)
+
+            album.cover = albumCover.id
+        } else console.log(`No cover found for ${album.title}`)
+
+        await album.save()
+    }
     return album
 }
 
@@ -96,6 +110,8 @@ export async function getArtist(song: ISong): Promise<IArtist & Document<any, an
         })
 
         console.log(`Found new artist ${artist.name}`)
+
+        await artist.save()
     }
 
     return artist

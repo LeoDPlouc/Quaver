@@ -13,19 +13,16 @@
 
 import { Schema, model } from "mongoose"
 
-interface IArtist {
-    name?: string
-    cover?: string
+interface IDbInfo {
+    version: number
 }
 
-const artistSchema = new Schema<IArtist>({
-    name: {
-        type: String
-    },
-    cover: {
-        type: String
+const dbInfoSchema = new Schema<IDbInfo>({
+    version: {
+        type: Number,
+        require: [true, "Db must have a version"]
     }
 })
-const Artist = model<IArtist>("Artist", artistSchema)
+const DbInfo = model<IDbInfo>("DbInfo", dbInfoSchema)
 
-export { Artist, IArtist }
+export { DbInfo, IDbInfo } 

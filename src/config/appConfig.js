@@ -11,21 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
-
-interface IArtist {
-    name?: string
-    cover?: string
+module.exports = {
+    DB_VERSION: 3,
+    APP_VERSION: "0.1.0-beta"
 }
-
-const artistSchema = new Schema<IArtist>({
-    name: {
-        type: String
-    },
-    cover: {
-        type: String
-    }
-})
-const Artist = model<IArtist>("Artist", artistSchema)
-
-export { Artist, IArtist }

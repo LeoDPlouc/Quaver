@@ -1,0 +1,18 @@
+CHANGELOG
+
+====================================================
+0.1.0-beta
+
+Server:
+- Changed environnement variables names
+- Added headless mode
+- Added a migration logic for the database
+- Automatic Musicbrainz fetching
+- Changed fpcalc package to fpcalc-async
+- Automatic cover fetching
+- New environnement variable QUAVER_IMAGES_PATH to store cover
+- Default value for QUAVER_MUSIC_PATH changed to /music
+
+FrontEnd:
+- Added logo
+- Fetched cover are displayed in place of the placeholder
