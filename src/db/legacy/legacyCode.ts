@@ -11,26 +11,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Album, IAlbum } from "../migrationModels/albumMigrationModel"
-import { IMigration } from "../migration"
-import { getAlbumMBIdLegacy } from "../legacy/legacyCode"
+import { IReleaseList } from "musicbrainz-api"
+import { mbApi } from "../../apis/mbApi"
+import { IAlbum } from "../migrationModels/albumMigrationModel"
 
-export const migration0: IMigration = {
-    async up() {
-        var albums = await Album.find()
+export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {
 
-        for (var i = 0; i < albums.length; i++) {
-            var a = albums[i]
+    var query = `release:${album.title as string}`
 
-            if (!a.mbid) {
-                console.log(`Migration 0 -> 1 album ${a.id}`)
+    if (album.artist) query += ` and artist:${album.artist}`
 
-                a.mbid = await getAlbumMBIdLegacy(a)
-                await a.save()
-            }
-        }
-    },
-    async down() {
-
-    }
+    var result = await mbApi.search<IReleaseList>("release", { query })
+    return result.releases[0].id
 }
