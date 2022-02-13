@@ -19,6 +19,7 @@ import { Song } from "../models/songModel"
 import logger from "../utils/logger"
 import { cleanManyAlbums } from "./albumController"
 import { cleanManySongs } from "./songController"
+import { validationResult } from "express-validator"
 
 export function cleanOneArtist(data: IArtist & Document<any, any, IArtist>): any {
     var cleanedData = {
@@ -57,6 +58,13 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
 }
 
 export async function getOneArtist(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         //Search an artist by id and clean the output
         const artist = cleanOneArtist(await Artist.findById(req.params.id))
@@ -77,6 +85,13 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
 }
 
 export async function updateArtist(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         const artist = await Artist.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -99,6 +114,13 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
 }
 
 export async function getArtistSongs(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         //Search songs by artistId and clean the output
         const songs = await Song.find({ artistId: req.params.id })
@@ -120,6 +142,13 @@ export async function getArtistSongs(req: Request, res: Response, next: NextFunc
 }
 
 export async function getArtistAlbums(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         //Search albums by artistId and clean the output
         const albums = await Album.find({ artistId: req.params.id })

@@ -15,6 +15,7 @@ import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
 import { Image, IImage } from "../models/imageModel"
 import logger from "../utils/logger"
+import { validationResult } from "express-validator"
 
 //Clean api output
 export function cleanOneImage(data: IImage & Document<any, any, IImage>): any {
@@ -52,6 +53,13 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
 }
 
 export async function getOneImageInfo(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         //Search an image by id and clean the output
         const image = cleanOneImage(await Image.findById(req.params.id))
@@ -72,6 +80,13 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
 }
 
 export async function getImage(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         //Search an image by id and send the file
         const image = await Image.findById(req.params.id)

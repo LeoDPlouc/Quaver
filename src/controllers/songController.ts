@@ -15,6 +15,7 @@ import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
 import { ISong, Song } from "../models/songModel"
 import logger from "../utils/logger"
+import { validationResult } from "express-validator"
 
 //Clean api output
 export function cleanOneSong(data: ISong & Document<any, any, ISong>): any {
@@ -62,6 +63,13 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
 }
 
 export async function getOneSongInfo(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         //Search a song by id and clean the output
         const song = cleanOneSong(await Song.findById(req.params.id))
@@ -82,6 +90,13 @@ export async function getOneSongInfo(req: Request, res: Response, next: NextFunc
 }
 
 export async function updateSongInfo(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -104,6 +119,13 @@ export async function updateSongInfo(req: Request, res: Response, next: NextFunc
 }
 
 export async function getSongStream(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         //Search a song by id and and send the file
         const song = await Song.findById(req.params.id)
@@ -119,6 +141,13 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
 }
 
 export async function updateLike(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         //Search a song by id
         const song = await Song.findById(req.params.id)

@@ -24,6 +24,7 @@
     "coverart": "0.0.1",
     "express": "^4.17.2",
     "express-session": "^1.17.2",
+    "express-validator": "^6.14.0",
     "fpcalc-async": "^1.0.9",
     "mongoose": "^5.13.14",
     "music-metadata": "^7.11.4",
