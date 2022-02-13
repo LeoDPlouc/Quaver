@@ -15,8 +15,6 @@ import request from "supertest"
 import { cleanDatabase, createDatabase } from "./util"
 import app from "../src/app"
 
-jest.setTimeout(20000)
-
 describe("Song", () => {
     beforeAll(createDatabase)
     afterAll(cleanDatabase)
