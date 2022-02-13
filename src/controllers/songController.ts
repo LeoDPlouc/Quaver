@@ -47,7 +47,7 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
         const songs = cleanManySongs(await Song.find())
 
         res.json({
-            status: "succes",
+            status: "success",
             results: songs.length,
             data: {
                 songs
@@ -157,7 +157,7 @@ export async function updateLike(req: Request, res: Response, next: NextFunction
         await song.save()
 
         res.json({
-            status: "succes"
+            status: "success"
         })
     }
     catch (e) {
