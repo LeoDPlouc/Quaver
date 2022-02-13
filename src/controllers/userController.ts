@@ -14,6 +14,7 @@
 import bcrypt from "bcryptjs"
 import { Request, Response, NextFunction } from "express"
 import { User } from "../models/userModel"
+import logger from "../utils/logger"
 
 export async function signUp(req: Request, res: Response, next: NextFunction) {
     try {
@@ -35,7 +36,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
             }
         })
     } catch (e) {
-        console.log(e)
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -72,6 +73,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })

@@ -14,6 +14,7 @@
 import { Document } from "mongoose";
 import { DB_VERSION } from "../config/appConfig"
 import { DbInfo, IDbInfo } from "../models/dbInfoModel";
+import logger from "../utils/logger";
 import { migration0 } from "./migrationScripts/migration0";
 import { migration1 } from "./migrationScripts/migration1";
 import { migration2 } from "./migrationScripts/migration2";
@@ -49,8 +50,8 @@ export async function Migrate() {
     var db_ver = info.version
     var app_ver = DB_VERSION
 
-    console.log(`Database schema version : ${db_ver}`)
-    console.log(`Application schema version : ${app_ver}`)
+    logger.info(`Database schema version : ${db_ver}`)
+    logger.info(`Application schema version : ${app_ver}`)
 
     //Compare db version with app version and apply migration
     if (db_ver > app_ver) {

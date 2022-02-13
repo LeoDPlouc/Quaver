@@ -14,6 +14,7 @@
 import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
 import { ISong, Song } from "../models/songModel"
+import logger from "../utils/logger"
 
 //Clean api output
 export function cleanOneSong(data: ISong & Document<any, any, ISong>): any {
@@ -53,6 +54,7 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -72,6 +74,7 @@ export async function getOneSongInfo(req: Request, res: Response, next: NextFunc
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -93,6 +96,7 @@ export async function updateSongInfo(req: Request, res: Response, next: NextFunc
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })

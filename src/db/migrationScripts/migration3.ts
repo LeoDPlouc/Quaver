@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Album } from "../../models/albumModel"
+import logger from "../../utils/logger"
 import { IMigration } from "../migration"
 
 export const migration3: IMigration = {
@@ -26,7 +27,7 @@ export const migration3: IMigration = {
             var a = albums[i]
 
             if (a.mbids) {
-                console.log(`Migration 3 -> 2 album ${a.id}`)
+                logger.info(`Migration 3 -> 2 album ${a.id}`)
 
                 a.mbid = a.mbids[0]
                 a.mbids = undefined

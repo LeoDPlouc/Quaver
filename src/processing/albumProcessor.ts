@@ -20,6 +20,7 @@ import { IImage, Image } from "../models/imageModel"
 import coverart from "coverart"
 import { saveImage } from "./imageProcessor"
 import { mbApi } from "../apis/mbApi"
+import logger from "../utils/logger"
 
 const ca = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
 
@@ -39,14 +40,14 @@ export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
     return ids
 }
 
-export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<any, any, IImage>> {
+export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>): Promise<IImage & Document<any, any, IImage>> {
 
     var cover
     var ext
 
     var i = 0
     //Try fetching cover art for every MB ID
-    while (!image && i < album.mbids.length) {
+    while (!cover && i < album.mbids.length) {
         try {
             //Fetch Cover art
             var p = new Promise<any>((resolve, reject) => {
@@ -64,10 +65,13 @@ export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<an
     }
 
     if (image) {
+        logger.info(`Found new cover for ${album.id}`)
         //Save the image cover on the hard drive
         var path = await saveImage(image, extension)
+        var newCover = new Image({ path })
+        await newCover.save()
 
-        return new Image({ path })
+        return newCover
     }
     return null
 }
@@ -83,7 +87,7 @@ export async function getArtist(album: IAlbum) {
             name: album.artist
         })
 
-        console.log(`Found new artist ${artist.name}`)
+        logger.info(`Found new artist ${artist.id}`)
     }
 
     return artist

@@ -6,7 +6,7 @@
 // (at your option) any later version.
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
- // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -15,6 +15,7 @@ import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
 import { Album, IAlbum } from "../models/albumModel"
 import { Song } from "../models/songModel"
+import logger from "../utils/logger"
 import { cleanManySongs } from "./songController"
 
 //Clean api output
@@ -50,7 +51,7 @@ async function getAllAlbums(req: Request, res: Response, next: NextFunction) {
         })
 
     } catch (e) {
-        console.debug(e)
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -70,6 +71,7 @@ async function getOneAlbum(req: Request, res: Response, next: NextFunction) {
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -91,6 +93,7 @@ async function updateAlbum(req: Request, res: Response, next: NextFunction) {
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -110,7 +113,8 @@ export async function getAlbumSongs(req: Request, res: Response, next: NextFunct
                 songs: cleanedSongs
             }
         })
-    } catch {
+    } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })

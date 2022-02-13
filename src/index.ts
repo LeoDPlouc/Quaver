@@ -32,6 +32,8 @@ import songCollector from "./workers/songCollector"
 import { IUser } from "./models/userModel"
 import { waitForDb } from "./db/initdb"
 import { Migrate } from "./db/migration"
+import logMiddleware from "./middleware/logMiddleware"
+import logger from "./utils/logger"
 
 //Declare the objects stored in session
 declare module 'express-session' {
@@ -55,6 +57,8 @@ app.use(session({
 //Parse request's body to json
 app.use(express.json())
 
+app.use(logMiddleware)
+
 //Declare routes
 app.use("/api/song", songRouter)
 app.use("/api/user", userRouter)
@@ -76,5 +80,5 @@ waitForDb()
         songCollector()
 
         //Open server
-        app.listen(APP_PORT, () => console.log(`listening on port ${APP_PORT}`))
+        app.listen(APP_PORT, () => logger.info(`listening on port ${APP_PORT}`))
     })

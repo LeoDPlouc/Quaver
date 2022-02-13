@@ -16,6 +16,7 @@ import { Document } from "mongoose"
 import { Album } from "../models/albumModel"
 import { Artist, IArtist } from "../models/artistModel"
 import { Song } from "../models/songModel"
+import logger from "../utils/logger"
 import { cleanManyAlbums } from "./albumController"
 import { cleanManySongs } from "./songController"
 
@@ -48,6 +49,7 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -67,6 +69,7 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -88,6 +91,7 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -107,7 +111,8 @@ export async function getArtistSongs(req: Request, res: Response, next: NextFunc
             }
         })
     }
-    catch {
+    catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -127,7 +132,8 @@ export async function getArtistAlbums(req: Request, res: Response, next: NextFun
             }
         })
     }
-    catch {
+    catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })

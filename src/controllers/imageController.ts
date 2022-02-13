@@ -14,6 +14,7 @@
 import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
 import { Image, IImage } from "../models/imageModel"
+import logger from "../utils/logger"
 
 //Clean api output
 export function cleanOneImage(data: IImage & Document<any, any, IImage>): any {
@@ -43,6 +44,7 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -62,6 +64,7 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -76,6 +79,7 @@ export async function getImage(req: Request, res: Response, next: NextFunction) 
         res.sendFile(image.path)
 
     } catch (e) {
+        logger.error(e)
         res.json({
             status: "fail"
         })

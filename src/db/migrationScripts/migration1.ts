@@ -15,6 +15,7 @@ import { getAlbumCover } from "../../processing/albumProcessor"
 import { IMigration } from "../migration"
 import { getAlbumMBIdLegacy } from "../legacy/legacyCode"
 import { Album } from "../../models/albumModel"
+import logger from "../../utils/logger"
 
 export const migration1: IMigration = {
     //Download album covers
@@ -25,7 +26,7 @@ export const migration1: IMigration = {
             var a = albums[i]
 
             if (!a.cover) {
-                console.log(`Migration 1 -> 2 album ${a.id}`)
+                logger.info(`Migration 1 -> 2 album ${a.id}`)
 
                 var cover = await getAlbumCover(a)
                 if (cover) {
@@ -46,7 +47,7 @@ export const migration1: IMigration = {
             var a = albums[i]
 
             if (!a.mbid) {
-                console.log(`Migration 1 -> 0 album ${a.id}`)
+                logger.info(`Migration 1 -> 0 album ${a.id}`)
 
                 a.mbid = await getAlbumMBIdLegacy(a)
                 await a.save()
