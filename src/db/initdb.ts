@@ -31,7 +31,7 @@ export async function waitForDb() {
         })
         .then(() => logger.info("Successfully connected to database"))
         .catch((e) => {
-            logger.crit(e)
+            logger.error(e)
             //retry connection
             setTimeout(waitForDb, 5000)
         })
