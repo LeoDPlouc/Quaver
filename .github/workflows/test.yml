@@ -22,7 +22,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Start database
-      run: docker-compose up mongo -d
+      run: docker-compose up -d mongo
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
