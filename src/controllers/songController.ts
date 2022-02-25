@@ -75,14 +75,14 @@ export async function getOneSongInfo(req: Request, res: Response, next: NextFunc
         const song = cleanOneSong(await Song.findById(req.params.id))
 
         res.json({
-            status: "succes",
+            status: "success",
             data: {
                 song
             }
         })
 
     } catch (e) {
-        logger.crit(e)
+        logger.error(e)
         res.json({
             status: "fail"
         })

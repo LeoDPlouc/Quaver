@@ -37,7 +37,7 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
         const images = cleanManyImages(await Image.find())
 
         res.json({
-            status: "succes",
+            status: "success",
             results: images.length,
             data: {
                 images
@@ -45,7 +45,7 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
         })
 
     } catch (e) {
-        logger.crit(e)
+        logger.error(e)
         res.json({
             status: "fail"
         })
@@ -65,14 +65,14 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
         const image = cleanOneImage(await Image.findById(req.params.id))
 
         res.json({
-            status: "succes",
+            status: "success",
             data: {
                 image
             }
         })
 
     } catch (e) {
-        logger.crit(e)
+        logger.error(e)
         res.json({
             status: "fail"
         })

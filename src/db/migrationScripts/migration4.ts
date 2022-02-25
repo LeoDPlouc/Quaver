@@ -11,7 +11,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module.exports = {
-    DB_VERSION: 4,
-    APP_VERSION: "0.1.0-beta"
+import { Album } from "../../models/albumModel"
+import logger from "../../utils/logger"
+import { IMigration } from "../migration"
+import { migration2 } from "./migration2"
+
+export const migration4: IMigration = {
+    async up() {
+    },
+
+    //Remove MB ID list and keep only one
+    async down() {
+        migration2.down()
+    }
 }

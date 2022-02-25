@@ -15,6 +15,7 @@ import { waitForDb } from "../src/db/initdb"
 import { Artist } from "../src/models/artistModel"
 import { Album } from "../src/models/albumModel"
 import { Song } from "../src/models/songModel"
+import { Image } from "../src/models/imageModel"
 import mongoose from "mongoose"
 
 export async function createDatabase() {
@@ -27,12 +28,34 @@ export async function createDatabase() {
     await new Song({ album: "Nevermind", albumId: album.id, artist: "Nirvana", artistId: artist.id, n: 2, like: 0, path: "/dev/zero", title: "In Bloom", year: 1991 }).save()
     await new Song({ album: "Nevermind", albumId: album.id, artist: "Nirvana", artistId: artist.id, n: 4, like: 0, path: "/dev/zero", title: "Breed", year: 1991 }).save()
     await new Song({ album: "Nevermind", albumId: album.id, artist: "Nirvana", artistId: artist.id, n: 5, like: 0, path: "/dev/zero", title: "Lithium", year: 1991 }).save()
+    await new Image({ path: "/dev/zero" }).save()
 }
 
 export async function cleanDatabase() {
     await Artist.deleteMany()
     await Album.deleteMany()
     await Song.deleteMany()
+    await Image.deleteMany()
 
     await mongoose.disconnect()
+}
+
+export async function getOneSong() {
+    var songs = await Song.find()
+    return songs[0]
+}
+
+export async function getOneAlbum() {
+    var albums = await Album.find()
+    return albums[0]
+}
+
+export async function getOneArtist() {
+    var artists = await Artist.find()
+    return artists[0]
+}
+
+export async function getOneImage() {
+    var images = await Image.find()
+    return images[0]
 }

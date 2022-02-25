@@ -19,17 +19,19 @@ import { migration0 } from "./migrationScripts/migration0";
 import { migration1 } from "./migrationScripts/migration1";
 import { migration2 } from "./migrationScripts/migration2";
 import { migration3 } from "./migrationScripts/migration3";
+import { migration4 } from "./migrationScripts/migration4";
 
 export interface IMigration {
-    up: () => void
-    down: () => void
+    up: () => Promise<void>
+    down: () => Promise<void>
 }
 
 const migrations: IMigration[] = [
     migration0,
     migration1,
     migration2,
-    migration3
+    migration3,
+    migration4
 ]
 
 async function FetchDbInfo(): Promise<Document<any, any, IDbInfo> & IDbInfo> {

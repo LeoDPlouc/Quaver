@@ -19,12 +19,86 @@ describe("Song", () => {
     beforeAll(createDatabase)
     afterAll(cleanDatabase)
 
-    describe("Get /songs/", () => {
+    var id
+
+    describe("Get /song/", () => {
         it("Should return all songs", async () => {
             var res = await request(app).get("/api/song").expect(200)
 
+            id = res.body.data.songs[0].id
+
             expect(res.body.status).toBe("success")
             expect(res.body.results).toBe(5)
+        })
+    })
+
+    describe("Get /song/:id", () => {
+        it("Should return one song", async () => {
+            var res = await request(app).get(`/api/song/${id}`).expect(200)
+
+            expect(res.body.status).toBe("success")
+            expect(res.body.data.song).toBeDefined()
+        })
+
+        it("Should fail with id undefined", async () => {
+            var res = await request(app).get("/api/song/undefined").expect(200)
+
+            expect(res.body.status).toBe("fail")
+        })
+    })
+
+    describe("Get /song/:id/stream", () => {
+        it("Should fail with id undefined", async () => {
+            var res = await request(app).get("/api/song/undefined/stream").expect(200)
+
+            expect(res.body.status).toBe("fail")
+        })
+    })
+
+    describe("Get /song/:id/like", () => {
+        it("Should change like value to 1", async () => {
+            var res = await request(app).patch(`/api/song/${id}/like`).send({ like: 1 }).expect(200)
+
+            expect(res.body.status).toBe("success")
+
+            res = await request(app).get(`/api/song/${id}`).expect(200)
+
+            expect(res.body.status).toBe("success")
+            expect(res.body.data.song.like).toBe(1)
+        })
+
+        it("Should change like value to 0", async () => {
+            var res = await request(app).patch(`/api/song/${id}/like`).send({ like: 0 }).expect(200)
+
+            expect(res.body.status).toBe("success")
+
+            res = await request(app).get(`/api/song/${id}`).expect(200)
+
+            expect(res.body.status).toBe("success")
+            expect(res.body.data.song.like).toBe(0)
+        })
+
+        it("Should change like value to -1", async () => {
+            var res = await request(app).patch(`/api/song/${id}/like`).send({ like: -1 }).expect(200)
+
+            expect(res.body.status).toBe("success")
+
+            res = await request(app).get(`/api/song/${id}`).expect(200)
+
+            expect(res.body.status).toBe("success")
+            expect(res.body.data.song.like).toBe(-1)
+        })
+
+        it("Should fail with 5", async () => {
+            var res = await request(app).patch(`/api/song/${id}/like`).send({ like: 5 }).expect(200)
+
+            expect(res.body.status).toBe("fail")
+        })
+
+        it("Should fail with id undefined", async () => {
+            var res = await request(app).patch("/api/song/undefined/like").send({ like: 0 }).expect(200)
+
+            expect(res.body.status).toBe("fail")
         })
     })
 })

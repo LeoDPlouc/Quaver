@@ -15,14 +15,11 @@ import { Document } from "mongoose"
 import { Artist, IArtist } from "../models/artistModel"
 import { IAlbum } from "../models/albumModel"
 import { IReleaseList } from "musicbrainz-api"
-import { APP_VERSION } from "../config/appConfig"
 import { IImage, Image } from "../models/imageModel"
-import coverart from "coverart"
 import { saveImage } from "./imageProcessor"
 import { mbApi } from "../apis/mbApi"
 import logger from "../utils/logger"
-
-const ca = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
+import { caApi } from "../apis/caApi"
 
 export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
 
@@ -51,7 +48,7 @@ export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>):
         try {
             //Fetch Cover art
             var p = new Promise<any>((resolve, reject) => {
-                ca.release(album.mbids[i], { piece: "front" }, (err, data) => {
+                caApi.release(album.mbids[i], { piece: "front" }, (err, data) => {
                     if (err) reject(err)
                     resolve(data)
                 })
@@ -68,6 +65,7 @@ export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>):
         logger.info(`Found new cover for ${album.id}`)
         //Save the image cover on the hard drive
         var path = await saveImage(image, extension)
+
         var newCover = new Image({ path })
         await newCover.save()
 

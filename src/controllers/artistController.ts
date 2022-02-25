@@ -42,7 +42,7 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
         const artists = cleanManyArtists(await Artist.find())
 
         res.json({
-            status: "succes",
+            status: "success",
             results: artists.length,
             data: {
                 artists
@@ -70,7 +70,7 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
         const artist = cleanOneArtist(await Artist.findById(req.params.id))
 
         res.json({
-            status: "succes",
+            status: "success",
             data: {
                 artist
             }
@@ -99,7 +99,7 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
         })
 
         res.json({
-            status: "succes",
+            status: "success",
             data: {
                 artist
             }
@@ -127,7 +127,8 @@ export async function getArtistSongs(req: Request, res: Response, next: NextFunc
         const cleanedSongs = cleanManySongs(songs)
 
         res.json({
-            status: "succes",
+            status: "success",
+            results: songs.length,
             data: {
                 songs: cleanedSongs
             }
@@ -155,7 +156,8 @@ export async function getArtistAlbums(req: Request, res: Response, next: NextFun
         const cleanedAlbums = cleanManyAlbums(albums)
 
         res.json({
-            status: "succes",
+            status: "success",
+            results: albums.length,
             data: {
                 albums: cleanedAlbums
             }

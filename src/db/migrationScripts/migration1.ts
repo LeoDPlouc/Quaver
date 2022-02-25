@@ -11,9 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getAlbumCover } from "../../processing/albumProcessor"
 import { IMigration } from "../migration"
-import { getAlbumMBIdLegacy } from "../legacy/legacyCode"
+import { getAlbumCoverLegacy } from "../legacy/legacyCode"
 import { Album } from "../../models/albumModel"
 import logger from "../../utils/logger"
 
@@ -28,7 +27,7 @@ export const migration1: IMigration = {
             if (!a.cover) {
                 logger.info(`Migration 1 -> 2 album ${a.id}`)
 
-                var cover = await getAlbumCover(a)
+                var cover = await getAlbumCoverLegacy(a)
                 if (cover) {
                     await cover.save()
 
@@ -49,7 +48,7 @@ export const migration1: IMigration = {
             if (!a.mbid) {
                 logger.info(`Migration 1 -> 0 album ${a.id}`)
 
-                a.mbid = await getAlbumMBIdLegacy(a)
+                a.mbid = undefined
                 await a.save()
             }
         }

@@ -44,7 +44,7 @@ export async function getAllAlbums(req: Request, res: Response, next: NextFuncti
         const albums = cleanManyAlbums(await Album.find())
 
         res.json({
-            status: "succes",
+            status: "success",
             results: albums.length,
             data: {
                 albums
@@ -72,7 +72,7 @@ export async function getOneAlbum(req: Request, res: Response, next: NextFunctio
         const album = cleanOneAlbum(await Album.findById(req.params.id))
 
         res.json({
-            status: "succes",
+            status: "success",
             data: {
                 album
             }
@@ -129,7 +129,7 @@ export async function getAlbumSongs(req: Request, res: Response, next: NextFunct
         var cleanedSongs = cleanManySongs(songs)
 
         res.json({
-            status: "succes",
+            status: "success",
             results: cleanedSongs.length,
             data: {
                 songs: cleanedSongs

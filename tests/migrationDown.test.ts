@@ -11,7 +11,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module.exports = {
-    DB_VERSION: 4,
-    APP_VERSION: "0.1.0-beta"
-}
+import { cleanDatabase, createDatabase, getOneAlbum } from "./util"
+import { migration1 } from "../src/db/migrationScripts/migration1"
+
+
+describe("Migration down", () => {
+    beforeAll(createDatabase)
+    afterAll(cleanDatabase)
+
+    it("Migration 1 down", async () => {
+        await migration1.down()
+
+        var album = await getOneAlbum()
+
+        expect(album.mbid).toBeUndefined()
+    })
+})
