@@ -27,7 +27,7 @@ describe("Album", () => {
 
             id = res.body.data.albums[0].id
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.results).toBe(1)
         })
     })
@@ -36,14 +36,14 @@ describe("Album", () => {
         it("Should return one album", async () => {
             var res = await request(app).get(`/api/album/${id}`).expect(200)
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.data.album).toBeDefined()
         })
 
         it("Should fail with id undefined", async () => {
             var res = await request(app).get("/api/album/undefined").expect(200)
 
-            expect(res.body.status).toBe("fail")
+            expect(res.body.statusCode).toBe(2)
         })
     })
 
@@ -51,14 +51,14 @@ describe("Album", () => {
         it("Should return album's songs", async () => {
             var res = await request(app).get(`/api/album/${id}/songs`).expect(200)
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.results).toBe(5)
         })
 
         it("Should fail with id undefined", async () => {
             var res = await request(app).get("/api/album/undefined/songs").expect(200)
 
-            expect(res.body.status).toBe("fail")
+            expect(res.body.statusCode).toBe(2)
         })
     })
 })

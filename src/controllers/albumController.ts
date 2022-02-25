@@ -45,6 +45,7 @@ export async function getAllAlbums(req: Request, res: Response, next: NextFuncti
 
         res.json({
             status: "success",
+            statusCode: 0,
             results: albums.length,
             data: {
                 albums
@@ -54,7 +55,9 @@ export async function getAllAlbums(req: Request, res: Response, next: NextFuncti
     } catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -63,7 +66,9 @@ export async function getOneAlbum(req: Request, res: Response, next: NextFunctio
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -73,6 +78,7 @@ export async function getOneAlbum(req: Request, res: Response, next: NextFunctio
 
         res.json({
             status: "success",
+            statusCode: 0,
             data: {
                 album
             }
@@ -81,7 +87,9 @@ export async function getOneAlbum(req: Request, res: Response, next: NextFunctio
     } catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -90,7 +98,9 @@ export async function updateAlbum(req: Request, res: Response, next: NextFunctio
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -102,6 +112,7 @@ export async function updateAlbum(req: Request, res: Response, next: NextFunctio
 
         res.json({
             status: "succes",
+            statusCode: 0,
             data: {
                 album
             }
@@ -110,7 +121,9 @@ export async function updateAlbum(req: Request, res: Response, next: NextFunctio
     } catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -119,7 +132,9 @@ export async function getAlbumSongs(req: Request, res: Response, next: NextFunct
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            satusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -131,6 +146,7 @@ export async function getAlbumSongs(req: Request, res: Response, next: NextFunct
         res.json({
             status: "success",
             results: cleanedSongs.length,
+            statusCode: 0,
             data: {
                 songs: cleanedSongs
             }
@@ -138,7 +154,9 @@ export async function getAlbumSongs(req: Request, res: Response, next: NextFunct
     } catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }

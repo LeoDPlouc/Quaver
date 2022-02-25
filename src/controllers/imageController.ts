@@ -38,6 +38,7 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
 
         res.json({
             status: "success",
+            statusCode: 0,
             results: images.length,
             data: {
                 images
@@ -47,7 +48,9 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
     } catch (e) {
         logger.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -56,7 +59,9 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Invalid error"
         })
     }
 
@@ -66,6 +71,7 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
 
         res.json({
             status: "success",
+            statusCode: 0,
             data: {
                 image
             }
@@ -74,7 +80,9 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
     } catch (e) {
         logger.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -83,7 +91,9 @@ export async function getImage(req: Request, res: Response, next: NextFunction) 
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -96,7 +106,9 @@ export async function getImage(req: Request, res: Response, next: NextFunction) 
     } catch (e) {
         logger.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }

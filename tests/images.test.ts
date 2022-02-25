@@ -27,7 +27,7 @@ describe("Image", () => {
 
             id = res.body.data.images[0].id
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.results).toBe(1)
         })
     })
@@ -36,14 +36,14 @@ describe("Image", () => {
         it("Should return one image", async () => {
             var res = await request(app).get(`/api/image/${id}`).expect(200)
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.data.image).toBeDefined()
         })
 
         it("Should fail with id undefined", async () => {
             var res = await request(app).get("/api/image/undefined").expect(200)
 
-            expect(res.body.status).toBe("fail")
+            expect(res.body.statusCode).toBe(2)
         })
     })
 
@@ -51,7 +51,7 @@ describe("Image", () => {
         it("Should fail with id undefined", async () => {
             var res = await request(app).get("/api/image/undefined/file").expect(200)
 
-            expect(res.body.status).toBe("fail")
+            expect(res.body.statusCode).toBe(2)
         })
     })
 })

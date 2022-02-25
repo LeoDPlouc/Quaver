@@ -48,6 +48,7 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
 
         res.json({
             status: "success",
+            statusCode: 0,
             results: songs.length,
             data: {
                 songs
@@ -57,7 +58,9 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
     } catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -66,7 +69,9 @@ export async function getOneSongInfo(req: Request, res: Response, next: NextFunc
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -76,6 +81,7 @@ export async function getOneSongInfo(req: Request, res: Response, next: NextFunc
 
         res.json({
             status: "success",
+            statusCode: 0,
             data: {
                 song
             }
@@ -84,7 +90,9 @@ export async function getOneSongInfo(req: Request, res: Response, next: NextFunc
     } catch (e) {
         logger.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -93,7 +101,9 @@ export async function updateSongInfo(req: Request, res: Response, next: NextFunc
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid error"
         })
     }
 
@@ -105,6 +115,7 @@ export async function updateSongInfo(req: Request, res: Response, next: NextFunc
 
         res.json({
             status: "succes",
+            statusCode: 0,
             data: {
                 song
             }
@@ -113,7 +124,9 @@ export async function updateSongInfo(req: Request, res: Response, next: NextFunc
     } catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -122,7 +135,9 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -135,7 +150,9 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
     } catch (e) {
         console.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -144,7 +161,9 @@ export async function updateLike(req: Request, res: Response, next: NextFunction
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -157,13 +176,16 @@ export async function updateLike(req: Request, res: Response, next: NextFunction
         await song.save()
 
         res.json({
-            status: "success"
+            status: "success",
+            statusCode: 0,
         })
     }
     catch (e) {
         console.log(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }

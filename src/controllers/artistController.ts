@@ -43,6 +43,7 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
 
         res.json({
             status: "success",
+            statusCode: 0,
             results: artists.length,
             data: {
                 artists
@@ -52,6 +53,8 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
     } catch (e) {
         logger.crit(e)
         res.json({
+            statusCode: 1,
+            errorMessage: "Server error",
             status: "fail"
         })
     }
@@ -61,7 +64,9 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -71,6 +76,7 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
 
         res.json({
             status: "success",
+            statusCode: 0,
             data: {
                 artist
             }
@@ -79,7 +85,9 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
     } catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -88,7 +96,9 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid error"
         })
     }
 
@@ -100,6 +110,7 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
 
         res.json({
             status: "success",
+            statusCode: 0,
             data: {
                 artist
             }
@@ -108,7 +119,9 @@ export async function updateArtist(req: Request, res: Response, next: NextFuncti
     } catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -117,7 +130,9 @@ export async function getArtistSongs(req: Request, res: Response, next: NextFunc
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -128,6 +143,7 @@ export async function getArtistSongs(req: Request, res: Response, next: NextFunc
 
         res.json({
             status: "success",
+            statusCode: 0,
             results: songs.length,
             data: {
                 songs: cleanedSongs
@@ -137,7 +153,9 @@ export async function getArtistSongs(req: Request, res: Response, next: NextFunc
     catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
@@ -146,7 +164,9 @@ export async function getArtistAlbums(req: Request, res: Response, next: NextFun
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
@@ -157,6 +177,7 @@ export async function getArtistAlbums(req: Request, res: Response, next: NextFun
 
         res.json({
             status: "success",
+            statusCode: 0,
             results: albums.length,
             data: {
                 albums: cleanedAlbums
@@ -166,7 +187,9 @@ export async function getArtistAlbums(req: Request, res: Response, next: NextFun
     catch (e) {
         logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }

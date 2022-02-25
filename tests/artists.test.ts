@@ -27,7 +27,7 @@ describe("Artist", () => {
 
             id = res.body.data.artists[0].id
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.results).toBe(1)
         })
     })
@@ -36,14 +36,14 @@ describe("Artist", () => {
         it("Should return one artist", async () => {
             var res = await request(app).get(`/api/artist/${id}`).expect(200)
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.data.artist).toBeDefined()
         })
 
         it("Should fail with id undefined", async () => {
             var res = await request(app).get("/api/artist/undefined").expect(200)
 
-            expect(res.body.status).toBe("fail")
+            expect(res.body.statusCode).toBe(2)
         })
     })
 
@@ -51,14 +51,14 @@ describe("Artist", () => {
         it("Should return artist's songs", async () => {
             var res = await request(app).get(`/api/artist/${id}/songs`).expect(200)
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.results).toBe(5)
         })
 
         it("Should fail with id undefined", async () => {
             var res = await request(app).get("/api/artist/undefined/songs").expect(200)
 
-            expect(res.body.status).toBe("fail")
+            expect(res.body.statusCode).toBe(2)
         })
     })
 
@@ -66,14 +66,14 @@ describe("Artist", () => {
         it("Should return artist's albums", async () => {
             var res = await request(app).get(`/api/artist/${id}/albums`).expect(200)
 
-            expect(res.body.status).toBe("success")
+            expect(res.body.statusCode).toBe(0)
             expect(res.body.results).toBe(1)
         })
 
         it("Should fail with id undefined", async () => {
             var res = await request(app).get("/api/artist/undefined/albums").expect(200)
 
-            expect(res.body.status).toBe("fail")
+            expect(res.body.statusCode).toBe(2)
         })
     })
 })
