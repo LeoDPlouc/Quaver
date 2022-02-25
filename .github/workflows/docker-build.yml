@@ -13,6 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Build the Docker image
+    - 
+      name: Checkout
+      uses: actions/checkout@v2
+    -
+      name: Build Quaver
+      run: npm run build
+    - 
+      name: Build the Docker image
       run: docker build . --file Dockerfile --tag quaver-test
