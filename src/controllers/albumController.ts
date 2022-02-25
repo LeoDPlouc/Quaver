@@ -133,7 +133,7 @@ export async function getAlbumSongs(req: Request, res: Response, next: NextFunct
     if (!err.isEmpty()) {
         return res.json({
             status: "fail",
-            satusCode: 2,
+            statusCode: 2,
             errorMessage: "Invalid request"
         })
     }

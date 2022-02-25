@@ -98,7 +98,7 @@ describe("Song", () => {
         it("Should fail with id undefined", async () => {
             var res = await request(app).patch("/api/song/undefined/like").send({ like: 0 }).expect(200)
 
-            expect(res.body.statusCode).toBe(0)
+            expect(res.body.statusCode).toBe(2)
         })
     })
 })

@@ -60,8 +60,8 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
     if (!err.isEmpty()) {
         return res.json({
             status: "fail",
-            statusCode: 1,
-            errorMessage: "Invalid error"
+            statusCode: 2,
+            errorMessage: "Invalid request"
         })
     }
 
