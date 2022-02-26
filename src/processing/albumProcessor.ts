@@ -37,16 +37,7 @@ export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
     return ids
 }
 
-export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>, session: ClientSession): Promise<IImage & Document<any, any, IImage>> {
-
-    var localSession = false
-    if (!session) {
-        session = await startSession()
-        session.startTransaction()
-        localSession = true
-    }
-
-    try {
+export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>): Promise<IImage & Document<any, any, IImage>> {
         var cover
         var ext
 
@@ -75,15 +66,11 @@ export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>, 
             var path = await saveImage(image, extension)
 
             var newCover = new Image({ path })
-            await newCover.save({ session })
+            await newCover.save()
 
             return newCover
         }
         return null
-    } catch (err) {
-        if (localSession) await session.abortTransaction()
-        throw err
-    }
 }
 
 export async function getArtist(album: IAlbum) {

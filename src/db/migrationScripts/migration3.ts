@@ -23,28 +23,23 @@ export const migration3: IMigration = {
         var albums = await Album.find()
 
         for (var i = 0; i < albums.length; i++) {
-            var session = await startSession()
-            session.startTransaction()
             var a = albums[i]
 
             try {
                 if (!a.cover) {
                     logger.info(`Migration 3 -> 4 album ${a.id}`)
 
-                    var cover = await getAlbumCover(a, session)
+                    var cover = await getAlbumCover(a)
                     if (cover) {
-                        await cover.save({ session })
+                        await cover.save()
 
                         a.cover = cover.id
-                        await a.save({ session })
+                        await a.save()
                     }
                 }
             } catch (err) {
                 logger.error(err)
-                await session.abortTransaction()
-                throw err
             }
-            await session.commitTransaction()
         }
     },
 
