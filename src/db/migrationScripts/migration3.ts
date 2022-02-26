@@ -24,6 +24,7 @@ export const migration3: IMigration = {
 
         for (var i = 0; i < albums.length; i++) {
             var session = await startSession()
+            session.startTransaction()
             var a = albums[i]
 
             try {
