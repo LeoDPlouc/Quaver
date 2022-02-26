@@ -1,5 +1,5 @@
-rm -vr build &&\
-rm -vr dist &&\
+rm -vfr build &&\
+rm -vfr dist &&\
 \
 mkdir -v build &&\
 mkdir -v dist &&\

@@ -1,6 +1,6 @@
 npm run build &&\
 \
-rm -vr publish &&\
+rm -vfr publish &&\
 \
 mkdir -v publish &&\
 mkdir -v publish/src &&\
