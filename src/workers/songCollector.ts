@@ -22,7 +22,6 @@ import { getAlbum, getArtist, getMetadataFromFile } from "../processing/songProc
 import { Song } from "../models/songModel"
 import { MUSIC_PATH } from "../config/config"
 import logger from "../utils/logger"
-import { startSession } from "mongoose"
 
 async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true }).catch()
@@ -38,10 +37,6 @@ async function collect(libPath: string) {
 }
 
 async function registerSong(songPath: string) {
-
-    var session = await startSession()
-    session.startTransaction()
-
     try {
         //Only considere audio files
         if (!(mm.lookup(path.extname(songPath)) as string).match("audio"))
@@ -56,29 +51,27 @@ async function registerSong(songPath: string) {
         const songInfo = await getMetadataFromFile(songPath)
 
         song = new Song(songInfo)
-        await song.save({ session }).then(() => logger.info(`Found new song ${song.id}`))
+        await song.save().then(() => logger.info(`Found new song ${song.id}`))
 
         //Fetch the song's album
-        var album = await getAlbum(song, session)
+        var album = await getAlbum(song)
 
         //Save the albumId in the song
         song.albumId = album.id
-        await song.save({ session })
+        await song.save()
 
         //Fetch the song's artist
-        var artist = await getArtist(song, session)
+        var artist = await getArtist(song)
 
         //Save the artistId in the song
         song.artistId = artist.id
-        await song.save({ session })
+        await song.save()
 
         //Save the artistid in the album
         album.artistId = artist.id
-        await album.save({ session })
-        await session.commitTransaction()
+        await album.save()
     } catch (err) {
         logger.error(err)
-        await session.abortTransaction()
     }
 }
 

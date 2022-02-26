@@ -59,7 +59,7 @@ export async function getMetadataFromFile(songPath: string): Promise<ISong> {
     return song
 }
 
-export async function getAlbum(song: ISong, session?: ClientSession): Promise<IAlbum & Document<any, any, IAlbum>> {
+export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any, IAlbum>> {
     var album: IAlbum & Document<any, any, IAlbum> = null
 
     //If the artist doesn't already exist, creates it
@@ -82,17 +82,17 @@ export async function getAlbum(song: ISong, session?: ClientSession): Promise<IA
         album.mbids = albumMbId
 
         //Fetch album's cover
-        var albumCover = await getAlbumCover(album, session)
+        var albumCover = await getAlbumCover(album)
         if (albumCover) {
             album.cover = albumCover.id
         } else logger.info(`No cover found ${album.id}`)
 
-        await album.save({ session })
+        await album.save()
     }
     return album
 }
 
-export async function getArtist(song: ISong, session: ClientSession): Promise<IArtist & Document<any, any, IArtist>> {
+export async function getArtist(song: ISong): Promise<IArtist & Document<any, any, IArtist>> {
 
     var artist: IArtist & Document<any, any, IArtist> = null
 
@@ -109,7 +109,7 @@ export async function getArtist(song: ISong, session: ClientSession): Promise<IA
 
         logger.info(`Found new artist ${artist.id}`)
 
-        await artist.save({ session })
+        await artist.save()
     }
 
     return artist
