@@ -31,7 +31,10 @@ declare module 'express-session' {
 waitForDb()
     .then(async () => {
         //Apply database migration
-        await Migrate()
+        await Migrate().catch((reason) => {
+            logger.error(reason)
+            process.exit(1)
+        })
 
         //Start collection of the songs
         songCollector()

@@ -22,9 +22,10 @@ import { getAlbum, getArtist, getMetadataFromFile } from "../processing/songProc
 import { Song } from "../models/songModel"
 import { MUSIC_PATH } from "../config/config"
 import logger from "../utils/logger"
+import { startSession } from "mongoose"
 
 async function collect(libPath: string) {
-    var paths = await fs.readdir(libPath, { withFileTypes: true })
+    var paths = await fs.readdir(libPath, { withFileTypes: true }).catch()
     for (var i = 0; i < paths.length; i++) {
         var fullPath = path.join(libPath, paths[i].name)
 
@@ -38,38 +39,47 @@ async function collect(libPath: string) {
 
 async function registerSong(songPath: string) {
 
-    //Only considere audio files
-    if (!(mm.lookup(path.extname(songPath)) as string).match("audio"))
-        return
+    var session = await startSession()
+    session.startTransaction()
 
-    var song = await Song.findOne({ path: songPath })
+    try {
+        //Only considere audio files
+        if (!(mm.lookup(path.extname(songPath)) as string).match("audio"))
+            return
 
-    //If the song doesn't already exist, extract its metadata and create a new song
-    if (song)
-        return
+        var song = await Song.findOne({ path: songPath })
 
-    const songInfo = await getMetadataFromFile(songPath)
+        //If the song doesn't already exist, extract its metadata and create a new song
+        if (song)
+            return
 
-    song = new Song(songInfo)
-    await song.save().then(() => logger.info(`Found new song ${song.id}`))
+        const songInfo = await getMetadataFromFile(songPath)
 
-    //Fetch the song's album
-    var album = await getAlbum(song)
+        song = new Song(songInfo)
+        await song.save({ session }).then(() => logger.info(`Found new song ${song.id}`))
 
-    //Save the albumId in the song
-    song.albumId = album.id
-    await song.save()
+        //Fetch the song's album
+        var album = await getAlbum(song, session)
 
-    //Fetch the song's artist
-    var artist = await getArtist(song)
+        //Save the albumId in the song
+        song.albumId = album.id
+        await song.save({ session })
 
-    //Save the artistId in the song
-    song.artistId = artist.id
-    await song.save()
+        //Fetch the song's artist
+        var artist = await getArtist(song, session)
 
-    //Save the artistid in the album
-    album.artistId = artist.id
-    await album.save()
+        //Save the artistId in the song
+        song.artistId = artist.id
+        await song.save({ session })
+
+        //Save the artistid in the album
+        album.artistId = artist.id
+        await album.save({ session })
+        await session.commitTransaction()
+    } catch (err) {
+        logger.error(err)
+        await session.abortTransaction()
+    }
 }
 
 

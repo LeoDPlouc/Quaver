@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document } from "mongoose"
+import { ClientSession, Document, startSession } from "mongoose"
 import { Artist, IArtist } from "../models/artistModel"
 import { IAlbum } from "../models/albumModel"
 import { IReleaseList } from "musicbrainz-api"
@@ -37,41 +37,53 @@ export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
     return ids
 }
 
-export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>): Promise<IImage & Document<any, any, IImage>> {
+export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>, session: ClientSession): Promise<IImage & Document<any, any, IImage>> {
 
-    var cover
-    var ext
+    var localSession = false
+    if (!session) {
+        session = await startSession()
+        session.startTransaction()
+        localSession = true
+    }
 
-    var i = 0
-    //Try fetching cover art for every MB ID
-    while (!cover && i < album.mbids.length) {
-        try {
-            //Fetch Cover art
-            var p = new Promise<any>((resolve, reject) => {
-                caApi.release(album.mbids[i], { piece: "front" }, (err, data) => {
-                    if (err) reject(err)
-                    resolve(data)
+    try {
+        var cover
+        var ext
+
+        var i = 0
+        //Try fetching cover art for every MB ID
+        while (!cover && i < album.mbids.length) {
+            try {
+                //Fetch Cover art
+                var p = new Promise<any>((resolve, reject) => {
+                    caApi.release(album.mbids[i], { piece: "front" }, (err, data) => {
+                        if (err) reject(err)
+                        resolve(data)
+                    })
                 })
-            })
-            var { image, extension } = await p
-            cover = image
-            ext = extension
+                var { image, extension } = await p
+                cover = image
+                ext = extension
+            }
+            catch { }
+            finally { i++ }
         }
-        catch { }
-        finally { i++ }
+
+        if (image) {
+            logger.info(`Found new cover for ${album.id}`)
+            //Save the image cover on the hard drive
+            var path = await saveImage(image, extension)
+
+            var newCover = new Image({ path })
+            await newCover.save({ session })
+
+            return newCover
+        }
+        return null
+    } catch (err) {
+        if (localSession) await session.abortTransaction()
+        throw err
     }
-
-    if (image) {
-        logger.info(`Found new cover for ${album.id}`)
-        //Save the image cover on the hard drive
-        var path = await saveImage(image, extension)
-
-        var newCover = new Image({ path })
-        await newCover.save()
-
-        return newCover
-    }
-    return null
 }
 
 export async function getArtist(album: IAlbum) {

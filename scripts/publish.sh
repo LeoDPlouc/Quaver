@@ -16,7 +16,7 @@ rm -vr publish/src
 
 cp -vr dist publish
 
-docker build -t dplouc/quaver:$1 .
+docker build -t dplouc/quaver:$1 -t dplouc/quaver:latest .
 
 rm -vr dist/src
 docker build -t dplouc/quaver:$1-hl .
@@ -24,5 +24,6 @@ docker build -t dplouc/quaver:$1-hl .
 rm -vr dist
 mv publish/dist dist
 
+docker push dplouc/quaver:latest
 docker push dplouc/quaver:$1
 docker push dplouc/quaver:$1-hl
