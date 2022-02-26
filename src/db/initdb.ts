@@ -17,6 +17,7 @@
 import mongoose from "mongoose"
 
 import { MONGO_IP, MONGO_PASSWORD, MONGO_PORT, MONGO_USER } from "../config/config"
+import logger from "../utils/logger"
 
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`
 
@@ -28,9 +29,9 @@ export async function waitForDb() {
             useFindAndModify: false,
             dbName: "quaver"
         })
-        .then(() => console.log("Successfully connected to database"))
+        .then(() => logger.info("Successfully connected to database"))
         .catch((e) => {
-            console.log(e)
+            logger.error(e)
             //retry connection
             setTimeout(waitForDb, 5000)
         })

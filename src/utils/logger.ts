@@ -11,7 +11,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module.exports = {
-    DB_VERSION: 4,
-    APP_VERSION: "0.1.0-beta"
-}
+import { createLogger, format, transports } from "winston";
+
+
+
+export default createLogger({
+    transports: [
+        new transports.Console(),
+        new transports.File({ dirname: "logs", filename: "quaver.log" })
+    ],
+    format: format.combine(
+        format.colorize(),
+        format.timestamp(),
+        format.printf(({ timestamp, level, message }) => {
+            return `[${timestamp}] ${level}: ${message}`
+        })
+    )
+})

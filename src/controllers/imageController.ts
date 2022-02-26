@@ -14,6 +14,8 @@
 import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
 import { Image, IImage } from "../models/imageModel"
+import logger from "../utils/logger"
+import { validationResult } from "express-validator"
 
 //Clean api output
 export function cleanOneImage(data: IImage & Document<any, any, IImage>): any {
@@ -35,7 +37,8 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
         const images = cleanManyImages(await Image.find())
 
         res.json({
-            status: "succes",
+            status: "success",
+            statusCode: 0,
             results: images.length,
             data: {
                 images
@@ -43,32 +46,57 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
         })
 
     } catch (e) {
+        logger.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
 
 export async function getOneImageInfo(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
+        })
+    }
+
     try {
         //Search an image by id and clean the output
         const image = cleanOneImage(await Image.findById(req.params.id))
 
         res.json({
-            status: "succes",
+            status: "success",
+            statusCode: 0,
             data: {
                 image
             }
         })
 
     } catch (e) {
+        logger.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
 
 export async function getImage(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
+        })
+    }
+
     try {
         //Search an image by id and send the file
         const image = await Image.findById(req.params.id)
@@ -76,8 +104,11 @@ export async function getImage(req: Request, res: Response, next: NextFunction) 
         res.sendFile(image.path)
 
     } catch (e) {
+        logger.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }

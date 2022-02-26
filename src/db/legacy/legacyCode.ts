@@ -14,6 +14,12 @@
 import { IReleaseList } from "musicbrainz-api"
 import { mbApi } from "../../apis/mbApi"
 import { IAlbum } from "../../models/albumModel"
+import { Document } from "mongoose"
+import { IImage } from "../../models/imageModel"
+import { caApi } from "../../apis/caApi"
+import logger from "../../utils/logger"
+import { saveImage } from "../../processing/imageProcessor"
+import { Image } from "../../models/imageModel"
 
 export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {
 
@@ -24,4 +30,28 @@ export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {
 
     var result = await mbApi.search<IReleaseList>("release", { query })
     return result.releases[0].id
+}
+
+export async function getAlbumCoverLegacy(album: IAlbum & Document<any, any, IAlbum>): Promise<IImage & Document<any, any, IImage>> {
+
+    //Fetch Cover art
+    var p = new Promise<any>((resolve, reject) => {
+        caApi.release(album.mbid, { piece: "front" }, (err, data) => {
+            if (err) reject(err)
+            resolve(data)
+        })
+    })
+    var { image, extension } = await p
+
+    if (image) {
+        logger.info(`Found new cover for ${album.id}`)
+        //Save the image cover on the hard drive
+        var path = await saveImage(image, extension)
+
+        var newCover = new Image({ path })
+        await newCover.save()
+
+        return newCover
+    }
+    return null
 }

@@ -14,6 +14,7 @@
 import { IMigration } from "../migration"
 import { getAlbumMBIdLegacy } from "../legacy/legacyCode"
 import { Album } from "../../models/albumModel"
+import logger from "../../utils/logger"
 
 export const migration0: IMigration = {
     //Add MB ID to albums
@@ -24,7 +25,7 @@ export const migration0: IMigration = {
             var a = albums[i]
 
             if (!a.mbid) {
-                console.log(`Migration 0 -> 1 album ${a.id}`)
+                logger.info(`Migration 0 -> 1 album ${a.id}`)
 
                 a.mbid = await getAlbumMBIdLegacy(a)
                 await a.save()

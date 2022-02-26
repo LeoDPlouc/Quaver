@@ -18,15 +18,16 @@ import { parseFile } from "music-metadata"
 import { Document } from "mongoose"
 import Path from "path"
 import fp from "fpcalc-async"
-import { Image } from "../models/imageModel"
 import { Album, IAlbum } from "../models/albumModel"
 import { Artist, IArtist } from "../models/artistModel"
 import { ISong } from "../models/songModel"
 import { FPCALC_PATH } from "../config/config"
 import { getAlbumCover, getAlbumMBId } from "./albumProcessor"
+import { FpcalcResult } from "fpcalc"
+import logger from "../utils/logger"
 
 export async function getAcoustid(songPath: string): Promise<string> {
-    var fingerprint
+    var fingerprint: FpcalcResult<string>
 
     //If fpcalc isn't in PATH, use fpcalc with its path
     if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH })
@@ -74,7 +75,7 @@ export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any,
             year: song.year
         })
 
-        console.log(`Found new album ${album.title}`)
+        logger.info(`Found new album ${album.id}`)
 
         //Fetch album's MBId
         var albumMbId = await getAlbumMBId(album)
@@ -83,12 +84,8 @@ export async function getAlbum(song: ISong): Promise<IAlbum & Document<any, any,
         //Fetch album's cover
         var albumCover = await getAlbumCover(album)
         if (albumCover) {
-            await albumCover.save()
-
-            console.log(`Found new cover for ${album.title}`)
-
             album.cover = albumCover.id
-        } else console.log(`No cover found for ${album.title}`)
+        } else logger.info(`No cover found ${album.id}`)
 
         await album.save()
     }
@@ -109,7 +106,7 @@ export async function getArtist(song: ISong): Promise<IArtist & Document<any, an
             name: song.artist
         })
 
-        console.log(`Found new artist ${artist.name}`)
+        logger.info(`Found new artist ${artist.id}`)
 
         await artist.save()
     }

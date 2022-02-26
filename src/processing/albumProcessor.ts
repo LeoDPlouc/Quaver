@@ -15,13 +15,11 @@ import { Document } from "mongoose"
 import { Artist, IArtist } from "../models/artistModel"
 import { IAlbum } from "../models/albumModel"
 import { IReleaseList } from "musicbrainz-api"
-import { APP_VERSION } from "../config/appConfig"
 import { IImage, Image } from "../models/imageModel"
-import coverart from "coverart"
 import { saveImage } from "./imageProcessor"
 import { mbApi } from "../apis/mbApi"
-
-const ca = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
+import logger from "../utils/logger"
+import { caApi } from "../apis/caApi"
 
 export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
 
@@ -39,18 +37,18 @@ export async function getAlbumMBId(album: IAlbum): Promise<string[]> {
     return ids
 }
 
-export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<any, any, IImage>> {
+export async function getAlbumCover(album: IAlbum & Document<any, any, IAlbum>): Promise<IImage & Document<any, any, IImage>> {
 
     var cover
     var ext
 
     var i = 0
     //Try fetching cover art for every MB ID
-    while (!image && i < album.mbids.length) {
+    while (!cover && i < album.mbids.length) {
         try {
             //Fetch Cover art
             var p = new Promise<any>((resolve, reject) => {
-                ca.release(album.mbids[i], { piece: "front" }, (err, data) => {
+                caApi.release(album.mbids[i], { piece: "front" }, (err, data) => {
                     if (err) reject(err)
                     resolve(data)
                 })
@@ -64,10 +62,14 @@ export async function getAlbumCover(album: IAlbum): Promise<IImage & Document<an
     }
 
     if (image) {
+        logger.info(`Found new cover for ${album.id}`)
         //Save the image cover on the hard drive
         var path = await saveImage(image, extension)
 
-        return new Image({ path })
+        var newCover = new Image({ path })
+        await newCover.save()
+
+        return newCover
     }
     return null
 }
@@ -83,7 +85,7 @@ export async function getArtist(album: IAlbum) {
             name: album.artist
         })
 
-        console.log(`Found new artist ${artist.name}`)
+        logger.info(`Found new artist ${artist.id}`)
     }
 
     return artist

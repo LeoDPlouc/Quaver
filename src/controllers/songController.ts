@@ -14,6 +14,8 @@
 import { Request, Response, NextFunction } from "express"
 import { Document } from "mongoose"
 import { ISong, Song } from "../models/songModel"
+import logger from "../utils/logger"
+import { validationResult } from "express-validator"
 
 //Clean api output
 export function cleanOneSong(data: ISong & Document<any, any, ISong>): any {
@@ -45,7 +47,8 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
         const songs = cleanManySongs(await Song.find())
 
         res.json({
-            status: "succes",
+            status: "success",
+            statusCode: 0,
             results: songs.length,
             data: {
                 songs
@@ -53,32 +56,57 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
 
 export async function getOneSongInfo(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
+        })
+    }
+
     try {
         //Search a song by id and clean the output
         const song = cleanOneSong(await Song.findById(req.params.id))
 
         res.json({
-            status: "succes",
+            status: "success",
+            statusCode: 0,
             data: {
                 song
             }
         })
 
     } catch (e) {
+        logger.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
 
 export async function updateSongInfo(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid error"
+        })
+    }
+
     try {
         const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -87,19 +115,32 @@ export async function updateSongInfo(req: Request, res: Response, next: NextFunc
 
         res.json({
             status: "succes",
+            statusCode: 0,
             data: {
                 song
             }
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
 
 export async function getSongStream(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
+        })
+    }
+
     try {
         //Search a song by id and and send the file
         const song = await Song.findById(req.params.id)
@@ -109,12 +150,23 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
     } catch (e) {
         console.error(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }
 
 export async function updateLike(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail",
+            statusCode: 2,
+            errorMessage: "Invalid request"
+        })
+    }
+
     try {
         //Search a song by id
         const song = await Song.findById(req.params.id)
@@ -124,13 +176,16 @@ export async function updateLike(req: Request, res: Response, next: NextFunction
         await song.save()
 
         res.json({
-            status: "succes"
+            status: "success",
+            statusCode: 0,
         })
     }
     catch (e) {
         console.log(e)
         res.json({
-            status: "fail"
+            status: "fail",
+            statusCode: 1,
+            errorMessage: "Server error"
         })
     }
 }

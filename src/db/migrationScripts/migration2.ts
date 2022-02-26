@@ -16,6 +16,7 @@ import { deleteImage } from "../../processing/imageProcessor"
 import { getAlbumMBId } from "../../processing/albumProcessor"
 import { Album } from "../../models/albumModel"
 import { Image } from "../../models/imageModel"
+import logger from "../../utils/logger"
 
 export const migration2: IMigration = {
     //Remove single MB ID and fetch all fiting MB IDs 
@@ -25,7 +26,7 @@ export const migration2: IMigration = {
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
 
-            console.log(`Migration 2 -> 3 album ${a.id}`)
+            logger.info(`Migration 2 -> 3 album ${a.id}`)
 
             a.mbids = await getAlbumMBId(a)
             a.mbid = undefined
@@ -42,7 +43,7 @@ export const migration2: IMigration = {
             var a = albums[i]
 
             if (a.cover) {
-                console.log(`Migration 2 -> 1 album ${a.id}`)
+                logger.info(`Migration 2 -> 1 album ${a.id}`)
 
                 var cover = await Image.findById(a.cover)
 

@@ -21,6 +21,7 @@ import mm from "mime-types"
 import { getAlbum, getArtist, getMetadataFromFile } from "../processing/songProcessor"
 import { Song } from "../models/songModel"
 import { MUSIC_PATH } from "../config/config"
+import logger from "../utils/logger"
 
 async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true })
@@ -50,7 +51,7 @@ async function registerSong(songPath: string) {
     const songInfo = await getMetadataFromFile(songPath)
 
     song = new Song(songInfo)
-    await song.save().then(() => console.log(`Found new song ${songPath}`))
+    await song.save().then(() => logger.info(`Found new song ${song.id}`))
 
     //Fetch the song's album
     var album = await getAlbum(song)
@@ -74,7 +75,7 @@ async function registerSong(songPath: string) {
 
 async function doWork() {
 
-    console.log("Song collection Started")
+    logger.info("Song collection Started")
 
     //Collection run in background and is relaunched every 30 sec
     while (true) {

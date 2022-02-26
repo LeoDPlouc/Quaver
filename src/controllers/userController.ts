@@ -14,8 +14,17 @@
 import bcrypt from "bcryptjs"
 import { Request, Response, NextFunction } from "express"
 import { User } from "../models/userModel"
+import logger from "../utils/logger"
+import { validationResult } from "express-validator"
 
 export async function signUp(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         var { username, password } = req.body
         //Hash the password with salt
@@ -27,7 +36,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
             "password": hashpass
         })
         await user.save()
-        
+
         res.json({
             status: "sucess",
             data: {
@@ -35,7 +44,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
             }
         })
     } catch (e) {
-        console.log(e)
+        logger.crit(e)
         res.json({
             status: "fail"
         })
@@ -43,6 +52,13 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function signIn(req: Request, res: Response, next: NextFunction) {
+    var err = validationResult(req)
+    if (!err.isEmpty()) {
+        return res.json({
+            status: "fail"
+        })
+    }
+
     try {
         var { username, password } = req.body
 
@@ -72,6 +88,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
         })
 
     } catch (e) {
+        logger.crit(e)
         res.json({
             status: "fail"
         })

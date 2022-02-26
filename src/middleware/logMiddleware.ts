@@ -11,7 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module.exports = {
-    DB_VERSION: 4,
-    APP_VERSION: "0.1.0-beta"
+import { Request, Response, NextFunction } from "express"
+import logger from "../utils/logger"
+
+export default function protect(req: Request, res: Response, next: NextFunction) {
+    logger.info(`${req.ip} ${req.url}`)
+    next()
 }

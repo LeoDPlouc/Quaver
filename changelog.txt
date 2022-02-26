@@ -1,6 +1,12 @@
 CHANGELOG
 
 ====================================================
+0.2.0-beta
+
+API:
+- Changed API reponses. Added status code et error messages
+
+====================================================
 0.1.0-beta
 
 Server:
