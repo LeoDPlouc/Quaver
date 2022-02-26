@@ -13,7 +13,7 @@
 
 import mongoose from "mongoose"
 import { APP_PORT } from "./config/config"
-import songCollector from "./workers/songCollector"
+import { runSongCollector } from "./workers/workers"
 import { IUser } from "./models/userModel"
 import { waitForDb } from "./db/initdb"
 import { Migrate } from "./db/migration"
@@ -37,7 +37,7 @@ waitForDb()
         })
 
         //Start collection of the songs
-        songCollector()
+        runSongCollector()
 
         //Open server
         app.listen(APP_PORT, () => logger.info(`listening on port ${APP_PORT}`))
