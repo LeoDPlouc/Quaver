@@ -17,8 +17,8 @@ jobs:
       name: Checkout
       uses: actions/checkout@v2
     -
-      name: Build Quaver
-      run: npm run build
+      name: Build Quaver 
+      run: npm install && npm run build
     - 
       name: Build the Docker image
       run: docker build . --file Dockerfile --tag quaver-test
