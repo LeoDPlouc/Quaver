@@ -34,9 +34,6 @@ export default defineComponent({
     methods: {
         getCoverURL,
         getClass(pos: number) {
-
-            console.log(this.isFetching)
-
             var cls = "artistCover "
 
             if (this.albumsCover.length <= 1) {
@@ -68,13 +65,16 @@ export default defineComponent({
             return cls
         },
         async fetchAlbumCovers() {
-            var albums = await getArtistAlbums(this.artist.id) as Album[]
-            this.albumsCover = albums.map((a) => a.cover)
-            this.isFetching = false
+            try {
+                var albums = await getArtistAlbums(this.artist.id) as Album[]
+                this.albumsCover = albums.map((a) => a.cover)
+                this.isFetching = false
+            } catch { }
         }
     },
 
     async created() {
+        this.fetchAlbumCovers()
     },
 
     data() {
@@ -155,8 +155,8 @@ export default defineComponent({
 
 .coverContainer {
     display: grid;
-    grid-template-rows: 5vw 5vw;
-    grid-template-columns: 5vw 5vw;
+    grid-template-rows: 50% 50%;
+    grid-template-columns: 50% 50%;
     overflow: clip;
 }
 </style>
