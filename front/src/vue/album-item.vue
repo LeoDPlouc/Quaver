@@ -45,7 +45,7 @@ export default defineComponent({
 .albumItem {
   border: 1px solid var(--misc);
   display: grid;
-  grid-template-rows: 10vw 3em 2em 2em;
+  grid-template-rows: 10vw 3em 3em 2em;
   width: 10vw;
   height: fit-content;
   margin-bottom: 10px;
