@@ -52,7 +52,9 @@ export default defineComponent({
   margin-bottom: 10px;
 }
 .cover {
-  height: 10vw;
+  max-height: 10vw;
+  max-width: 10vw;
+  object-fit: scale-down;
 }
 .albumItemProp {
   text-align: center;
