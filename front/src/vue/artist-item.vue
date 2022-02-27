@@ -44,7 +44,7 @@ export default defineComponent({
 .artistItem {
   border: 1px solid var(--misc);
   display: grid;
-  grid-template-rows: 10vw 2em;
+  grid-template-rows: 10vw 3em;
   width: 10vw;
   height: fit-content;
   margin-bottom: 10px;
