@@ -78,6 +78,8 @@ body {
     display: grid;
     grid-template-rows: 3em auto 5vh;
     height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 .view {
     grid-row: 2;
