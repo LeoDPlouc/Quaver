@@ -89,6 +89,6 @@ body {
     grid-row: 3;
 }
 .logo {
-    height: 7vh;
+    height: 3em;
 }
 </style>
