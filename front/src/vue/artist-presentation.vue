@@ -67,10 +67,13 @@ export default defineComponent({
     margin-left: 10px;
 }
 .artistPresentationAlbumList {
-    height: calc(10vw + 9em);
-    overflow: scroll;
+    height: calc(10vw + 10em);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .artistPresentationSongList {
     width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 </style>

@@ -83,7 +83,8 @@ body {
 }
 .view {
     grid-row: 2;
-    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .player {
     grid-row: 3;
