@@ -11,6 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { startSession } from "mongoose"
 import { Album } from "../../models/albumModel"
 import { getAlbumCover } from "../../processing/albumProcessor"
 import logger from "../../utils/logger"
@@ -24,16 +25,20 @@ export const migration3: IMigration = {
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
 
-            if (!a.cover) {
-                logger.info(`Migration 3 -> 4 album ${a.id}`)
+            try {
+                if (!a.cover) {
+                    logger.info(`Migration 3 -> 4 album ${a.id}`)
 
-                var cover = await getAlbumCover(a)
-                if (cover) {
-                    await cover.save()
+                    var cover = await getAlbumCover(a)
+                    if (cover) {
+                        await cover.save()
 
-                    a.cover = cover.id
-                    await a.save()
+                        a.cover = cover.id
+                        await a.save()
+                    }
                 }
+            } catch (err) {
+                logger.error(err)
             }
         }
     },
