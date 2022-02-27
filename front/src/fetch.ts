@@ -118,3 +118,7 @@ export async function getArtistAlbums(id: string): Promise<Album[]> {
     })
     return albums
 }
+
+export function getCoverURL(id : string) {
+  return `/api/image/${id}/file`
+}

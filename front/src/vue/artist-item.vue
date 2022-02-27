@@ -16,10 +16,7 @@
 
 <template>
   <div class="artistItem" @click="openPresentation()">
-    <img
-      class="cover"
-      src="https://ia902305.us.archive.org/31/items/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1-30810216800_thumb250.jpg"
-    />
+    <cover-mosaic :artist="artist" :isFetching="false"></cover-mosaic>
     <div class="artistItemProp">{{ artist.name }}</div>
   </div>
 </template>
@@ -27,14 +24,29 @@
 <script lang='ts'>
 import { defineComponent } from "vue";
 import { router } from "../app";
-import { Artist } from "../models"
+import { getArtistAlbums, getCoverURL } from "../fetch";
+import { Album, Artist } from "../models"
+import coverMosaicVue from "./cover-mosaic.vue";
 
 export default defineComponent({
   props: { artist: Artist },
+  components: { coverMosaic: coverMosaicVue },
 
   methods: {
     openPresentation() {
       router.push({ path: "/artist/" + this.artist.id })
+    },
+    getCoverURL
+  },
+
+  async created() {
+    var albums = await getArtistAlbums(this.artist.id) as Album[]
+    this.albumsCover = albums.map((a) => a.cover)
+  },
+
+  data() {
+    return {
+      albumsCover: [] as string[]
     }
   }
 })
@@ -48,9 +60,6 @@ export default defineComponent({
   width: 10vw;
   height: fit-content;
   margin-bottom: 10px;
-}
-.cover {
-  height: 10vw;
 }
 .artistItemProp {
   text-align: center;
