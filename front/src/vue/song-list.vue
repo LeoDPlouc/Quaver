@@ -62,16 +62,11 @@ export default defineComponent({
         songChanged(e: SongItemTitleClickedEventArgs) {
             this.$emit("song-changed", new SongChangedEventArgs(e.song, e.index, this.songs))
         },
-        searchSong,
         updateFilteredSongs(query: string) {
             var filtered = searchSong(query, this.songs)
             this.filteredSongs.splice(0, this.filteredSongs.length)
 
             filtered.forEach(s => this.filteredSongs.push(s))
-
-            console.log(this.songs)
-            console.log(filtered)
-            console.log(this.filteredSongs)
         }
     },
 

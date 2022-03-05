@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Song } from "./models";
+import { Album, Artist, Song } from "./models";
 
 export function searchSong(query: string, song: Song[]): Song[] {
 
@@ -22,7 +22,40 @@ export function searchSong(query: string, song: Song[]): Song[] {
     console.log(song)
 
     return song.filter(s => {
+        if (!s.title) return false
         var match = s.title.toLowerCase().match(query.toLowerCase())
+        return match != null && match.length > 0
+    })
+
+}
+
+export function searchAlbum(query: string, album: Album[]): Album[] {
+
+    if (!query.length) query = ".*"
+
+    console.log(query)
+
+    console.log(album)
+
+    return album.filter(s => {
+        if (!s.title) return false
+        var match = s.title.toLowerCase().match(query.toLowerCase())
+        return match != null && match.length > 0
+    })
+
+}
+
+export function searchArtist(query: string, artist: Artist[]): Artist[] {
+
+    if (!query.length) query = ".*"
+
+    console.log(query)
+
+    console.log(artist)
+
+    return artist.filter(a => {
+        if (!a.name) return false
+        var match = a.name.toLowerCase().match(query.toLowerCase())
         return match != null && match.length > 0
     })
 
