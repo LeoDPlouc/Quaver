@@ -17,7 +17,7 @@
 <template>
     <div>
         <song-item
-            v-for="(song, index) in songs"
+            v-for="(song, index) in filteredSongs"
             :key="index"
             :song="song"
             :index="index"
@@ -31,6 +31,7 @@ import { defineComponent } from "vue";
 import { SongChangedEventArgs, SongItemTitleClickedEventArgs } from "../eventArgs";
 import { getAlbumSongs, getAllSongs, getArtistSongs } from "../fetch";
 import { Song } from "../models";
+import { searchSong } from "../searching";
 import songItemVue from "./song-item.vue";
 
 export default defineComponent({
@@ -40,21 +41,43 @@ export default defineComponent({
 
     emits: ["song-changed"],
 
+    props: { queryString: String },
+
     async created() {
         if (this.$route.fullPath.match("/album/")) this.songs = await getAlbumSongs(this.$route.params.id)
         else if (this.$route.fullPath.match("/artist/")) this.songs = await getArtistSongs(this.$route.params.id)
         else this.songs = await getAllSongs()
 
+        this.updateFilteredSongs("")
+
     },
     data() {
         return {
-            songs: [] as Song[]
+            songs: [] as Song[],
+            filteredSongs: [] as Song[]
         }
     },
 
     methods: {
         songChanged(e: SongItemTitleClickedEventArgs) {
             this.$emit("song-changed", new SongChangedEventArgs(e.song, e.index, this.songs))
+        },
+        searchSong,
+        updateFilteredSongs(query: string) {
+            var filtered = searchSong(query, this.songs)
+            this.filteredSongs.splice(0, this.filteredSongs.length)
+
+            filtered.forEach(s => this.filteredSongs.push(s))
+
+            console.log(this.songs)
+            console.log(filtered)
+            console.log(this.filteredSongs)
+        }
+    },
+
+    watch: {
+        queryString(newQ, oldQ) {
+            this.updateFilteredSongs(newQ)
         }
     }
 })
