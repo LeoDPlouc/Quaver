@@ -16,7 +16,7 @@
 
 <template>
   <div class="songItem">
-    <div class="songItemProp songItemLike" @click="likeSong" @dblclick="dislikeSong">{{ song.like }}</div>
+    <div class="songItemProp songItemLike" @click="likeSong">{{ song.like }}</div>
     <div class="songItemProp songItemN">{{ song.n }}</div>
     <div class="songItemProp songItemTitle" @click="songItemTitleClicked">{{ song.title }}</div>
     <div class="songItemProp songItemDuration">{{ formatDuration(song.duration) }}</div>
@@ -58,7 +58,7 @@ export default defineComponent({
 
       switch (this.song.like) {
         case 1:
-          like = 0
+          like = -1
           break;
         case 0:
           like = 1
@@ -73,19 +73,7 @@ export default defineComponent({
           if (res.ok) {
             res.json()
               .then(resJson => {
-                if (resJson.status == "succes") this.song.like = like
-              })
-          }
-        })
-    },
-    dislikeSong() {
-      fetch("/api/song/" + this.song.id + "/like", { method: "PATCH", body: JSON.stringify({ like: -1 }) })
-        .then(res => {
-          if (res.ok) {
-
-            res.json()
-              .then(resJson => {
-                if (resJson.status == "succes") this.song.like = -1
+                if (resJson.statusCode == 0) this.song.like = like
               })
           }
         })

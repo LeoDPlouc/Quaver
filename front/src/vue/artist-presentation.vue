@@ -17,10 +17,7 @@
 <template>
     <div>
         <div class="artistPresentationHeader">
-            <img
-                class="artistPresentationCover"
-                src="https://ia902305.us.archive.org/31/items/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1/mbid-af52ffd5-95ef-4621-b5b7-3b3ae3995cc1-30810216800_thumb250.jpg"
-            />
+            <cover-mosaic :artist="artist"></cover-mosaic>
             <div class="artistPresentationInfos">
                 <div class="artistPresentationInfo">{{ artist.name }}</div>
             </div>
@@ -35,13 +32,14 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import { Album, Artist } from '../models'
+import { Artist } from '../models'
 import songList from "./song-list.vue"
 import AlbumList from "./album-list.vue"
 import { getArtist } from "../fetch"
+import coverMosaicVue from "./cover-mosaic.vue"
 
 export default defineComponent({
-    components: { songList: songList, albumList: AlbumList, AlbumList },
+    components: { songList: songList, albumList: AlbumList, coverMosaic: coverMosaicVue },
 
     emits: ["song-changed"],
 
@@ -51,7 +49,8 @@ export default defineComponent({
 
     data() {
         return {
-            artist: {} as Artist
+            artist: {} as Artist,
+            isFetching: true
         }
     }
 })
@@ -64,17 +63,17 @@ export default defineComponent({
     grid-template-columns: 15vw auto;
     margin-bottom: 10px;
 }
-.artistPresentationCover {
-    width: 15vw;
-}
 .artistPresentationInfos {
     margin-left: 10px;
 }
 .artistPresentationAlbumList {
-    height: calc(10vw + 9em);
-    overflow: scroll;
+    height: calc(10vw + 10em);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .artistPresentationSongList {
     width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 </style>

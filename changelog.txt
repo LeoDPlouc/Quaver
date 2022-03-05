@@ -1,6 +1,19 @@
 CHANGELOG
 
 ====================================================
+0.3.0-beta
+
+FrontEnd:
+- Resized album and artist items to avoid horizontal clipping of names
+- Change display settings of too large and too little cover to avoid overflowing
+- Hid useless scrollbars
+- Changed artist image placeholder to a mosaic of album
+- Fixed the logo overflowing
+- Changed like button behavior
+- Likes now update when clicked on
+- Added a text input to do search on items
+
+====================================================
 0.2.0-beta
 
 API:

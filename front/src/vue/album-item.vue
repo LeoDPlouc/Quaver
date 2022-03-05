@@ -16,7 +16,7 @@
 
 <template>
   <div class="albumItem" @click="openPresentation()">
-    <img class="cover" :src="getCoverURL()" />
+    <img class="albumCover" :src="getCoverURL(album.cover)" />
     <div class="albumItemProp">{{ album.title }}</div>
     <div class="albumItemProp">{{ album.artist }}</div>
     <div class="albumItemProp">{{ album.year }}</div>
@@ -27,6 +27,7 @@
 import { defineComponent } from "vue";
 import { router } from "../app";
 import { Album } from "../models"
+import { getCoverURL } from "../fetch";
 
 export default defineComponent({
   props: { album: Album },
@@ -35,9 +36,7 @@ export default defineComponent({
     openPresentation() {
       router.push({ path: "/album/" + this.album.id })
     },
-    getCoverURL() {
-      return `/api/image/${this.album.cover}/file`
-    }
+    getCoverURL
   }
 })
 </script>
@@ -46,13 +45,15 @@ export default defineComponent({
 .albumItem {
   border: 1px solid var(--misc);
   display: grid;
-  grid-template-rows: 10vw 3em 2em 2em;
+  grid-template-rows: 10vw 3em 3em 2em;
   width: 10vw;
   height: fit-content;
   margin-bottom: 10px;
 }
-.cover {
-  height: 10vw;
+.albumCover {
+  max-height: 10vw;
+  max-width: 10vw;
+  object-fit: scale-down;
 }
 .albumItemProp {
   text-align: center;
