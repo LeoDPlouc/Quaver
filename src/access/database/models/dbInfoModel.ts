@@ -19,4 +19,4 @@ const dbInfoSchema = new Schema<DbInfo>({
         require: [true, "Db must have a version"]
     }
 })
-export const DbInfoModel = model<DbInfo>("DbInfo", dbInfoSchema)
+export const dbInfoModel = model<DbInfo>("DbInfo", dbInfoSchema)

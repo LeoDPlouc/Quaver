@@ -22,4 +22,4 @@ const artistSchema = new Schema<Artist>({
     }
 })
 
-export const ArtistModel = model<Artist>("Artist", artistSchema)
+export const artistModel = model<Artist>("Artist", artistSchema)

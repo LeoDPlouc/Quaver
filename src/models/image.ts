@@ -12,6 +12,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 interface Image {
-    id: string,
+    id?: string,
     path: string
 }

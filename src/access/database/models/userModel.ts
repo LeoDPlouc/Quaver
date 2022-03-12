@@ -24,4 +24,4 @@ const userSchema = new Schema<User>({
         require: [true, "User needs a password"]
     }
 })
-export const UserModel = model<User>("User", userSchema)
+export const userModel = model<User>("User", userSchema)

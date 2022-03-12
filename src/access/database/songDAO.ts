@@ -12,16 +12,20 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { SongModel } from "./models/songModel";
+import { songModel } from "./models/songModel";
 
 export async function getAllSongModels(): Promise<(Song & Document<any, any, Song>)[]> {
-    return await SongModel.find()
+    return await songModel.find()
 }
 
-export async function getSongModel(id: String): Promise<Song & Document<any, any, Song>> {
-    return await SongModel.findById(id)
+export async function getSongModel(id: string): Promise<Song & Document<any, any, Song>> {
+    return await songModel.findById(id)
 }
 
 export async function updateSongModel(song: Song) {
-    SongModel.findByIdAndUpdate(song.id, song)
+    await songModel.findByIdAndUpdate(song.id, song)
+}
+
+export async function createSongModel(song: Song) {
+    await songModel.create(song)
 }

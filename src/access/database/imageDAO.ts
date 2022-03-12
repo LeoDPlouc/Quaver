@@ -12,12 +12,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { ImageModel } from "./models/imageModel";
+import { imageModel } from "./models/imageModel";
 
 export async function getAllImagesModels(): Promise<(Image & Document<any, any, Image>)[]> {
-    return await ImageModel.find()
+    return await imageModel.find()
 }
 
-export async function getImageModel(id: String): Promise<Image & Document<any, any, Image>> {
-    return await ImageModel.findById(id)
+export async function getImageModel(id: string): Promise<Image & Document<any, any, Image>> {
+    return await imageModel.findById(id)
 }

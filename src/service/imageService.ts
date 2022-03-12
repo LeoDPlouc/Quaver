@@ -18,6 +18,6 @@ export async function getAllImages(): Promise<Image[]> {
     return (await getAllImagesModels()).map(i => mapImage(i))
 }
 
-export async function getImage(id: String): Promise<Image> {
+export async function getImage(id: string): Promise<Image> {
     return mapImage(await getImageModel(id))
 }

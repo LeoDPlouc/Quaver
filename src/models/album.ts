@@ -12,7 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 interface Album {
-    id: string,
+    id?: string,
     title?: string,
     artist?: string,
     artistId?: string,

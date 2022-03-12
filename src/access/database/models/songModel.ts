@@ -52,4 +52,4 @@ const songSchema = new Schema<Song>({
         type: String
     }
 })
-export const SongModel = model<Song>("Song", songSchema)
+export const songModel = model<Song>("Song", songSchema)

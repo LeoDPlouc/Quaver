@@ -13,21 +13,29 @@
 
 import { Document } from "mongoose"
 import { albumModel } from "./models/albumModel"
-import { ArtistModel } from "./models/artistModel"
-import { SongModel } from "./models/songModel"
+import { artistModel } from "./models/artistModel"
+import { songModel } from "./models/songModel"
 
 export async function getAllArtistModels(): Promise<(Artist & Document<any, any, Artist>)[]> {
-    return await ArtistModel.find()
+    return await artistModel.find()
 }
 
-export async function getArtistModel(id: String): Promise<Artist & Document<any, any, Artist>> {
-    return await ArtistModel.findById(id)
+export async function getArtistModel(id: string): Promise<Artist & Document<any, any, Artist>> {
+    return await artistModel.findById(id)
 }
 
-export async function getArtistSongModels(id: String): Promise<(Song & Document<any, any, Song>)[]> {
-    return await SongModel.find({ artistId: id })
+export async function getArtistSongModels(id: string): Promise<(Song & Document<any, any, Song>)[]> {
+    return await songModel.find({ artistId: id })
 }
 
-export async function getArtistAlbumModels(id: String): Promise<(Album & Document<any, any, Album>)[]> {
+export async function getArtistAlbumModels(id: string): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find({ artistId: id })
+}
+
+export async function createArtistModel(artist: Artist) {
+    await artistModel.create(artist)
+}
+
+export async function searchArtistModelByName(name: string): Promise<(Artist & Document<any, any, Artist>)[]> {
+    return await artistModel.find({ name: name })
 }

@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getAllArtistModels, getArtistAlbumModels, getArtistModel, getArtistSongModels } from "../access/database/artistDAO";
+import { createArtistModel, getAllArtistModels, getArtistAlbumModels, getArtistModel, getArtistSongModels, searchArtistModelByName } from "../access/database/artistDAO";
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapArtist } from "../mappers/artistMapper";
 import { mapSong } from "../mappers/songMapper";
@@ -20,14 +20,22 @@ export async function getAllArtists(): Promise<Artist[]> {
     return (await getAllArtistModels()).map(a => mapArtist(a))
 }
 
-export async function getArtist(id: String): Promise<Artist> {
+export async function getArtist(id: string): Promise<Artist> {
     return mapArtist(await getArtistModel(id))
 }
 
-export async function getArtistSongs(id: String): Promise<Song[]> {
+export async function getArtistSongs(id: string): Promise<Song[]> {
     return (await getArtistSongModels(id)).map(s => mapSong(s))
 }
 
-export async function getArtistAlbums(id: String): Promise<Album[]> {
+export async function getArtistAlbums(id: string): Promise<Album[]> {
     return (await getArtistAlbumModels(id)).map(a => mapAlbum(a))
+}
+
+export async function createArtist(artist: Artist) {
+    await createArtistModel(artist)
+}
+
+export async function searchArtistByName(name: string) {
+    return await searchArtistModelByName(name)
 }

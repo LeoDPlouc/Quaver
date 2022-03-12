@@ -19,4 +19,4 @@ const imageSchema = new Schema<Image>({
         require: [true, "Image must have a path"]
     }
 })
-export const ImageModel = model<Image>("Image", imageSchema)
+export const imageModel = model<Image>("Image", imageSchema)

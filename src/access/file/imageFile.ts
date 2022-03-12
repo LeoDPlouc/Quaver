@@ -12,10 +12,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { v4 } from "uuid"
-import fs from "fs/promises"
 import path from "path"
-import { IMAGES_PATH } from "../config/config"
-import { IImage } from "../access/database/models/imageModel"
+import { IMAGES_PATH } from "../../config/config"
+import fs from "fs/promises"
 
 export async function saveImage(data: string, extension: string): Promise<string> {
     //Create an UUID for the name of the file
@@ -27,6 +26,6 @@ export async function saveImage(data: string, extension: string): Promise<string
     return p
 }
 
-export async function deleteImage(image: IImage): Promise<void> {
-    return await fs.rm(image.path)
+export async function deleteImage(path: string): Promise<void> {
+    return await fs.rm(path)
 }

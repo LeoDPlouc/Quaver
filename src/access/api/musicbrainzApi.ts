@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MusicBrainzApi } from "musicbrainz-api";
+import { IReleaseList, MusicBrainzApi } from "musicbrainz-api";
 import { APP_VERSION } from "../../config/appConfig";
 
 const mbApi = new MusicBrainzApi({
@@ -19,3 +19,19 @@ const mbApi = new MusicBrainzApi({
     appVersion: APP_VERSION,
     appContactInfo: "https://github.com/LeoDPlouc/Quaver"
 })
+
+export async function getAlbumMBId(album: Album): Promise<string[]> {
+
+    //Build query with available info
+    var query = `release:${album.title as string}`
+
+    if (album.artist) query += ` and artist:${album.artist}`
+
+    var result = await mbApi.search<IReleaseList>("release", { query })
+
+    //Only keep ids of the release with score 100
+    var releases = result.releases.filter(release => release.score == 100)
+    var ids = releases.map(release => release.id)
+
+    return ids
+}

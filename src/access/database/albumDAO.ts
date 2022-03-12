@@ -13,16 +13,28 @@
 
 import { Document } from "mongoose";
 import { albumModel } from "./models/albumModel";
-import { SongModel } from "./models/songModel";
+import { songModel } from "./models/songModel";
 
 export async function getAllAlbumModels(): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find()
 }
 
-export async function getAlbumModel(id: String): Promise<Album & Document<any, any, Album>> {
+export async function getAlbumModel(id: string): Promise<Album & Document<any, any, Album>> {
     return await albumModel.findById(id)
 }
 
-export async function getAlbumSongModel(id: String): Promise<(Song & Document<any, any, Song>)[]> {
-    return await SongModel.find({ albumId: id })
+export async function getAlbumSongModel(id: string): Promise<(Song & Document<any, any, Song>)[]> {
+    return await songModel.find({ albumId: id })
+}
+
+export async function createAlbumModel(album: Album) {
+    await albumModel.create(album)
+}
+
+export async function findAlbumModelByName(albumTitle: string, artistName?: string): Promise<(Album & Document<any, any, Album>)[]> {
+
+    var query: Album = { title: albumTitle }
+    if (artistName) query.artist = artistName
+
+    return await albumModel.find(query)
 }
