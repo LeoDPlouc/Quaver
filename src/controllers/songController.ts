@@ -41,7 +41,7 @@ export async function getAllSongsInfoCtrl(req: Request, res: Response) {
     }
 }
 
-export async function getOneSongInfo(req: Request, res: Response) {
+export async function getOneSongInfoCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -73,7 +73,7 @@ export async function getOneSongInfo(req: Request, res: Response) {
     }
 }
 
-export async function getSongStream(req: Request, res: Response) {
+export async function getSongStreamCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -99,7 +99,7 @@ export async function getSongStream(req: Request, res: Response) {
     }
 }
 
-export async function updateLike(req: Request, res: Response) {
+export async function updateLikeCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
