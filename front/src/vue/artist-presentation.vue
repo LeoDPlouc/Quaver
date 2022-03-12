@@ -67,7 +67,6 @@ export default defineComponent({
     margin-left: 10px;
 }
 .artistPresentationAlbumList {
-    height: calc(10vw + 10em);
     overflow-y: auto;
     overflow-x: hidden;
 }
