@@ -11,18 +11,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { Document } from "mongoose";
+import { ImageModel } from "./models/imageModel";
 
-interface IImage {
-    path: string
+export async function getAllImagesModels(): Promise<(Image & Document<any, any, Image>)[]> {
+    return await ImageModel.find()
 }
 
-const imageSchema = new Schema<IImage>({
-    path: {
-        type: String,
-        require: [true, "Image must have a path"]
-    }
-})
-const Image = model<IImage>("Image", imageSchema)
-
-export { Image, IImage }
+export async function getImageModel(id: String): Promise<Image & Document<any, any, Image>> {
+    return await ImageModel.findById(id)
+}

@@ -13,33 +13,9 @@
 
 import { Schema, model } from "mongoose"
 
-interface ISong {
-    title?: string,
-    n?: number,
-    duration?: Number,
-    like?: Number,
-    artist?: string,
-    artistId?: string,
-    album?: string,
-    albumId?: string,
-    path: string,
-    acoustid?: string,
-    year?: number,
-    format?: string
-}
-
-const songSchema = new Schema<ISong>({
+const albumSchema = new Schema<Album>({
     title: {
         type: String
-    },
-    n: {
-        type: Number
-    },
-    duration: {
-        type: Number
-    },
-    like: {
-        type: Number
     },
     artist: {
         type: String
@@ -47,26 +23,18 @@ const songSchema = new Schema<ISong>({
     artistId: {
         type: String
     },
-    album: {
-        type: String
-    },
-    albumId: {
-        type: String
-    },
-    path: {
-        type: String,
-        require: [true, "Song must have a path"]
-    },
-    acoustid: {
+    cover: {
         type: String
     },
     year: {
-        type: Number
-    },
-    format: {
         type: String
+    },
+    mbid: {
+        type: String
+    },
+    mbids: {
+        type: [String]
     }
 })
-const Song = model<ISong>("Song", songSchema)
 
-export { Song, ISong }
+export const albumModel = model<Album>("Album", albumSchema)

@@ -11,18 +11,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { Album } from "../../models/albumModel"
+import logger from "../../../../utils/logger"
+import { IMigration } from "../migration"
+import { migration2 } from "./migration2"
 
-interface IDbInfo {
-    version: number
-}
+export const migration4: IMigration = {
+    async up() {
+    },
 
-const dbInfoSchema = new Schema<IDbInfo>({
-    version: {
-        type: Number,
-        require: [true, "Db must have a version"]
+    //Remove MB ID list and keep only one
+    async down() {
+        migration2.down()
     }
-})
-const DbInfo = model<IDbInfo>("DbInfo", dbInfoSchema)
-
-export { DbInfo, IDbInfo } 
+}

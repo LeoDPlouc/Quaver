@@ -10,15 +10,19 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-{
-    "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true,
-        "target": "ES5",
-        "esModuleInterop": true,
-        "moduleResolution": "node"
-    },
-    "include": [
-        "./src/**/**/**/*"
-    ]
+
+import { Document } from "mongoose";
+import { albumModel } from "./models/albumModel";
+import { SongModel } from "./models/songModel";
+
+export async function getAllAlbumModels(): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel.find()
+}
+
+export async function getAlbumModel(id: String): Promise<Album & Document<any, any, Album>> {
+    return await albumModel.findById(id)
+}
+
+export async function getAlbumSongModel(id: String): Promise<(Song & Document<any, any, Song>)[]> {
+    return await SongModel.find({ albumId: id })
 }

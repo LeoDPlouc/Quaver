@@ -12,45 +12,27 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { IMigration } from "../migration"
-import { getAlbumCoverLegacy } from "../legacy/legacyCode"
+import { getAlbumMBIdLegacy } from "../legacy/legacyCode"
 import { Album } from "../../models/albumModel"
-import logger from "../../utils/logger"
+import logger from "../../../../utils/logger"
 
-export const migration1: IMigration = {
-    //Download album covers
+export const migration0: IMigration = {
+    //Add MB ID to albums
     async up() {
         var albums = await Album.find()
 
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
 
-            if (!a.cover) {
-                logger.info(`Migration 1 -> 2 album ${a.id}`)
-
-                var cover = await getAlbumCoverLegacy(a)
-                if (cover) {
-                    await cover.save()
-
-                    a.cover = cover.id
-                    await a.save()
-                }
-            }
-        }
-    },
-
-    //Remove MB IDs
-    async down() {
-        var albums = await Album.find()
-
-        for (var i = 0; i < albums.length; i++) {
-            var a = albums[i]
-
             if (!a.mbid) {
-                logger.info(`Migration 1 -> 0 album ${a.id}`)
+                logger.info(`Migration 0 -> 1 album ${a.id}`)
 
-                a.mbid = undefined
+                a.mbid = await getAlbumMBIdLegacy(a)
                 await a.save()
             }
         }
+    },
+    async down() {
+
     }
 }

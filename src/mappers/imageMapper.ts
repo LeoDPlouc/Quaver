@@ -10,15 +10,20 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-{
-    "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true,
-        "target": "ES5",
-        "esModuleInterop": true,
-        "moduleResolution": "node"
-    },
-    "include": [
-        "./src/**/**/**/*"
-    ]
+
+import { Document } from "mongoose"
+
+export function mapImage(data: Image & Document<any, any, Image>): Image {
+    var cleanedData: Image = {
+        id: data.id,
+        path: data.path
+    }
+    return cleanedData
+}
+
+export function mapImageDTO(data: Image): ImageDTO {
+    var cleanedData: ImageDTO = {
+        id: data.id
+    }
+    return cleanedData
 }

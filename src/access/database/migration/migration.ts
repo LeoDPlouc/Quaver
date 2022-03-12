@@ -12,9 +12,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { DB_VERSION } from "../config/appConfig"
+import { DB_VERSION } from "../../../config/appConfig"
 import { DbInfo, IDbInfo } from "../models/dbInfoModel";
-import logger from "../utils/logger";
+import logger from "../../../utils/logger";
 import { migration0 } from "./migrationScripts/migration0";
 import { migration1 } from "./migrationScripts/migration1";
 import { migration2 } from "./migrationScripts/migration2";

@@ -12,11 +12,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { IMigration } from "../migration"
-import { deleteImage } from "../../processing/imageProcessor"
-import { getAlbumMBId } from "../../processing/albumProcessor"
+import { deleteImage } from "../../../../processing/imageProcessor"
+import { getAlbumMBId } from "../../../../processing/albumProcessor"
 import { Album } from "../../models/albumModel"
 import { Image } from "../../models/imageModel"
-import logger from "../../utils/logger"
+import logger from "../../../../utils/logger"
 
 export const migration2: IMigration = {
     //Remove single MB ID and fetch all fiting MB IDs 

@@ -11,11 +11,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MusicBrainzApi } from "musicbrainz-api";
-import { APP_VERSION } from "../config/appConfig";
+import { getAllSongModels, getSongModel, updateSongModel } from "../access/database/songDAO";
+import { mapSong } from "../mappers/songMapper";
 
-export const mbApi = new MusicBrainzApi({
-    appName: "Quaver",
-    appVersion: APP_VERSION,
-    appContactInfo: "https://github.com/LeoDPlouc/Quaver"
-})
+
+export async function getAllSongs(): Promise<Song[]> {
+    return (await getAllSongModels()).map(s => mapSong(s))
+}
+
+export async function getSong(id: String): Promise<Song> {
+    return mapSong(await getSongModel(id))
+}
+
+export async function updateSong(song: Song) {
+    updateSongModel(song)
+}

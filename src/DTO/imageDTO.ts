@@ -11,7 +11,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { APP_VERSION } from "../config/appConfig";
-import coverart from "coverart"
-
-export const caApi = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
+interface ImageDTO {
+    id: string
+}

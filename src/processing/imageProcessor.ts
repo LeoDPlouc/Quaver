@@ -15,7 +15,7 @@ import { v4 } from "uuid"
 import fs from "fs/promises"
 import path from "path"
 import { IMAGES_PATH } from "../config/config"
-import { IImage } from "../models/imageModel"
+import { IImage } from "../access/database/models/imageModel"
 
 export async function saveImage(data: string, extension: string): Promise<string> {
     //Create an UUID for the name of the file

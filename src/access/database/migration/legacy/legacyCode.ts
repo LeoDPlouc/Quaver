@@ -17,8 +17,8 @@ import { IAlbum } from "../../models/albumModel"
 import { Document } from "mongoose"
 import { IImage } from "../../models/imageModel"
 import { caApi } from "../../apis/caApi"
-import logger from "../../utils/logger"
-import { saveImage } from "../../processing/imageProcessor"
+import logger from "../../../../utils/logger"
+import { saveImage } from "../../../../processing/imageProcessor"
 import { Image } from "../../models/imageModel"
 
 export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {

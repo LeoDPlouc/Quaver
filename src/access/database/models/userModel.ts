@@ -10,15 +10,18 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-{
-    "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true,
-        "target": "ES5",
-        "esModuleInterop": true,
-        "moduleResolution": "node"
+
+import { Schema, model } from "mongoose"
+
+const userSchema = new Schema<User>({
+    username: {
+        type: String,
+        require: [true, "User needs a name"],
+        unique: true
     },
-    "include": [
-        "./src/**/**/**/*"
-    ]
-}
+    password: {
+        type: String,
+        require: [true, "User needs a password"]
+    }
+})
+export const UserModel = model<User>("User", userSchema)

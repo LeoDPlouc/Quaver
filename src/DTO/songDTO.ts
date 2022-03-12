@@ -10,15 +10,17 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-{
-    "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true,
-        "target": "ES5",
-        "esModuleInterop": true,
-        "moduleResolution": "node"
-    },
-    "include": [
-        "./src/**/**/**/*"
-    ]
+
+interface SongDTO {
+    id?: string
+    title?: string,
+    n?: number,
+    duration?: number,
+    like?: number,
+    artist?: string,
+    artistId?: string,
+    album?: string,
+    albumId?: string,
+    year?: number,
+    format?: string
 }

@@ -11,17 +11,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Album } from "../../models/albumModel"
-import logger from "../../utils/logger"
-import { IMigration } from "../migration"
-import { migration2 } from "./migration2"
+import { Document } from "mongoose";
+import { SongModel } from "./models/songModel";
 
-export const migration4: IMigration = {
-    async up() {
-    },
+export async function getAllSongModels(): Promise<(Song & Document<any, any, Song>)[]> {
+    return await SongModel.find()
+}
 
-    //Remove MB ID list and keep only one
-    async down() {
-        migration2.down()
-    }
+export async function getSongModel(id: String): Promise<Song & Document<any, any, Song>> {
+    return await SongModel.findById(id)
+}
+
+export async function updateSongModel(song: Song) {
+    SongModel.findByIdAndUpdate(song.id, song)
 }

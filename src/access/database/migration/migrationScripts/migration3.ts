@@ -13,8 +13,8 @@
 
 import { startSession } from "mongoose"
 import { Album } from "../../models/albumModel"
-import { getAlbumCover } from "../../processing/albumProcessor"
-import logger from "../../utils/logger"
+import { getAlbumCover } from "../../../../processing/albumProcessor"
+import logger from "../../../../utils/logger"
 import { IMigration } from "../migration"
 
 export const migration3: IMigration = {

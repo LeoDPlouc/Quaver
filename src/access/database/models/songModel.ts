@@ -13,19 +13,43 @@
 
 import { Schema, model } from "mongoose"
 
-interface IArtist {
-    name?: string
-    cover?: string
-}
-
-const artistSchema = new Schema<IArtist>({
-    name: {
+const songSchema = new Schema<Song>({
+    title: {
         type: String
     },
-    cover: {
+    n: {
+        type: Number
+    },
+    duration: {
+        type: Number
+    },
+    like: {
+        type: Number
+    },
+    artist: {
+        type: String
+    },
+    artistId: {
+        type: String
+    },
+    album: {
+        type: String
+    },
+    albumId: {
+        type: String
+    },
+    path: {
+        type: String,
+        require: [true, "Song must have a path"]
+    },
+    acoustid: {
+        type: String
+    },
+    year: {
+        type: Number
+    },
+    format: {
         type: String
     }
 })
-const Artist = model<IArtist>("Artist", artistSchema)
-
-export { Artist, IArtist }
+export const SongModel = model<Song>("Song", songSchema)

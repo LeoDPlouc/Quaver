@@ -14,9 +14,9 @@
 import mongoose from "mongoose"
 import { APP_PORT } from "./config/config"
 import { runSongCollector } from "./workers/workers"
-import { IUser } from "./models/userModel"
-import { waitForDb } from "./db/initdb"
-import { Migrate } from "./db/migration"
+import { IUser } from "./access/database/models/userModel"
+import { waitForDb } from "./access/database/migration/initdb"
+import { Migrate } from "./access/database/migration/migration"
 import logger from "./utils/logger"
 import app from "./app"
 

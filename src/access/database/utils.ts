@@ -11,41 +11,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import mongoose from "mongoose"
 
-interface IAlbum {
-    title?: String,
-    artist?: String,
-    artistId?: String,
-    cover?: String,
-    year?: string,
-    mbid?: string,
-    mbids?: string[]
+import { MONGO_IP, MONGO_PASSWORD, MONGO_PORT, MONGO_USER } from "../../config/config"
+import logger from "../../utils/logger"
+
+const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`
+
+export async function connectToDb() {
+    await mongoose
+        .connect(mongoUrl, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false,
+            dbName: "quaver"
+        })
+        .then(() => logger.info("Successfully connected to database"))
+        .catch((e) => {
+            logger.error(e)
+            //retry connection
+            setTimeout(connectToDb, 5000)
+        })
 }
 
-const albumSchema = new Schema<IAlbum>({
-    title: {
-        type: String
-    },
-    artist: {
-        type: String
-    },
-    artistId: {
-        type: String
-    },
-    cover: {
-        type: String
-    },
-    year: {
-        type: String
-    },
-    mbid: {
-        type: String
-    },
-    mbids: {
-        type: [String]
-    }
-})
-const Album = model<IAlbum>("Album", albumSchema)
-
-export { IAlbum, Album } 

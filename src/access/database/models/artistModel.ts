@@ -13,22 +13,13 @@
 
 import { Schema, model } from "mongoose"
 
-interface IUser {
-    username: string,
-    password: string
-}
-
-const userSchema = new Schema<IUser>({
-    username: {
-        type: String,
-        require: [true, "User needs a name"],
-        unique: true
+const artistSchema = new Schema<Artist>({
+    name: {
+        type: String
     },
-    password: {
-        type: String,
-        require: [true, "User needs a password"]
+    cover: {
+        type: String
     }
 })
-const User = model<IUser>("User", userSchema)
 
-export { User, IUser }
+export const ArtistModel = model<Artist>("Artist", artistSchema)

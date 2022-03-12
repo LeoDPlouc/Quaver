@@ -10,15 +10,14 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-{
-    "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true,
-        "target": "ES5",
-        "esModuleInterop": true,
-        "moduleResolution": "node"
-    },
-    "include": [
-        "./src/**/**/**/*"
-    ]
+
+import { getAllImagesModels, getImageModel } from "../access/database/imageDAO";
+import { mapImage } from "../mappers/imageMapper";
+
+export async function getAllImages(): Promise<Image[]> {
+    return (await getAllImagesModels()).map(i => mapImage(i))
+}
+
+export async function getImage(id: String): Promise<Image> {
+    return mapImage(await getImageModel(id))
 }

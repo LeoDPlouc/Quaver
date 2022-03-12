@@ -13,12 +13,11 @@
 
 import bcrypt from "bcryptjs"
 import { Request, Response, NextFunction } from "express"
-import { User } from "../models/userModel"
 import logger from "../utils/logger"
 import { validationResult } from "express-validator"
 
 export async function signUp(req: Request, res: Response, next: NextFunction) {
-    var err = validationResult(req)
+    /*var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
             status: "fail"
@@ -48,11 +47,11 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
         res.json({
             status: "fail"
         })
-    }
+    }*/
 }
 
 export async function signIn(req: Request, res: Response, next: NextFunction) {
-    var err = validationResult(req)
+    /*var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
             status: "fail"
@@ -92,5 +91,5 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
         res.json({
             status: "fail"
         })
-    }
+    }*/
 }

@@ -12,10 +12,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose"
-import { Artist, IArtist } from "../models/artistModel"
-import { IAlbum } from "../models/albumModel"
+import { Artist, IArtist } from "../access/database/models/artistModel"
+import { IAlbum } from "../access/database/models/albumModel"
 import { IReleaseList } from "musicbrainz-api"
-import { IImage, Image } from "../models/imageModel"
+import { IImage, Image } from "../access/database/models/imageModel"
 import { saveImage } from "./imageProcessor"
 import { mbApi } from "../apis/mbApi"
 import logger from "../utils/logger"

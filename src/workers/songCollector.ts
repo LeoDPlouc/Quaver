@@ -16,10 +16,10 @@ import path from "path"
 import mm from "mime-types"
 
 import { getAlbum, getArtist, getMetadataFromFile } from "../processing/songProcessor"
-import { Song } from "../models/songModel"
+import { Song } from "../access/database/models/songModel"
 import { MUSIC_PATH } from "../config/config"
 import logger from "../utils/logger"
-import { waitForDb } from "../db/initdb"
+import { waitForDb } from "../access/database/migration/initdb"
 
 async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true }).catch()

@@ -10,15 +10,31 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-{
-    "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true,
-        "target": "ES5",
-        "esModuleInterop": true,
-        "moduleResolution": "node"
-    },
-    "include": [
-        "./src/**/**/**/*"
-    ]
+
+import { Document } from "mongoose"
+
+export function mapAlbum(data: Album & Document<any, any, Album>): Album {
+    var cleanedData: Album = {
+        id: data.id,
+        title: data.title,
+        artist: data.artist,
+        artistId: data.artistId,
+        cover: data.cover,
+        year: data.year,
+        mbid: data.mbid,
+        mbids: data.mbids
+    }
+    return cleanedData
+}
+
+export function mapAlbumDTO(data: Album): AlbumDTO {
+    var cleanedData: AlbumDTO = {
+        id: data.id,
+        title: data.title,
+        artist: data.artist,
+        artistId: data.artistId,
+        cover: data.cover,
+        year: data.year
+    }
+    return cleanedData
 }
