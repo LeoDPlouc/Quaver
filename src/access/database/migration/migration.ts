@@ -13,7 +13,7 @@
 
 import { Document } from "mongoose";
 import { DB_VERSION } from "../../../config/appConfig"
-import { DbInfo, IDbInfo } from "../models/dbInfoModel";
+import { dbInfoModel } from "../models/dbInfoModel";
 import logger from "../../../utils/logger";
 import { migration0 } from "./migrationScripts/migration0";
 import { migration1 } from "./migrationScripts/migration1";
@@ -34,11 +34,11 @@ const migrations: IMigration[] = [
     migration4
 ]
 
-async function FetchDbInfo(): Promise<Document<any, any, IDbInfo> & IDbInfo> {
-    return await DbInfo.find()
+async function FetchDbInfo(): Promise<Document<any, any, DbInfo> & DbInfo> {
+    return await dbInfoModel.find()
         .then(async (infos) => {
             if (infos.length == 0) {
-                return await DbInfo.create({ version: DB_VERSION })
+                return await dbInfoModel.create({ version: DB_VERSION })
             }
             else return infos[0]
         })
