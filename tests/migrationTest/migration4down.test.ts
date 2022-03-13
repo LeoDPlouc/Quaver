@@ -12,7 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { cleanDatabase, createDatabase, getOneAlbum } from "../util"
-import { migration4 } from "../../src/db/migrationScripts/migration4"
+import { migration4 } from "../../src/access/database/migration/migrationScripts/migration4"
 
 describe("Migration 4 down", () => {
     beforeAll(createDatabase)

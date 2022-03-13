@@ -12,9 +12,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { cleanDatabase, createDatabase, getOneAlbum } from "../util"
-import { migration2 } from "../../src/db/migrationScripts/migration2"
-import { migration0 } from "../../src/db/migrationScripts/migration0"
-import { migration1 } from "../../src/db/migrationScripts/migration1"
+import { migration2 } from "../../src/access/database/migration/migrationScripts/migration2"
+import { migration0 } from "../../src/access/database/migration/migrationScripts/migration0"
+import { migration1 } from "../../src/access/database/migration/migrationScripts/migration1"
 
 describe("Migration 2 up", () => {
     beforeAll(createDatabase)

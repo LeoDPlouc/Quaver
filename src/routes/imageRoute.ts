@@ -13,7 +13,7 @@
 
 import { Router } from "express"
 
-import { getAllImagesInfo, getImage, getOneImageInfo } from "../controllers/imageController"
+import { getAllImagesInfoCtrl, getImageFileCtrl, getOneImageInfoCtrl } from "../controllers/imageController"
 import { protect } from "../middleware/authMiddleware"
 import { param } from "express-validator"
 
@@ -22,14 +22,14 @@ const router = Router()
 router.route("/")
     .get(
         protect,
-        getAllImagesInfo
+        getAllImagesInfoCtrl
     )
 
 router.route("/:id")
     .get(
         protect,
         param("id").not().equals("undefined"),
-        getOneImageInfo
+        getOneImageInfoCtrl
     )
 
 
@@ -37,7 +37,7 @@ router.route("/:id/file")
     .get(
         protect,
         param("id").not().equals("undefined"),
-        getImage
+        getImageFileCtrl
     )
 
 export = router

@@ -12,39 +12,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Request, Response, NextFunction } from "express"
-import { Document } from "mongoose"
-import { ISong, Song } from "../models/songModel"
 import logger from "../utils/logger"
 import { validationResult } from "express-validator"
+import { getAllSongs, getSong, updateSong } from "../service/songService"
+import { mapSongDTO } from "../mappers/songMapper"
 
-//Clean api output
-export function cleanOneSong(data: ISong & Document<any, any, ISong>): any {
-    var cleanedData = {
-        id: data._id,
-        title: data.title,
-        n: data.n,
-        artist: data.artist,
-        album: data.album,
-        year: data.year,
-        duration: data.duration,
-        like: data.like,
-        albumId: data.albumId,
-        artistId: data.artistId,
-        format: data.format
-    }
-    return cleanedData
-}
-
-export function cleanManySongs(datas: (ISong & Document<any, any, ISong>)[]): any[] {
-    var cleaned = []
-    datas.forEach((data, i) => cleaned.push(cleanOneSong(data)))
-    return cleaned
-}
-
-export async function getAllSongsInfo(req: Request, res: Response, next: NextFunction) {
+export async function getAllSongsInfoCtrl(req: Request, res: Response) {
     try {
         //Search all songs in the db and clean the output
-        const songs = cleanManySongs(await Song.find())
+        const songs = (await getAllSongs()).map(s => mapSongDTO(s))
 
         res.json({
             status: "success",
@@ -56,7 +32,7 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
         })
 
     } catch (e) {
-        logger.crit(e)
+        logger.error(e)
         res.json({
             status: "fail",
             statusCode: 1,
@@ -65,7 +41,7 @@ export async function getAllSongsInfo(req: Request, res: Response, next: NextFun
     }
 }
 
-export async function getOneSongInfo(req: Request, res: Response, next: NextFunction) {
+export async function getOneSongInfoCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -77,7 +53,7 @@ export async function getOneSongInfo(req: Request, res: Response, next: NextFunc
 
     try {
         //Search a song by id and clean the output
-        const song = cleanOneSong(await Song.findById(req.params.id))
+        const song = mapSongDTO(await getSong(req.params.id))
 
         res.json({
             status: "success",
@@ -97,41 +73,7 @@ export async function getOneSongInfo(req: Request, res: Response, next: NextFunc
     }
 }
 
-export async function updateSongInfo(req: Request, res: Response, next: NextFunction) {
-    var err = validationResult(req)
-    if (!err.isEmpty()) {
-        return res.json({
-            status: "fail",
-            statusCode: 2,
-            errorMessage: "Invalid error"
-        })
-    }
-
-    try {
-        const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        })
-
-        res.json({
-            status: "succes",
-            statusCode: 0,
-            data: {
-                song
-            }
-        })
-
-    } catch (e) {
-        logger.crit(e)
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-    }
-}
-
-export async function getSongStream(req: Request, res: Response, next: NextFunction) {
+export async function getSongStreamCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -143,7 +85,7 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
 
     try {
         //Search a song by id and and send the file
-        const song = await Song.findById(req.params.id)
+        const song = await getSong(req.params.id)
 
         res.sendFile(song.path)
 
@@ -157,7 +99,7 @@ export async function getSongStream(req: Request, res: Response, next: NextFunct
     }
 }
 
-export async function updateLike(req: Request, res: Response, next: NextFunction) {
+export async function updateLikeCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -169,11 +111,11 @@ export async function updateLike(req: Request, res: Response, next: NextFunction
 
     try {
         //Search a song by id
-        const song = await Song.findById(req.params.id)
+        const song = await getSong(req.params.id)
 
         //Update the like field
         song.like = Number(req.body.like)
-        await song.save()
+        updateSong(song)
 
         res.json({
             status: "success",

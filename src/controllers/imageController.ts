@@ -11,30 +11,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Request, Response, NextFunction } from "express"
-import { Document } from "mongoose"
-import { Image, IImage } from "../models/imageModel"
+import { Request, Response } from "express"
 import logger from "../utils/logger"
 import { validationResult } from "express-validator"
+import { getAllImages, getImage } from "../service/imageService"
+import { mapImageDTO } from "../mappers/imageMapper"
 
-//Clean api output
-export function cleanOneImage(data: IImage & Document<any, any, IImage>): any {
-    var cleanedData = {
-        id: data._id
-    }
-    return cleanedData
-}
-
-export function cleanManyImages(datas: (IImage & Document<any, any, IImage>)[]): any[] {
-    var cleaned = []
-    datas.forEach((data, i) => cleaned.push(cleanOneImage(data)))
-    return cleaned
-}
-
-export async function getAllImagesInfo(req: Request, res: Response, next: NextFunction) {
+export async function getAllImagesInfoCtrl(req: Request, res: Response) {
     try {
         //Search all images in the db and clean the output
-        const images = cleanManyImages(await Image.find())
+        const images = (await getAllImages()).map(i => mapImageDTO(i))
 
         res.json({
             status: "success",
@@ -55,7 +41,7 @@ export async function getAllImagesInfo(req: Request, res: Response, next: NextFu
     }
 }
 
-export async function getOneImageInfo(req: Request, res: Response, next: NextFunction) {
+export async function getOneImageInfoCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -67,7 +53,7 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
 
     try {
         //Search an image by id and clean the output
-        const image = cleanOneImage(await Image.findById(req.params.id))
+        const image = mapImageDTO(await getImage(req.params.id))
 
         res.json({
             status: "success",
@@ -87,7 +73,7 @@ export async function getOneImageInfo(req: Request, res: Response, next: NextFun
     }
 }
 
-export async function getImage(req: Request, res: Response, next: NextFunction) {
+export async function getImageFileCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -99,7 +85,7 @@ export async function getImage(req: Request, res: Response, next: NextFunction) 
 
     try {
         //Search an image by id and send the file
-        const image = await Image.findById(req.params.id)
+        const image = await getImage(req.params.id)
 
         res.sendFile(image.path)
 

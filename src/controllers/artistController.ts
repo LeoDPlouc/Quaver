@@ -11,35 +11,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Request, Response, NextFunction } from "express"
-import { Document } from "mongoose"
-import { Album } from "../models/albumModel"
-import { Artist, IArtist } from "../models/artistModel"
-import { Song } from "../models/songModel"
+import { Request, Response } from "express"
 import logger from "../utils/logger"
-import { cleanManyAlbums } from "./albumController"
-import { cleanManySongs } from "./songController"
 import { validationResult } from "express-validator"
+import { getAllArtists, getArtist, getArtistAlbums, getArtistSongs } from "../service/artistService"
+import { mapArtistDTO } from "../mappers/artistMapper"
+import { mapSongDTO } from "../mappers/songMapper"
+import { mapAlbumDTO } from "../mappers/albumMapper"
 
-export function cleanOneArtist(data: IArtist & Document<any, any, IArtist>): any {
-    var cleanedData = {
-        id: data._id,
-        name: data.name,
-        cover: data.cover
-    }
-    return cleanedData
-}
-
-export function cleanManyArtists(datas: (IArtist & Document<any, any, IArtist>)[]): any[] {
-    var cleaned = []
-    datas.forEach((data, i) => cleaned.push(cleanOneArtist(data)))
-    return cleaned
-}
-
-export async function getAllArtists(req: Request, res: Response, next: NextFunction) {
+export async function getAllArtistsCtrl(req: Request, res: Response) {
     try {
         //Search all artists in the db and clean the output
-        const artists = cleanManyArtists(await Artist.find())
+        const artists = (await getAllArtists()).map(a => mapArtistDTO(a))
 
         res.json({
             status: "success",
@@ -51,7 +34,7 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
         })
 
     } catch (e) {
-        logger.crit(e)
+        logger.error(e)
         res.json({
             statusCode: 1,
             errorMessage: "Server error",
@@ -60,7 +43,7 @@ export async function getAllArtists(req: Request, res: Response, next: NextFunct
     }
 }
 
-export async function getOneArtist(req: Request, res: Response, next: NextFunction) {
+export async function getOneArtistCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -72,7 +55,7 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
 
     try {
         //Search an artist by id and clean the output
-        const artist = cleanOneArtist(await Artist.findById(req.params.id))
+        const artist = mapArtistDTO(await getArtist(req.params.id))
 
         res.json({
             status: "success",
@@ -83,7 +66,7 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
         })
 
     } catch (e) {
-        logger.crit(e)
+        logger.error(e)
         res.json({
             status: "fail",
             statusCode: 1,
@@ -92,41 +75,7 @@ export async function getOneArtist(req: Request, res: Response, next: NextFuncti
     }
 }
 
-export async function updateArtist(req: Request, res: Response, next: NextFunction) {
-    var err = validationResult(req)
-    if (!err.isEmpty()) {
-        return res.json({
-            status: "fail",
-            statusCode: 2,
-            errorMessage: "Invalid error"
-        })
-    }
-
-    try {
-        const artist = await Artist.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        })
-
-        res.json({
-            status: "success",
-            statusCode: 0,
-            data: {
-                artist
-            }
-        })
-
-    } catch (e) {
-        logger.crit(e)
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-    }
-}
-
-export async function getArtistSongs(req: Request, res: Response, next: NextFunction) {
+export async function getArtistSongsCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -138,20 +87,19 @@ export async function getArtistSongs(req: Request, res: Response, next: NextFunc
 
     try {
         //Search songs by artistId and clean the output
-        const songs = await Song.find({ artistId: req.params.id })
-        const cleanedSongs = cleanManySongs(songs)
+        const songs = (await getArtistSongs(req.params.id)).map(s => mapSongDTO(s))
 
         res.json({
             status: "success",
             statusCode: 0,
             results: songs.length,
             data: {
-                songs: cleanedSongs
+                songs: songs
             }
         })
     }
     catch (e) {
-        logger.crit(e)
+        logger.error(e)
         res.json({
             status: "fail",
             statusCode: 1,
@@ -160,7 +108,7 @@ export async function getArtistSongs(req: Request, res: Response, next: NextFunc
     }
 }
 
-export async function getArtistAlbums(req: Request, res: Response, next: NextFunction) {
+export async function getArtistAlbumsCtrl(req: Request, res: Response) {
     var err = validationResult(req)
     if (!err.isEmpty()) {
         return res.json({
@@ -172,20 +120,19 @@ export async function getArtistAlbums(req: Request, res: Response, next: NextFun
 
     try {
         //Search albums by artistId and clean the output
-        const albums = await Album.find({ artistId: req.params.id })
-        const cleanedAlbums = cleanManyAlbums(albums)
+        const albums = (await getArtistAlbums(req.params.id)).map(a => mapAlbumDTO(a))
 
         res.json({
             status: "success",
             statusCode: 0,
             results: albums.length,
             data: {
-                albums: cleanedAlbums
+                albums: albums
             }
         })
     }
     catch (e) {
-        logger.crit(e)
+        logger.error(e)
         res.json({
             status: "fail",
             statusCode: 1,
