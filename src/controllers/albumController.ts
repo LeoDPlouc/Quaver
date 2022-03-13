@@ -54,7 +54,7 @@ export async function getAlbumCtrl(req: Request, res: Response) {
 
     try {
         //Search an album by id and clean the output
-        const album = mapAlbumDTO(await getAlbum(req.body.id))
+        const album = mapAlbumDTO(await getAlbum(req.params.id))
 
         res.json({
             status: "success",

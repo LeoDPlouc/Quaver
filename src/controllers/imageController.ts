@@ -53,7 +53,7 @@ export async function getOneImageInfoCtrl(req: Request, res: Response) {
 
     try {
         //Search an image by id and clean the output
-        const image = mapImageDTO(await getImage(req.body.id))
+        const image = mapImageDTO(await getImage(req.params.id))
 
         res.json({
             status: "success",
@@ -85,7 +85,7 @@ export async function getImageFileCtrl(req: Request, res: Response) {
 
     try {
         //Search an image by id and send the file
-        const image = await getImage(req.body.id)
+        const image = await getImage(req.params.id)
 
         res.sendFile(image.path)
 

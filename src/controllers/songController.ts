@@ -53,7 +53,7 @@ export async function getOneSongInfoCtrl(req: Request, res: Response) {
 
     try {
         //Search a song by id and clean the output
-        const song = mapSongDTO(await getSong(req.body.id))
+        const song = mapSongDTO(await getSong(req.params.id))
 
         res.json({
             status: "success",
