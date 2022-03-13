@@ -14,21 +14,20 @@
 import mongoose from "mongoose"
 import { APP_PORT } from "./config/config"
 import { runSongCollector } from "./workers/workers"
-import { IUser } from "./access/database/models/userModel"
-import { waitForDb } from "./access/database/migration/initdb"
 import { Migrate } from "./access/database/migration/migration"
 import logger from "./utils/logger"
 import app from "./app"
+import { connectToDb } from "./access/database/utils"
 
 //Declare the objects stored in session
 declare module 'express-session' {
     interface SessionData {
-        user: IUser & mongoose.Document<any, any, IUser>
+        user: User & mongoose.Document<any, any, User>
     }
 }
 
 //Connect to the db
-waitForDb()
+connectToDb()
     .then(async () => {
         //Apply database migration
         await Migrate().catch((reason) => {
