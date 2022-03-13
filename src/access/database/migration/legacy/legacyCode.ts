@@ -53,3 +53,39 @@ export async function getAlbumCoverLegacy(album: Album & Document<any, any, Albu
     }
     return null
 }
+
+export async function getAlbumCoverLegacy2(album: Album & Document<any, any, Album>): Promise<Image & Document<any, any, Image>> {
+    var cover
+    var ext
+
+    var i = 0
+    //Try fetching cover art for every MB ID
+    while (!cover && i < album.mbids.length) {
+        try {
+            //Fetch Cover art
+            var p = new Promise<any>((resolve, reject) => {
+                caApi.release(album.mbids[i], { piece: "front" }, (err, data) => {
+                    if (err) reject(err)
+                    resolve(data)
+                })
+            })
+            var { image, extension } = await p
+            cover = image
+            ext = extension
+        }
+        catch { }
+        finally { i++ }
+    }
+
+    if (image) {
+        logger.info(`Found new cover for ${album.id}`)
+        //Save the image cover on the hard drive
+        var path = await saveImage(image, extension)
+
+        var newCover = new imageModel({ path })
+        await newCover.save()
+
+        return newCover
+    }
+    return null
+}

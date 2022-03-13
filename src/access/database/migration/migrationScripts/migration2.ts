@@ -12,16 +12,16 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { IMigration } from "../migration"
-import { deleteImage } from "../../../../processing/imageProcessor"
-import { getAlbumMBId } from "../../../../processing/albumProcessor"
-import { Album } from "../../models/albumModel"
-import { Image } from "../../models/imageModel"
+import { albumModel } from "../../models/albumModel"
+import { imageModel } from "../../models/imageModel"
 import logger from "../../../../utils/logger"
+import { getAlbumMBId } from "../../../api/musicbrainzApi"
+import { deleteImage } from "../../../file/imageFile"
 
 export const migration2: IMigration = {
     //Remove single MB ID and fetch all fiting MB IDs 
     async up() {
-        var albums = await Album.find()
+        var albums = await albumModel.find()
 
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
@@ -37,7 +37,7 @@ export const migration2: IMigration = {
 
     //Remove album covers
     async down() {
-        var albums = await Album.find()
+        var albums = await albumModel.find()
 
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
@@ -45,9 +45,9 @@ export const migration2: IMigration = {
             if (a.cover) {
                 logger.info(`Migration 2 -> 1 album ${a.id}`)
 
-                var cover = await Image.findById(a.cover)
+                var cover = await imageModel.findById(a.cover)
 
-                deleteImage(cover)
+                deleteImage(cover.path)
                 cover.delete()
 
                 a.cover = undefined

@@ -11,16 +11,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { startSession } from "mongoose"
-import { Album } from "../../models/albumModel"
-import { getAlbumCover } from "../../../../processing/albumProcessor"
+import { albumModel } from "../../models/albumModel"
 import logger from "../../../../utils/logger"
 import { IMigration } from "../migration"
+import { getAlbumCoverLegacy2 } from "../legacy/legacyCode"
 
 export const migration3: IMigration = {
     //Download album covers
     async up() {
-        var albums = await Album.find()
+        var albums = await albumModel.find()
 
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
@@ -29,7 +28,7 @@ export const migration3: IMigration = {
                 if (!a.cover) {
                     logger.info(`Migration 3 -> 4 album ${a.id}`)
 
-                    var cover = await getAlbumCover(a)
+                    var cover = await getAlbumCoverLegacy2(a)
                     if (cover) {
                         await cover.save()
 
@@ -45,7 +44,7 @@ export const migration3: IMigration = {
 
     //Remove MB ID list and keep only one
     async down() {
-        var albums = await Album.find()
+        var albums = await albumModel.find()
 
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]

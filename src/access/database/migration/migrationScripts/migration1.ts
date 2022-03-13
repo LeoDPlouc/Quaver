@@ -13,13 +13,13 @@
 
 import { IMigration } from "../migration"
 import { getAlbumCoverLegacy } from "../legacy/legacyCode"
-import { Album } from "../../models/albumModel"
+import { albumModel } from "../../models/albumModel"
 import logger from "../../../../utils/logger"
 
 export const migration1: IMigration = {
     //Download album covers
     async up() {
-        var albums = await Album.find()
+        var albums = await albumModel.find()
 
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
@@ -40,7 +40,7 @@ export const migration1: IMigration = {
 
     //Remove MB IDs
     async down() {
-        var albums = await Album.find()
+        var albums = await albumModel.find()
 
         for (var i = 0; i < albums.length; i++) {
             var a = albums[i]
