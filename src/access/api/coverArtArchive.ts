@@ -19,7 +19,8 @@ interface imageFileData {
     extension: string
 }
 
-const caApi = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
+//Ne plus exporter lors du nettoyage des dépréciés
+export const caApi = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
 
 export async function getAlbumCover(mbids: string[]): Promise<imageFileData> {
     var cover

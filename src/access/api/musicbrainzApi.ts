@@ -14,7 +14,8 @@
 import { IReleaseList, MusicBrainzApi } from "musicbrainz-api";
 import { APP_VERSION } from "../../config/appConfig";
 
-const mbApi = new MusicBrainzApi({
+//Ne plus exporter lors du nettoyage des dépréciés
+export const mbApi = new MusicBrainzApi({
     appName: "Quaver",
     appVersion: APP_VERSION,
     appContactInfo: "https://github.com/LeoDPlouc/Quaver"

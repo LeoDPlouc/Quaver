@@ -12,16 +12,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { IReleaseList } from "musicbrainz-api"
-import { mbApi } from "../../apis/mbApi"
-import { IAlbum } from "../../models/albumModel"
 import { Document } from "mongoose"
-import { IImage } from "../../models/imageModel"
-import { caApi } from "../../apis/caApi"
 import logger from "../../../../utils/logger"
-import { saveImage } from "../../../../processing/imageProcessor"
-import { Image } from "../../models/imageModel"
+import { mbApi } from "../../../api/musicbrainzApi"
+import { caApi } from "../../../api/coverArtArchive"
+import { saveImage } from "../../../file/imageFile"
+import { imageModel } from "../../models/imageModel"
 
-export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {
+export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
 
     var query = `release:${album.title as string}`
 
@@ -32,7 +30,7 @@ export async function getAlbumMBIdLegacy(album: IAlbum): Promise<string> {
     return result.releases[0].id
 }
 
-export async function getAlbumCoverLegacy(album: IAlbum & Document<any, any, IAlbum>): Promise<IImage & Document<any, any, IImage>> {
+export async function getAlbumCoverLegacy(album: Album & Document<any, any, Album>): Promise<Image & Document<any, any, Image>> {
 
     //Fetch Cover art
     var p = new Promise<any>((resolve, reject) => {
@@ -48,7 +46,7 @@ export async function getAlbumCoverLegacy(album: IAlbum & Document<any, any, IAl
         //Save the image cover on the hard drive
         var path = await saveImage(image, extension)
 
-        var newCover = new Image({ path })
+        var newCover = new imageModel({ path })
         await newCover.save()
 
         return newCover
