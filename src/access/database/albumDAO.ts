@@ -27,8 +27,8 @@ export async function getAlbumSongModel(id: string): Promise<(Song & Document<an
     return await songModel.find({ albumId: id })
 }
 
-export async function createAlbumModel(album: Album) {
-    await albumModel.create(album)
+export async function createAlbumModel(album: Album): Promise<string> {
+    return (await albumModel.create(album)).id
 }
 
 export async function findAlbumModelByName(albumTitle: string, artistName?: string): Promise<(Album & Document<any, any, Album>)[]> {

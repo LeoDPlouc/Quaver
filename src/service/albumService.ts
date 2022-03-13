@@ -27,8 +27,8 @@ export async function getAlbumSongs(id: string): Promise<Song[]> {
     return (await getAlbumSongModel(id)).map(s => mapSong(s))
 }
 
-export async function createAlbum(album: Album) {
-    await createAlbumModel(album)
+export async function createAlbum(album: Album): Promise<string> {
+    return await createAlbumModel(album)
 }
 
 export async function findAlbumByName(albumTitle: string, artistName?: string): Promise<Album[]> {

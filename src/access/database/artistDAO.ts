@@ -32,10 +32,10 @@ export async function getArtistAlbumModels(id: string): Promise<(Album & Documen
     return await albumModel.find({ artistId: id })
 }
 
-export async function createArtistModel(artist: Artist) {
-    await artistModel.create(artist)
+export async function createArtistModel(artist: Artist): Promise<string> {
+    return (await artistModel.create(artist)).id
 }
 
-export async function searchArtistModelByName(name: string): Promise<(Artist & Document<any, any, Artist>)[]> {
+export async function findArtistModelByName(name: string): Promise<(Artist & Document<any, any, Artist>)[]> {
     return await artistModel.find({ name: name })
 }

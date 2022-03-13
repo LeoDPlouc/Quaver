@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { createArtistModel, getAllArtistModels, getArtistAlbumModels, getArtistModel, getArtistSongModels, searchArtistModelByName } from "../access/database/artistDAO";
+import { createArtistModel, getAllArtistModels, getArtistAlbumModels, getArtistModel, getArtistSongModels, findArtistModelByName } from "../access/database/artistDAO";
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapArtist } from "../mappers/artistMapper";
 import { mapSong } from "../mappers/songMapper";
@@ -32,10 +32,10 @@ export async function getArtistAlbums(id: string): Promise<Album[]> {
     return (await getArtistAlbumModels(id)).map(a => mapAlbum(a))
 }
 
-export async function createArtist(artist: Artist) {
-    await createArtistModel(artist)
+export async function createArtist(artist: Artist): Promise<string> {
+    return await createArtistModel(artist)
 }
 
-export async function searchArtistByName(name: string) {
-    return await searchArtistModelByName(name)
+export async function findArtistByName(name: string): Promise<Artist[]> {
+    return (await findArtistModelByName(name)).map(a => mapArtist(a))
 }

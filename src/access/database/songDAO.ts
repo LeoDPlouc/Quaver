@@ -26,6 +26,10 @@ export async function updateSongModel(song: Song) {
     await songModel.findByIdAndUpdate(song.id, song)
 }
 
-export async function createSongModel(song: Song) {
-    await songModel.create(song)
+export async function createSongModel(song: Song): Promise<string> {
+    return (await songModel.create(song)).id
+}
+
+export async function findSongModelByPath(path: string): Promise<Song & Document<any, any, Song>> {
+    return (await songModel.find({ path }))[0]
 }

@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { createSongModel, getAllSongModels, getSongModel, updateSongModel } from "../access/database/songDAO";
+import { createSongModel, findSongModelByPath, getAllSongModels, getSongModel, updateSongModel } from "../access/database/songDAO";
 import { mapSong } from "../mappers/songMapper";
 
 
@@ -27,6 +27,10 @@ export async function updateSong(song: Song) {
     await updateSongModel(song)
 }
 
-export async function createSong(song: Song) {
-    await createSongModel(song)
+export async function createSong(song: Song): Promise<string> {
+    return await createSongModel(song)
+}
+
+export async function findSongByPath(path: string) {
+    return mapSong(await findSongModelByPath(path))
 }

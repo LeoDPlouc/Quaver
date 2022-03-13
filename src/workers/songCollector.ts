@@ -14,12 +14,13 @@
 import fs from "fs/promises"
 import path from "path"
 import mm from "mime-types"
-
-import { getAlbum, getArtist, getMetadataFromFile } from "../processing/songProcessor"
-import { Song } from "../access/database/models/songModel"
 import { MUSIC_PATH } from "../config/config"
+import { connectToDb } from "../access/database/utils"
 import logger from "../utils/logger"
-import { waitForDb } from "../access/database/migration/initdb"
+import { createSong, findSongByPath } from "../service/songService"
+import { getMetadataFromFile } from "../access/file/songFile"
+import { createAlbum, findAlbumByName } from "../service/albumService"
+import { createArtist, findArtistByName } from "../service/artistService"
 
 async function collect(libPath: string) {
     var paths = await fs.readdir(libPath, { withFileTypes: true }).catch()
@@ -37,37 +38,31 @@ async function collect(libPath: string) {
 async function registerSong(songPath: string) {
     try {
         //Only considere audio files
-        if (!(mm.lookup(path.extname(songPath)) as string).match("audio"))
-            return
-
-        var song = await Song.findOne({ path: songPath })
+        if (!(mm.lookup(path.extname(songPath)) as string).match("audio")) return
 
         //If the song doesn't already exist, extract its metadata and create a new song
-        if (song)
-            return
+        if (await findSongByPath(songPath)) return
 
-        const songInfo = await getMetadataFromFile(songPath)
+        var song = await getMetadataFromFile(songPath)
 
-        song = new Song(songInfo)
-        await song.save().then(() => logger.info(`Found new song ${song.id}`))
+        logger.info(`Found new song ${song.path}`)
 
         //Fetch the song's album
-        var album = await getAlbum(song)
-
-        //Save the albumId in the song
-        song.albumId = album.id
-        await song.save()
+        var album = (await findAlbumByName(song.album, song.artist))[0]
+        if (!album) album = { artist: song.artist, title: song.album, year: String(song.year) }
 
         //Fetch the song's artist
-        var artist = await getArtist(song)
+        var artist = (await findArtistByName(song.artist))[0]
+        if (!artist) artist = { name: song.artist }
 
-        //Save the artistId in the song
-        song.artistId = artist.id
-        await song.save()
+        const artistId = await createArtist(artist)
 
-        //Save the artistid in the album
-        album.artistId = artist.id
-        await album.save()
+        album.artistId = artistId
+        const albumId = await createAlbum(album)
+
+        song.artistId = artistId
+        song.albumId = albumId
+        await createSong(song)
     } catch (err) {
         logger.error(err)
     }
@@ -78,7 +73,7 @@ function doWork() {
 
     logger.info("Song collection Started")
 
-    waitForDb().then(async () => {
+    connectToDb().then(async () => {
 
         //Collection run in background and is relaunched every 30 sec
         while (true) {
