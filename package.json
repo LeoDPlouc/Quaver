@@ -8,6 +8,7 @@
     "startdev": "QUAVER_DB_IP=127.0.0.1 QUAVER_DB_USER=quaver QUAVER_DB_PASSWORD=quaver QUAVER_SESSION_SECRET=quaver QUAVER_MUSIC_PATH=./music QUAVER_IMAGES_PATH=./images node dist/index.js",
     "build": "./scripts/build.sh",
     "publish": "./scripts/publish.sh",
+    "publishPre": "./scripts/publishPre.sh",
     "test": "QUAVER_DB_IP=127.0.0.1 QUAVER_DB_USER=quaver QUAVER_DB_PASSWORD=quaver QUAVER_SESSION_SECRET=quaver QUAVER_MUSIC_PATH=./music QUAVER_IMAGES_PATH=./images jest --detectOpenHandles --runInBand"
   },
   "repository": {
