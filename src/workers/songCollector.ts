@@ -36,7 +36,7 @@ async function collect(libPath: string) {
 }
 
 async function registerSong(songPath: string) {
-    try {
+    //try {
         //Only considere audio files
         if (!(mm.lookup(path.extname(songPath)) as string).match("audio")) return
 
@@ -49,7 +49,7 @@ async function registerSong(songPath: string) {
 
         //Fetch the song's album
         var album = (await findAlbumByName(song.album, song.artist))[0]
-        if (!album) album = { artist: song.artist, title: song.album, year: String(song.year) }
+        if (!album) album = { artist: song.artist, title: song.album, year: song.year }
 
         //Fetch the song's artist
         var artist = (await findArtistByName(song.artist))[0]
@@ -63,9 +63,9 @@ async function registerSong(songPath: string) {
         song.artistId = artistId
         song.albumId = albumId
         await createSong(song)
-    } catch (err) {
-        logger.error(err)
-    }
+    //} catch (err) {
+    //    logger.error(err)
+    //}
 }
 
 

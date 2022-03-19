@@ -27,7 +27,7 @@ const albumSchema = new Schema<Album>({
         type: String
     },
     year: {
-        type: String
+        type: Number
     },
     mbid: {
         type: String

@@ -17,7 +17,7 @@ interface Album {
     artist?: string,
     artistId?: string,
     cover?: string,
-    year?: string,
+    year?: number,
     mbid?: string,
     mbids?: string[]
 }
