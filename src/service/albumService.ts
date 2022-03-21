@@ -20,7 +20,11 @@ export async function getAllAlbums(): Promise<Album[]> {
 }
 
 export async function getAlbum(id: string): Promise<Album> {
-    return mapAlbum(await getAlbumModel(id))
+
+    var model = await getAlbumModel(id)
+
+    if (!model) return null
+    return mapAlbum(model)
 }
 
 export async function getAlbumSongs(id: string): Promise<Song[]> {
