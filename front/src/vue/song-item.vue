@@ -15,7 +15,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 <template>
-  <div class="songItem">
+  <div v-show="search(queryString, song)" class="songItem">
     <div class="songItemProp songItemLike" @click="likeSong">{{ song.like }}</div>
     <div class="songItemProp songItemN">{{ song.n }}</div>
     <div class="songItemProp songItemTitle" @click="songItemTitleClicked">{{ song.title }}</div>
@@ -28,58 +28,73 @@
 
 <script lang='ts'>
 import { defineComponent } from "vue";
-import { Song } from "../models"
+import { Song } from "../models";
 import { SongItemTitleClickedEventArgs } from "../eventArgs";
+import { search } from "../searching";
 
 export default defineComponent({
   props: { song: Song, index: Number },
 
   emits: ["song-item-title-clicked"],
 
+  inject: ['query'],
+
+  data() {
+    return {
+      queryString: this.query
+    }
+  },
+
   methods: {
+    search,
     formatDuration(duration: number): string {
       try {
         var seconds = Number(duration) % 60;
         var secondsString = String(seconds).split(".")[0];
-        if (secondsString.length == 1) secondsString = secondsString + "0"
-        if (secondsString.length == 0) secondsString = "00"
+        if (secondsString.length == 1) secondsString = secondsString + "0";
+        if (secondsString.length == 0) secondsString = "00";
         var minutes = Number(duration) / 60;
         var minutesString = String(minutes).split(".")[0];
-        if (minutesString.length == 0) minutesString = "0"
+        if (minutesString.length == 0) minutesString = "0";
         return `${minutesString}:${secondsString}`;
       } catch (error) { }
       return String(duration);
     },
     songItemTitleClicked() {
-      this.$emit("song-item-title-clicked", new SongItemTitleClickedEventArgs(this.song, this.index))
+      this.$emit(
+        "song-item-title-clicked",
+        new SongItemTitleClickedEventArgs(this.song, this.index)
+      );
     },
     async likeSong() {
-      var like: Number
+      var like: Number;
 
       switch (this.song.like) {
         case 1:
-          like = -1
+          like = -1;
           break;
         case 0:
-          like = 1
+          like = 1;
           break;
         case -1:
-          like = 0
+          like = 0;
           break;
       }
 
-      var res = fetch("/api/song/" + this.song.id + "/like", { method: "PATCH", body: JSON.stringify({ like: like }), headers: { "Content-Type": "application/json" } })
-        .then(res => {
-          if (res.ok) {
-            res.json()
-              .then(resJson => {
-                if (resJson.statusCode == 0) this.song.like = like
-              })
-          }
-        })
-    }
+      var res = fetch("/api/song/" + this.song.id + "/like", {
+        method: "PATCH",
+        body: JSON.stringify({ like: like }),
+        headers: { "Content-Type": "application/json" },
+      }).then((res) => {
+        if (res.ok) {
+          res.json().then((resJson) => {
+            if (resJson.statusCode == 0) this.song.like = like;
+          });
+        }
+      });
+    },
   },
-})
+});
 </script>
 
 <style>

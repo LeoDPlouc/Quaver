@@ -12,23 +12,23 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 <template>
-    <div class="appContainer">
-        <div class="appButtons">
-            <router-link to="/">
-                <img class="logo" src="/img/logo.svg" />
-            </router-link>
-            <router-link to="/song">Song</router-link>
-            <router-link to="/album">Album</router-link>
-            <router-link to="/artist">Artist</router-link>
-            <input v-model="queryString" />
-        </div>
-        <router-view class="view" @song-changed="changeSong" :queryString="queryString" />
-        <player class="player" ref="player" />
+  <div class="appContainer">
+    <div class="appButtons">
+      <router-link to="/">
+        <img class="logo" src="/img/logo.svg" />
+      </router-link>
+      <router-link to="/song">Song</router-link>
+      <router-link to="/album">Album</router-link>
+      <router-link to="/artist">Artist</router-link>
+      <input v-model="queryString" />
     </div>
+    <router-view class="view" @song-changed="changeSong" />
+    <player class="player" ref="player" />
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import songListVue from "./song-list.vue";
 import playerVue from "./player.vue";
 import { SongChangedEventArgs } from "../eventArgs";
@@ -37,63 +37,69 @@ import artistListVue from "./artist-list.vue";
 import albumPresentationVue from "./album-presentation.vue";
 
 export default defineComponent({
-    components: {
-        "song-list": songListVue,
-        "album-list": albumListVue,
-        "artist-list": artistListVue,
-        "album-presentation": albumPresentationVue,
-        "player": playerVue
-    },
+  components: {
+    "song-list": songListVue,
+    "album-list": albumListVue,
+    "artist-list": artistListVue,
+    "album-presentation": albumPresentationVue,
+    player: playerVue,
+  },
 
-    methods: {
-        changeSong(e: SongChangedEventArgs) {
-            this.$refs.player.loadSong(e.song, e.index, e.playlist)
-        }
+  methods: {
+    changeSong(e: SongChangedEventArgs) {
+      this.$refs.player.loadSong(e.song, e.index, e.playlist);
     },
+  },
 
-    data() {
-        return {
-            queryString: ""
-        }
-    },
-})
+  data() {
+    return {
+      queryString: "",
+    };
+  },
+
+  provide() {
+    return {
+      query: computed(() => this.queryString)
+    };
+  },
+});
 </script>
 
 <style>
 :root {
-    --background: #14052e;
-    --misc: #5514c8;
-    --foreground: #8863c7;
+  --background: #14052e;
+  --misc: #5514c8;
+  --foreground: #8863c7;
 }
 body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    width: 100vw;
-    background-color: var(--background);
-    color: var(--foreground);
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 .appButtons {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 .appContainer {
-    grid-row: 1;
-    display: grid;
-    grid-template-rows: 3em auto 5vh;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+  grid-row: 1;
+  display: grid;
+  grid-template-rows: 3em auto 5vh;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 .view {
-    grid-row: 2;
-    overflow-y: auto;
-    overflow-x: hidden;
+  grid-row: 2;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .player {
-    grid-row: 3;
+  grid-row: 3;
 }
 .logo {
-    height: 3em;
+  height: 3em;
 }
 </style>

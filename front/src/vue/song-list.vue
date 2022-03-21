@@ -17,7 +17,7 @@
 <template>
     <div>
         <song-item
-            v-for="(song, index) in filteredSongs"
+            v-for="(song, index) in songs"
             :key="index"
             :song="song"
             :index="index"

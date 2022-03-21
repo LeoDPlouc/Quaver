@@ -13,14 +13,26 @@
 
 import { Album, Artist, Song } from "./models";
 
+export function search(queryString: any, obj: Song | Album | Artist) {
+
+    var query = queryString as string
+
+    if (!query.length) return true
+
+    var target = ""
+    if ((obj as Song).title) target = (obj as Song).title
+    if ((obj as Album).title) target = (obj as Album).title
+    if ((obj as Artist).name) target = (obj as Artist).name
+
+    if (!target) return false
+    var match = target.toLowerCase().match(query.toLowerCase())
+    return match != null && match.length > 0
+}
+
+
 export function searchSong(query: string, song: Song[]): Song[] {
 
     if (!query.length) query = ".*"
-
-    console.log(query)
-
-    console.log(song)
-
     return song.filter(s => {
         if (!s.title) return false
         var match = s.title.toLowerCase().match(query.toLowerCase())
