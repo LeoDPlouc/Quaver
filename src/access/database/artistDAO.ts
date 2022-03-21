@@ -39,3 +39,7 @@ export async function createArtistModel(artist: Artist): Promise<string> {
 export async function findArtistModelByName(name: string): Promise<(Artist & Document<any, any, Artist>)[]> {
     return await artistModel.find({ name: name })
 }
+
+export async function updateArtistModel(artist: Artist) {
+    await artistModel.findByIdAndUpdate(artist.id, artist)
+}

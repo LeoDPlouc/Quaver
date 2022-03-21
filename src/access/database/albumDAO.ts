@@ -38,3 +38,7 @@ export async function findAlbumModelByName(albumTitle: string, artistName?: stri
 
     return await albumModel.find(query)
 }
+
+export async function updateAlbumModel(album: Album) {
+    await albumModel.findByIdAndUpdate(album.id, album)
+}

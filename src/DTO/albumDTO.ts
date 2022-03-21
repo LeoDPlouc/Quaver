@@ -17,5 +17,5 @@ interface AlbumDTO {
     artist?: string,
     artistId?: string,
     cover?: string,
-    year?: string
+    year?: number
 }

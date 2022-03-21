@@ -20,7 +20,11 @@ export async function getAllSongs(): Promise<Song[]> {
 }
 
 export async function getSong(id: string): Promise<Song> {
-    return mapSong(await getSongModel(id))
+
+    var model = await getSongModel(id)
+
+    if (!model) return null
+    return mapSong(model)
 }
 
 export async function updateSong(song: Song) {
@@ -31,6 +35,10 @@ export async function createSong(song: Song): Promise<string> {
     return await createSongModel(song)
 }
 
-export async function findSongByPath(path: string) {
-    return mapSong(await findSongModelByPath(path))
+export async function findSongByPath(path: string): Promise<Song> {
+
+    var model = await findSongModelByPath(path)
+
+    if (!model) return null
+    return mapSong(model)
 }

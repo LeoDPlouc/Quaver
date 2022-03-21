@@ -17,9 +17,9 @@ import mm from "mime-types"
 import { MUSIC_PATH } from "../config/config"
 import { connectToDb } from "../access/database/utils"
 import logger from "../utils/logger"
-import { createSong, findSongByPath } from "../service/songService"
+import { createSong, findSongByPath, updateSong } from "../service/songService"
 import { getMetadataFromFile } from "../access/file/songFile"
-import { createAlbum, findAlbumByName } from "../service/albumService"
+import { createAlbum, findAlbumByName, updateAlbum } from "../service/albumService"
 import { createArtist, findArtistByName } from "../service/artistService"
 
 async function collect(libPath: string) {
@@ -49,16 +49,25 @@ async function registerSong(songPath: string) {
 
         //Fetch the song's album
         var album = (await findAlbumByName(song.album, song.artist))[0]
-        if (!album) album = { artist: song.artist, title: song.album, year: String(song.year) }
+        var albumId
+        if (!album) {
+            album = { artist: song.artist, title: song.album, year: song.year }
+            albumId = await createAlbum(album)
+            logger.info(`Found new album ${album.title}`)
+        }
 
         //Fetch the song's artist
         var artist = (await findArtistByName(song.artist))[0]
-        if (!artist) artist = { name: song.artist }
+        var artistId
+        if (!artist) {
+            artist = { name: song.artist }
+            artistId = await createArtist(artist)
+            logger.info(`Found new artist ${artist.name}`)
+        }
 
-        const artistId = await createArtist(artist)
 
         album.artistId = artistId
-        const albumId = await createAlbum(album)
+        await updateAlbum(album)
 
         song.artistId = artistId
         song.albumId = albumId
