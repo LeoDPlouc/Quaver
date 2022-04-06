@@ -17,7 +17,7 @@
 <template>
     <div>
         <div class="albumPresentationHeader">
-            <img class="albumPresentationCover" :src="getCoverURL()" />
+            <img loading="lazy" class="albumPresentationCover" :src="getCoverURL()" />
             <div class="albumPresentationInfos">
                 <div class="albumPresentationInfo">{{ album.title }}</div>
                 <div class="albumPresentationInfo">{{ album.artist }}</div>

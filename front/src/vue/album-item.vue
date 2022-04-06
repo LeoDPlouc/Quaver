@@ -16,7 +16,7 @@
 
 <template>
   <div v-show="search(queryString, album)" class="albumItem" @click="openPresentation()">
-    <img class="albumCover" :src="getCoverURL(album.cover)" />
+    <img loading="lazy" class="albumCover" :src="getCoverURL(album.cover)" />
     <div class="albumItemProp">{{ album.title }}</div>
     <div class="albumItemProp">{{ album.artist }}</div>
     <div class="albumItemProp">{{ album.year }}</div>

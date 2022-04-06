@@ -16,10 +16,10 @@
 
 <template>
     <div v-if="!isFetching" class="coverContainer">
-        <img :class="getClass(0)" :src="getCoverURL(albumsCover[0])" />
-        <img :class="getClass(1)" :src="getCoverURL(albumsCover[1])" />
-        <img :class="getClass(2)" :src="getCoverURL(albumsCover[2])" />
-        <img :class="getClass(3)" :src="getCoverURL(albumsCover[3])" />
+        <img loading="lazy" :class="getClass(0)" :src="getCoverURL(albumsCover[0])" />
+        <img loading="lazy" :class="getClass(1)" :src="getCoverURL(albumsCover[1])" />
+        <img loading="lazy" :class="getClass(2)" :src="getCoverURL(albumsCover[2])" />
+        <img loading="lazy" :class="getClass(3)" :src="getCoverURL(albumsCover[3])" />
     </div>
 </template>
 
