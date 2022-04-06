@@ -15,7 +15,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 <template>
-  <div class="artistItem" @click="openPresentation()">
+  <div v-show="search(queryString, artist)" class="artistItem" @click="openPresentation()">
     <cover-mosaic :artist="artist" :isFetching="false"></cover-mosaic>
     <div class="artistItemProp">{{ artist.name }}</div>
   </div>
@@ -26,17 +26,20 @@ import { defineComponent } from "vue";
 import { router } from "../app";
 import { getArtistAlbums, getCoverURL } from "../fetch";
 import { Album, Artist } from "../models"
+import { search } from "../searching";
 import coverMosaicVue from "./cover-mosaic.vue";
 
 export default defineComponent({
   props: { artist: Artist },
   components: { coverMosaic: coverMosaicVue },
+  inject: ['query'],
 
   methods: {
     openPresentation() {
       router.push({ path: "/artist/" + this.artist.id })
     },
-    getCoverURL
+    getCoverURL,
+    search
   },
 
   async created() {
@@ -46,7 +49,8 @@ export default defineComponent({
 
   data() {
     return {
-      albumsCover: [] as string[]
+      albumsCover: [] as string[],
+      queryString: this.query
     }
   }
 })

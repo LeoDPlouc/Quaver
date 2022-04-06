@@ -13,7 +13,7 @@
 
 <template>
     <div class="albumList">
-        <album-item v-for="(album, index) in filteredAlbums" :key="index" :album="album" />
+        <album-item v-for="(album, index) in albums" :key="index" :album="album" />
     </div>
 </template>
 
@@ -21,7 +21,6 @@
 import { defineComponent } from "vue";
 import { getAllAlbums, getArtistAlbums } from "../fetch";
 import { Album } from "../models";
-import { searchAlbum } from "../searching";
 import albumItemVue from "./album-item.vue";
 
 export default defineComponent({
@@ -34,29 +33,11 @@ export default defineComponent({
     async created() {
         if (this.$route.params.id) this.albums = await getArtistAlbums(this.$route.params.id)
         else this.albums = await getAllAlbums()
-
-        this.updateFilteredAlbums("")
     },
 
     data() {
         return {
             albums: [] as Album[],
-            filteredAlbums: [] as Album[]
-        }
-    },
-
-    methods: {
-        updateFilteredAlbums(query: string) {
-            var filtered = searchAlbum(query, this.albums)
-            this.filteredAlbums.splice(0, this.filteredAlbums.length)
-
-            filtered.forEach(a => this.filteredAlbums.push(a))
-        }
-    },
-
-    watch: {
-        queryString(newQ, oldQ) {
-            this.updateFilteredAlbums(newQ)
         }
     }
 })

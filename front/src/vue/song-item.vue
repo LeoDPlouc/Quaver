@@ -34,9 +34,7 @@ import { search } from "../searching";
 
 export default defineComponent({
   props: { song: Song, index: Number },
-
   emits: ["song-item-title-clicked"],
-
   inject: ['query'],
 
   data() {

@@ -15,7 +15,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 <template>
-  <div class="albumItem" @click="openPresentation()">
+  <div v-show="search(queryString, album)" class="albumItem" @click="openPresentation()">
     <img class="albumCover" :src="getCoverURL(album.cover)" />
     <div class="albumItemProp">{{ album.title }}</div>
     <div class="albumItemProp">{{ album.artist }}</div>
@@ -28,15 +28,25 @@ import { defineComponent } from "vue";
 import { router } from "../app";
 import { Album } from "../models"
 import { getCoverURL } from "../fetch";
+import { search } from "../searching";
 
 export default defineComponent({
   props: { album: Album },
+
+  inject: ['query'],
+
+  data() {
+    return {
+      queryString: this.query
+    }
+  },
 
   methods: {
     openPresentation() {
       router.push({ path: "/album/" + this.album.id })
     },
-    getCoverURL
+    getCoverURL,
+    search
   }
 })
 </script>
