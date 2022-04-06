@@ -49,7 +49,7 @@ export default defineComponent({
       try {
         var seconds = Number(duration) % 60;
         var secondsString = String(seconds).split(".")[0];
-        if (secondsString.length == 1) secondsString = secondsString + "0";
+        if (secondsString.length == 1) secondsString = "0" + secondsString;
         if (secondsString.length == 0) secondsString = "00";
         var minutes = Number(duration) / 60;
         var minutesString = String(minutes).split(".")[0];
