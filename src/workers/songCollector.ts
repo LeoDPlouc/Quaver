@@ -16,14 +16,24 @@ import path from "path"
 import mm from "mime-types"
 import { MUSIC_PATH } from "../config/config"
 import { connectToDb } from "../access/database/utils"
-import logger from "../utils/logger"
 import { createSong, findSongByPath, updateSong } from "../service/songService"
 import { getMetadataFromFile } from "../access/file/songFile"
 import { createAlbum, findAlbumByName, updateAlbum } from "../service/albumService"
 import { createArtist, findArtistByName } from "../service/artistService"
+import { Failure } from "../utils/Failable"
+import { logError, logInfo, setWorkerName } from "../utils/logger"
 
 async function collect(libPath: string) {
-    var paths = await fs.readdir(libPath, { withFileTypes: true }).catch()
+    try {
+        var paths = await fs.readdir(libPath, { withFileTypes: true })
+    } catch (err) {
+        let failure: Failure = {
+            file: __filename,
+            func: collect.name,
+            msg: err
+        }
+    }
+
     for (var i = 0; i < paths.length; i++) {
         var fullPath = path.join(libPath, paths[i].name)
 
@@ -36,51 +46,78 @@ async function collect(libPath: string) {
 }
 
 async function registerSong(songPath: string) {
-    try {
-        //Only considere audio files
-        if (!(mm.lookup(path.extname(songPath)) as string).match("audio")) return
+    //Only considere audio files
+    if (!(mm.lookup(path.extname(songPath)) as string).match("audio")) return
 
-        //If the song doesn't already exist, extract its metadata and create a new song
-        if (await findSongByPath(songPath)) return
+    //If the song doesn't already exist, extract its metadata and create a new song
+    if ((await findSongByPath(songPath)).result) return
 
-        var song = await getMetadataFromFile(songPath)
-
-        logger.info(`Found new song ${song.path}`)
-
-        //Fetch the song's album
-        var album = (await findAlbumByName(song.album, song.artist))[0]
-        var albumId
-        if (!album) {
-            album = { artist: song.artist, title: song.album, year: song.year }
-            albumId = await createAlbum(album)
-            logger.info(`Found new album ${album.title}`)
-        }
-
-        //Fetch the song's artist
-        var artist = (await findArtistByName(song.artist))[0]
-        var artistId
-        if (!artist) {
-            artist = { name: song.artist }
-            artistId = await createArtist(artist)
-            logger.info(`Found new artist ${artist.name}`)
-        }
-
-
-        album.artistId = artistId
-        await updateAlbum(album)
-
-        song.artistId = artistId
-        song.albumId = albumId
-        await createSong(song)
-    } catch (err) {
-        logger.error(err)
+    let metadataResult = await getMetadataFromFile(songPath)
+    if (metadataResult.failure) {
+        logError(metadataResult.failure)
+        return
     }
+    let song = metadataResult.result
+
+    logInfo(`Found new song ${song.path}`)
+
+    //Fetch the song's album
+    let albumResult = await findAlbumByName(song.album, song.artist)
+    if (albumResult.failure) {
+        logError(albumResult.failure)
+        return
+    }
+    let album = albumResult.result[0]
+
+    let albumId
+    if (!album) {
+        album = { artist: song.artist, title: song.album, year: song.year }
+
+        let albumIdResult = await createAlbum(album)
+        if (albumIdResult.failure) {
+            logError(albumIdResult.failure)
+            return
+        }
+        albumId = albumIdResult.result
+
+        logInfo(`Found new album ${album.title}`)
+    }
+
+    //Fetch the song's artist
+    let artistResult = await findArtistByName(song.artist)
+    if (artistResult.failure) {
+        logError(artistResult.failure)
+        return
+    }
+    let artist = artistResult.result[0]
+
+    let artistId
+    if (!artist) {
+        artist = { name: song.artist }
+
+        let artistIdResult = await createArtist(artist)
+        if (artistIdResult.failure) {
+            logError(artistIdResult.failure)
+            return
+        }
+        artistId = artistIdResult.result
+
+        logInfo(`Found new artist ${artist.name}`)
+    }
+
+
+    album.artistId = artistId
+    await updateAlbum(album)
+
+    song.artistId = artistId
+    song.albumId = albumId
+    await createSong(song)
 }
 
 
 function doWork() {
-
-    logger.info("Song collection Started")
+    setWorkerName("SongCollector")
+    logInfo("Song collection Started")
 
     connectToDb().then(async () => {
 

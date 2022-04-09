@@ -14,7 +14,7 @@
 import { Document } from "mongoose"
 
 export function mapArtist(data: Artist & Document<any, any, Artist>): Artist {
-    var cleanedData: Artist = {
+    let cleanedData: Artist = {
         id: data.id,
         name: data.name,
         cover: data.cover
@@ -23,7 +23,7 @@ export function mapArtist(data: Artist & Document<any, any, Artist>): Artist {
 }
 
 export function mapArtistDTO(data: Artist): ArtistDTO {
-    var cleanedData: ArtistDTO = {
+    let cleanedData: ArtistDTO = {
         id: data.id,
         name: data.name,
         cover: data.cover

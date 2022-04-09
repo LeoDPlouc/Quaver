@@ -13,7 +13,6 @@
 
 import bcrypt from "bcryptjs"
 import { Request, Response, NextFunction } from "express"
-import logger from "../utils/logger"
 import { validationResult } from "express-validator"
 
 export async function signUp(req: Request, res: Response, next: NextFunction) {

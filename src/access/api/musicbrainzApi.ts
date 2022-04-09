@@ -13,6 +13,7 @@
 
 import { IReleaseList, MusicBrainzApi } from "musicbrainz-api";
 import { APP_VERSION } from "../../config/appConfig";
+import { Failable } from "../../utils/Failable";
 
 //Ne plus exporter lors du nettoyage des dépréciés
 export const mbApi = new MusicBrainzApi({
@@ -21,18 +22,27 @@ export const mbApi = new MusicBrainzApi({
     appContactInfo: "https://github.com/LeoDPlouc/Quaver"
 })
 
-export async function getAlbumMBId(album: Album): Promise<string[]> {
+export async function getAlbumMBId(album: Album): Promise<Failable<string[]>> {
 
     //Build query with available info
-    var query = `release:${album.title as string}`
+    let query = `release:${album.title as string}`
 
-    if (album.artist) query += ` and artist:${album.artist}`
+    if (album.artist) { query += ` and artist:${album.artist}` }
 
-    var result = await mbApi.search<IReleaseList>("release", { query })
-
+    try {
+        var result = await mbApi.search<IReleaseList>("release", { query })
+    } catch (err) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAlbumMBId.name,
+                msg: err
+            }
+        }
+    }
     //Only keep ids of the release with score 100
     var releases = result.releases.filter(release => release.score == 100)
     var ids = releases.map(release => release.id)
 
-    return ids
+    return { result: ids }
 }

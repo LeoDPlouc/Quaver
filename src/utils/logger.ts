@@ -11,11 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Request } from "express";
 import { createLogger, format, transports } from "winston";
+import { Failure } from "./Failable";
 
-
-
-export default createLogger({
+var logger = createLogger({
     transports: [
         new transports.Console(),
         new transports.File({ dirname: "logs", filename: "quaver.log" })
@@ -28,3 +28,14 @@ export default createLogger({
         })
     )
 })
+
+var workerName: string
+
+export function setWorkerName(name: string) { workerName = name }
+
+
+export function logError(error: Failure) { logger.error(`${workerName} : ${error}`) }
+
+export function logInfo(info: string) { logger.info(`${workerName} : ${info}`) }
+
+export function logRequest(req: Request) { logger.info(`${req.ip} ${req.url}`) }

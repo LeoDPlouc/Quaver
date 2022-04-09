@@ -13,8 +13,9 @@
 
 import { Document } from "mongoose";
 import { DB_VERSION } from "../../../config/appConfig"
+import { Failable, Failure } from "../../../utils/Failable";
+import { logError, logInfo } from "../../../utils/logger";
 import { dbInfoModel } from "../models/dbInfoModel";
-import logger from "../../../utils/logger";
 import { migration0 } from "./migrationScripts/migration0";
 import { migration1 } from "./migrationScripts/migration1";
 import { migration2 } from "./migrationScripts/migration2";
@@ -22,8 +23,8 @@ import { migration3 } from "./migrationScripts/migration3";
 import { migration4 } from "./migrationScripts/migration4";
 
 export interface IMigration {
-    up: () => Promise<void>
-    down: () => Promise<void>
+    up: () => Promise<Failable<null>>
+    down: () => Promise<Failable<null>>
 }
 
 const migrations: IMigration[] = [
@@ -34,40 +35,104 @@ const migrations: IMigration[] = [
     migration4
 ]
 
-async function FetchDbInfo(): Promise<Document<any, any, DbInfo> & DbInfo> {
-    return await dbInfoModel.find()
-        .then(async (infos) => {
-            if (infos.length == 0) {
-                return await dbInfoModel.create({ version: DB_VERSION })
+async function FetchDbInfo(): Promise<Failable<Document<any, any, DbInfo> & DbInfo>> {
+    try {
+        return {
+            result: await dbInfoModel.find()
+                .then(async (infos) => {
+                    if (infos.length == 0) {
+                        return await dbInfoModel.create({ version: DB_VERSION })
+                    }
+                    else return infos[0]
+                })
+        }
+    } catch (err) {
+        return {
+            failure: {
+                file: __filename,
+                func: FetchDbInfo.name,
+                msg: err
             }
-            else return infos[0]
-        })
+        }
+    }
 }
 
-export async function Migrate() {
+export async function Migrate(): Promise<Failable<null>> {
 
     //Fetch db version
-    var info = await FetchDbInfo()
+    let infoResult = await FetchDbInfo()
+    if (infoResult.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: Migrate.name,
+                msg: "Database Infos fetching error"
+            }
+        }
+    }
+    let info = infoResult.result
 
-    var db_ver = info.version
-    var app_ver = DB_VERSION
+    let db_ver = info.version
+    let app_ver = DB_VERSION
 
-    logger.info(`Database schema version : ${db_ver}`)
-    logger.info(`Application schema version : ${app_ver}`)
+    logInfo(`Database schema version : ${db_ver}`)
+    logInfo(`Application schema version : ${app_ver}`)
 
     //Compare db version with app version and apply migration
     if (db_ver > app_ver) {
-        for (var i = db_ver; i > app_ver; i--) {
-            await migrations[i].down()
+        for (let i = db_ver; i > app_ver; i--) {
+            let migrationResult = await migrations[i].down()
+            if (migrationResult.failure) {
+                return {
+                    failure: {
+                        file: __filename,
+                        func: Migrate.name,
+                        msg: "Migration error",
+                        sourceFailure: migrationResult.failure
+                    }
+                }
+            }
             info.version--
-            await info.save()
+
+            try {
+                await info.save()
+            } catch (err) {
+                let failure: Failure = {
+                    file: __filename,
+                    func: Migrate.name,
+                    msg: err
+                }
+                logError(failure)
+                return
+            }
         }
     }
     if (db_ver < app_ver) {
         for (var i = db_ver; i < app_ver; i++) {
-            await migrations[i].up()
+            let migrationResult = await migrations[i].up()
+            if (migrationResult.failure) {
+                return {
+                    failure: {
+                        file: __filename,
+                        func: Migrate.name,
+                        msg: "Migration error",
+                        sourceFailure: migrationResult.failure
+                    }
+                }
+            }
             info.version++
-            await info.save()
+
+            try {
+                await info.save()
+            } catch (err) {
+                let failure: Failure = {
+                    file: __filename,
+                    func: Migrate.name,
+                    msg: err
+                }
+                logError(failure)
+                return
+            }
         }
     }
 }

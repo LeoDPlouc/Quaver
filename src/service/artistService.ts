@@ -15,35 +15,133 @@ import { createArtistModel, getAllArtistModels, getArtistAlbumModels, getArtistM
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapArtist } from "../mappers/artistMapper";
 import { mapSong } from "../mappers/songMapper";
+import { Failable } from "../utils/Failable";
 
-export async function getAllArtists(): Promise<Artist[]> {
-    return (await getAllArtistModels()).map(a => mapArtist(a))
+export async function getAllArtists(): Promise<Failable<Artist[]>> {
+    let result = await getAllArtistModels()
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAllArtists.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result.map(a => mapArtist(a)) }
 }
 
-export async function getArtist(id: string): Promise<Artist> {
+export async function getArtist(id: string): Promise<Failable<Artist>> {
+    let result = await getArtistModel(id)
 
-    var model = await getArtistModel(id)
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getArtist.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
 
-    if (!model) return null
-    return mapArtist(model)
+    if (!result.result) {
+        return {
+            failure: {
+                file: __filename,
+                func: getArtist.name,
+                msg: "Invalid Id"
+            }
+        }
+    }
+
+    return { result: mapArtist(result.result) }
 }
 
-export async function getArtistSongs(id: string): Promise<Song[]> {
-    return (await getArtistSongModels(id)).map(s => mapSong(s))
+export async function getArtistSongs(id: string): Promise<Failable<Song[]>> {
+    let result = await getArtistSongModels(id)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getArtistSongs.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result.map(s => mapSong(s)) }
 }
 
-export async function getArtistAlbums(id: string): Promise<Album[]> {
-    return (await getArtistAlbumModels(id)).map(a => mapAlbum(a))
+export async function getArtistAlbums(id: string): Promise<Failable<Album[]>> {
+    let result = await getArtistAlbumModels(id)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getArtistAlbums.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result.map(a => mapAlbum(a)) }
 }
 
-export async function createArtist(artist: Artist): Promise<string> {
-    return await createArtistModel(artist)
+export async function createArtist(artist: Artist): Promise<Failable<string>> {
+    let result = await createArtistModel(artist)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: createArtist.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result }
 }
 
-export async function findArtistByName(name: string): Promise<Artist[]> {
-    return (await findArtistModelByName(name)).map(a => mapArtist(a))
+export async function findArtistByName(name: string): Promise<Failable<Artist[]>> {
+    let result = await findArtistModelByName(name)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: findArtistByName.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result.map(a => mapArtist(a)) }
 }
 
-export async function updateArtist(artist: Artist) {
-    await updateArtistModel(artist)
+export async function updateArtist(artist: Artist): Promise<Failable<null>> {
+    let result = await updateArtistModel(artist)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: updateArtist.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: null }
 }

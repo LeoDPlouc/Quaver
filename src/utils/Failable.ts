@@ -11,19 +11,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document } from "mongoose"
-
-export function mapImage(data: Image & Document<any, any, Image>): Image {
-    let cleanedData: Image = {
-        id: data.id,
-        path: data.path
-    }
-    return cleanedData
+export interface Failable<T> {
+    failure?: Failure
+    result?: T
 }
 
-export function mapImageDTO(data: Image): ImageDTO {
-    let cleanedData: ImageDTO = {
-        id: data.id
-    }
-    return cleanedData
+export interface Failure {
+    msg: string,
+    file: string,
+    func: string,
+    sourceFailure?: Failure
 }

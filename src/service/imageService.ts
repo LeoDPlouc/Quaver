@@ -13,11 +13,48 @@
 
 import { getAllImagesModels, getImageModel } from "../access/database/imageDAO";
 import { mapImage } from "../mappers/imageMapper";
+import { Failable } from "../utils/Failable";
 
-export async function getAllImages(): Promise<Image[]> {
-    return (await getAllImagesModels()).map(i => mapImage(i))
+export async function getAllImages(): Promise<Failable<Image[]>> {
+    let result = await getAllImagesModels()
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAllImages.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result.map(i => mapImage(i)) }
 }
 
-export async function getImage(id: string): Promise<Image> {
-    return mapImage(await getImageModel(id))
+export async function getImage(id: string): Promise<Failable<Image>> {
+    let result = await getImageModel(id)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getImage.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    if (!result.result) {
+        return {
+            failure: {
+                file: __filename,
+                func: getImage.name,
+                msg: "Invalid Id"
+            }
+        }
+    }
+
+    return { result: mapImage(result.result) }
 }

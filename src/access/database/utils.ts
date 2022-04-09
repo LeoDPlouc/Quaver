@@ -14,7 +14,8 @@
 import mongoose from "mongoose"
 
 import { MONGO_IP, MONGO_PASSWORD, MONGO_PORT, MONGO_USER } from "../../config/config"
-import logger from "../../utils/logger"
+import { Failure } from "../../utils/Failable"
+import { logError, logInfo } from "../../utils/logger"
 
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`
 
@@ -26,9 +27,14 @@ export async function connectToDb() {
             useFindAndModify: false,
             dbName: "quaver"
         })
-        .then(() => logger.info("Successfully connected to database"))
-        .catch((e) => {
-            logger.error(e)
+        .then(() => logInfo("Successfully connected to database"))
+        .catch((err) => {
+            let failure: Failure = {
+                file: __filename,
+                func: connectToDb.name,
+                msg: err
+            }
+            logError(failure)
             //retry connection
             setTimeout(connectToDb, 5000)
         })
