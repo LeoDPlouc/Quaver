@@ -1,4 +1,4 @@
- <!-- Quaver is a self-hostable music player and music library manager
+<!-- Quaver is a self-hostable music player and music library manager
  Copyright (C) 2022  DPlouc
 
  This program is free software: you can redistribute it and/or modify
@@ -15,64 +15,62 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 <template>
-    <div>
-        <div class="artistPresentationHeader">
-            <cover-mosaic :artist="artist"></cover-mosaic>
-            <div class="artistPresentationInfos">
-                <div class="artistPresentationInfo">{{ artist.name }}</div>
-            </div>
-        </div>
-        <album-list class="artistPresentationAlbumList" />
-        <song-list
-            class="artistPresentationSongList"
-            @song-changed="$emit('song-changed', $event)"
-        />
+  <div>
+    <div class="artistPresentationHeader">
+      <cover-mosaic :artist="artist"></cover-mosaic>
+      <div class="artistPresentationInfos">
+        <div class="artistPresentationInfo">{{ artist.name }}</div>
+      </div>
     </div>
+    <album-list class="artistPresentationAlbumList" />
+    <song-list
+      class="artistPresentationSongList"
+      @song-changed="$emit('song-changed', $event)"
+    />
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
-import { Artist } from '../models'
-import songList from "./song-list.vue"
-import AlbumList from "./album-list.vue"
-import { getArtist } from "../fetch"
-import coverMosaicVue from "./cover-mosaic.vue"
+import { defineComponent } from "vue";
+import { Artist } from "../models";
+import songList from "./song-list.vue";
+import AlbumList from "./album-list.vue";
+import { getArtist } from "../fetch";
+import coverMosaicVue from "./cover-mosaic.vue";
 
 export default defineComponent({
-    components: { songList: songList, albumList: AlbumList, coverMosaic: coverMosaicVue },
+  components: { songList: songList, albumList: AlbumList, coverMosaic: coverMosaicVue },
 
-    emits: ["song-changed"],
+  emits: ["song-changed"],
 
-    async created() {
-        this.artist = await getArtist(this.$route.params.id)
-    },
+  async created() {
+    this.artist = await getArtist(this.$route.params.id);
+  },
 
-    data() {
-        return {
-            artist: {} as Artist,
-            isFetching: true
-        }
-    }
-})
-
+  data() {
+    return {
+      artist: {} as Artist,
+    };
+  },
+});
 </script>
 
 <style>
 .artistPresentationHeader {
-    display: grid;
-    grid-template-columns: 15vw auto;
-    margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 15vw auto;
+  margin-bottom: 10px;
 }
 .artistPresentationInfos {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 .artistPresentationAlbumList {
-    overflow-y: auto;
-    overflow-x: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .artistPresentationSongList {
-    width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 </style>

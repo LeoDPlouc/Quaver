@@ -14,7 +14,7 @@
 import { Document } from "mongoose"
 
 export function mapAlbum(data: Album & Document<any, any, Album>): Album {
-    var cleanedData: Album = {
+    let cleanedData: Album = {
         id: data.id,
         title: data.title,
         artist: data.artist,
@@ -28,7 +28,7 @@ export function mapAlbum(data: Album & Document<any, any, Album>): Album {
 }
 
 export function mapAlbumDTO(data: Album): AlbumDTO {
-    var cleanedData: AlbumDTO = {
+    let cleanedData: AlbumDTO = {
         id: data.id,
         title: data.title,
         artist: data.artist,

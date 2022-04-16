@@ -13,63 +13,109 @@
 
 import { IReleaseList } from "musicbrainz-api"
 import { Document } from "mongoose"
-import logger from "../../../../utils/logger"
 import { mbApi } from "../../../api/musicbrainzApi"
 import { caApi } from "../../../api/coverArtArchive"
 import { saveImage } from "../../../file/imageFile"
 import { imageModel } from "../../models/imageModel"
+import { Failable } from "../../../../utils/Failable"
+import { logInfo } from "../../../../utils/logger"
 
-export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
+export async function getAlbumMBIdLegacy(album: Album): Promise<Failable<string>> {
 
-    var query = `release:${album.title as string}`
+    let query = `release:${album.title as string}`
 
     //Add more info to the query if available
-    if (album.artist) query += ` and artist:${album.artist}`
+    if (album.artist) { query += ` and artist:${album.artist}` }
 
-    var result = await mbApi.search<IReleaseList>("release", { query })
-    return result.releases[0].id
+    try {
+        var result = await mbApi.search<IReleaseList>("release", { query })
+    } catch (err) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAlbumMBIdLegacy.name,
+                msg: err
+            }
+        }
+    }
+
+    if (!result.releases.length) { return { result: null } }
+    return { result: result.releases[0].id }
 }
 
-export async function getAlbumCoverLegacy(album: Album & Document<any, any, Album>): Promise<Image & Document<any, any, Image>> {
+export async function getAlbumCoverLegacy(album: Album & Document<any, any, Album>): Promise<Failable<Image & Document<any, any, Image>>> {
 
     //Fetch Cover art
-    var p = new Promise<any>((resolve, reject) => {
+    let p = new Promise<any>((resolve, reject) => {
         caApi.release(album.mbid, { piece: "front" }, (err, data) => {
             if (err) reject(err)
             resolve(data)
         })
     })
-    var { image, extension } = await p
+
+    try {
+        var { image, extension } = await p
+    } catch (err) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAlbumCoverLegacy.name,
+                msg: err
+            }
+        }
+    }
 
     if (image) {
-        logger.info(`Found new cover for ${album.id}`)
+        logInfo(`Found new cover for ${album.id}`)
         //Save the image cover on the hard drive
-        var path = await saveImage(image, extension)
+
+        try {
+            var path = await saveImage(image, extension)
+        } catch (err) {
+            return {
+                failure: {
+                    file: __filename,
+                    func: getAlbumCoverLegacy.name,
+                    msg: err
+                }
+            }
+        }
 
         var newCover = new imageModel({ path })
-        await newCover.save()
 
-        return newCover
+        try {
+            await newCover.save()
+        } catch (err) {
+            return {
+                failure: {
+                    file: __filename,
+                    func: getAlbumCoverLegacy.name,
+                    msg: err
+                }
+            }
+        }
+
+        return { result: newCover }
     }
-    return null
+    return { result: null }
 }
 
-export async function getAlbumCoverLegacy2(album: Album & Document<any, any, Album>): Promise<Image & Document<any, any, Image>> {
-    var cover
-    var ext
+export async function getAlbumCoverLegacy2(album: Album & Document<any, any, Album>): Promise<Failable<Image & Document<any, any, Image>>> {
+    let cover
+    let ext
 
-    var i = 0
+    let i = 0
     //Try fetching cover art for every MB ID
     while (!cover && i < album.mbids.length) {
         try {
             //Fetch Cover art
-            var p = new Promise<any>((resolve, reject) => {
+            let p = new Promise<any>((resolve, reject) => {
                 caApi.release(album.mbids[i], { piece: "front" }, (err, data) => {
                     if (err) reject(err)
                     resolve(data)
                 })
             })
-            var { image, extension } = await p
+            let { image, extension } = await p
             cover = image
             ext = extension
         }
@@ -77,15 +123,37 @@ export async function getAlbumCoverLegacy2(album: Album & Document<any, any, Alb
         finally { i++ }
     }
 
-    if (image) {
-        logger.info(`Found new cover for ${album.id}`)
+    if (cover) {
+        logInfo(`Found new cover for ${album.id}`)
         //Save the image cover on the hard drive
-        var path = await saveImage(image, extension)
+
+        try {
+            var path = await saveImage(cover, ext)
+        } catch (err) {
+            return {
+                failure: {
+                    file: __filename,
+                    func: getAlbumCoverLegacy2.name,
+                    msg: err
+                }
+            }
+        }
 
         var newCover = new imageModel({ path })
-        await newCover.save()
 
-        return newCover
+        try {
+            await newCover.save()
+        } catch (err) {
+            return {
+                failure: {
+                    file: __filename,
+                    func: getAlbumCoverLegacy2.name,
+                    msg: err
+                }
+            }
+        }
+
+        return { result: newCover }
     }
-    return null
+    return { result: null }
 }

@@ -1,4 +1,4 @@
- <!-- Quaver is a self-hostable music player and music library manager
+<!-- Quaver is a self-hostable music player and music library manager
  Copyright (C) 2022  DPlouc
 
  This program is free software: you can redistribute it and/or modify
@@ -15,10 +15,12 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 <template>
-  <div class="songItem">
-    <div class="songItemProp songItemLike" @click="likeSong">{{ song.like }}</div>
+  <div v-show="search(queryString, song)" class="songItem">
+    <div class="songItemProp songItemLike" @click="doLike">{{ song.like }}</div>
     <div class="songItemProp songItemN">{{ song.n }}</div>
-    <div class="songItemProp songItemTitle" @click="songItemTitleClicked">{{ song.title }}</div>
+    <div class="songItemProp songItemTitle" @click="songItemTitleClicked">
+      {{ song.title }}
+    </div>
     <div class="songItemProp songItemDuration">{{ formatDuration(song.duration) }}</div>
     <div class="songItemProp songItemArtist">{{ song.artist }}</div>
     <div class="songItemProp songItemAlbum">{{ song.album }}</div>
@@ -26,60 +28,59 @@
   </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import { defineComponent } from "vue";
-import { Song } from "../models"
+import { Song } from "../models";
 import { SongItemTitleClickedEventArgs } from "../eventArgs";
+import { search } from "../searching";
+import { formatDuration } from "../util";
+import { likeSong } from "../fetch";
 
 export default defineComponent({
   props: { song: Song, index: Number },
-
   emits: ["song-item-title-clicked"],
+  inject: ["query"],
+
+  data() {
+    return {
+      queryString: this.query,
+    };
+  },
 
   methods: {
-    formatDuration(duration: number): string {
-      try {
-        var seconds = Number(duration) % 60;
-        var secondsString = String(seconds).split(".")[0];
-        if (secondsString.length == 1) secondsString = secondsString + "0"
-        if (secondsString.length == 0) secondsString = "00"
-        var minutes = Number(duration) / 60;
-        var minutesString = String(minutes).split(".")[0];
-        if (minutesString.length == 0) minutesString = "0"
-        return `${minutesString}:${secondsString}`;
-      } catch (error) { }
-      return String(duration);
-    },
+    search,
+    formatDuration,
     songItemTitleClicked() {
-      this.$emit("song-item-title-clicked", new SongItemTitleClickedEventArgs(this.song, this.index))
+      this.$emit(
+        "song-item-title-clicked",
+        new SongItemTitleClickedEventArgs(this.song, this.index)
+      );
     },
-    async likeSong() {
-      var like: Number
+    async doLike() {
+      let like: number;
 
       switch (this.song.like) {
         case 1:
-          like = -1
+          like = -1;
           break;
         case 0:
-          like = 1
+          like = 1;
           break;
         case -1:
-          like = 0
+          like = 0;
           break;
       }
 
-      var res = fetch("/api/song/" + this.song.id + "/like", { method: "PATCH", body: JSON.stringify({ like: like }), headers: { "Content-Type": "application/json" } })
-        .then(res => {
-          if (res.ok) {
-            res.json()
-              .then(resJson => {
-                if (resJson.statusCode == 0) this.song.like = like
-              })
-          }
-        })
-    }
+      likeSong(like, this.song.id).then((res) => {
+        if (res.ok) {
+          res.json().then((resJson) => {
+            if (resJson.statusCode == 0) this.song.like = like;
+          });
+        }
+      });
+    },
   },
-})
+});
 </script>
 
 <style>

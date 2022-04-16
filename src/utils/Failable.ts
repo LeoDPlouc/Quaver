@@ -11,20 +11,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Album, Artist, Song } from "./models";
+export interface Failable<T> {
+    failure?: Failure
+    result?: T
+}
 
-export function search(queryString: any, obj: Song | Album | Artist) {
-
-    let query = queryString as string
-
-    if (!query.length) return true
-
-    let target = ""
-    if ((obj as Song).title) target = (obj as Song).title
-    if ((obj as Album).title) target = (obj as Album).title
-    if ((obj as Artist).name) target = (obj as Artist).name
-
-    if (!target) return false
-    let match = target.toLowerCase().match(query.toLowerCase())
-    return match != null && match.length > 0
+export interface Failure {
+    msg: string,
+    file: string,
+    func: string,
+    sourceFailure?: Failure
 }

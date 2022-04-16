@@ -16,34 +16,67 @@ import { FPCALC_PATH } from "../../config/config"
 import fp from "fpcalc-async"
 import { parseFile } from "music-metadata"
 import Path from "path"
+import { Failable, Failure } from "../../utils/Failable"
 
-export async function getAcoustid(songPath: string): Promise<string> {
-    var fingerprint: FpcalcResult<string>
+export async function getAcoustid(songPath: string): Promise<Failable<string>> {
+    let fingerprint: FpcalcResult<string>
 
     //If fpcalc isn't in PATH, use fpcalc with its path
-    if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH })
-    else fingerprint = await fp(songPath)
+    try {
+        if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH })
+        else fingerprint = await fp(songPath)
+    } catch (err) {
+        let failure: Failure = {
+            file: __filename,
+            func: getAcoustid.name,
+            msg: err
+        }
+        return { failure }
+    }
 
-    return fingerprint.fingerprint as string
+    return { result: fingerprint.fingerprint }
 
 }
 
-export async function getMetadataFromFile(songPath: string): Promise<Song> {
-    var tag = await parseFile(songPath)
+export async function getMetadataFromFile(songPath: string): Promise<Failable<Song>> {
+    try {
+        var tag = await parseFile(songPath)
+    } catch (err) {
+        let failure: Failure = {
+            file: __filename,
+            func: getMetadataFromFile.name,
+            msg: err
+        }
+        return { failure }
+    }
 
-    var format = Path.extname(songPath)
-    var fp = await getAcoustid(songPath)
+
+    let format = Path.extname(songPath)
+
+    let result = await getAcoustid(songPath)
+    if(result.failure){
+        let failure: Failure = {
+            file: __filename,
+            func: getMetadataFromFile.name,
+            msg: "AcoustId parsing error",
+            sourceFailure: result.failure
+        }
+        return { failure }
+    }
+    let fp = result.result
 
     return {
-        title: tag.common.title,
-        n: tag.common.track.no,
-        artist: tag.common.albumartist,
-        album: tag.common.album,
-        year: tag.common.year,
-        duration: tag.format.duration,
-        like: 0,
-        path: songPath,
-        format: format,
-        acoustid: fp
+        result: {
+            title: tag.common.title,
+            n: tag.common.track.no,
+            artist: tag.common.albumartist,
+            album: tag.common.album,
+            year: tag.common.year,
+            duration: tag.format.duration,
+            like: 0,
+            path: songPath,
+            format: format,
+            acoustid: fp
+        }
     }
 }

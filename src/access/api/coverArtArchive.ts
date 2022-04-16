@@ -23,27 +23,29 @@ interface imageFileData {
 export const caApi = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
 
 export async function getAlbumCover(mbids: string[]): Promise<imageFileData> {
-    var cover
-    var ext
+    let cover
+    let ext
 
-    var i = 0
+    let i = 0
     //Try fetching cover art for every MB ID
     while (!cover && i < mbids.length) {
         try {
             //Fetch Cover art
-            var p = new Promise<any>((resolve, reject) => {
+            let p = new Promise<any>((resolve, reject) => {
                 caApi.release(mbids[i], { piece: "front" }, (err, data) => {
-                    if (err) reject(err)
+                    if (err) { reject(err) }
                     resolve(data)
                 })
             })
-            var { image, extension } = await p
+            let { image, extension } = await p
             cover = image
             ext = extension
         }
         catch { }
         finally { i++ }
     }
+
+    if (!cover) { return null }
 
     return {
         data: cover,

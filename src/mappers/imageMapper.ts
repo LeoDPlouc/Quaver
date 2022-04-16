@@ -14,7 +14,7 @@
 import { Document } from "mongoose"
 
 export function mapImage(data: Image & Document<any, any, Image>): Image {
-    var cleanedData: Image = {
+    let cleanedData: Image = {
         id: data.id,
         path: data.path
     }
@@ -22,7 +22,7 @@ export function mapImage(data: Image & Document<any, any, Image>): Image {
 }
 
 export function mapImageDTO(data: Image): ImageDTO {
-    var cleanedData: ImageDTO = {
+    let cleanedData: ImageDTO = {
         id: data.id
     }
     return cleanedData

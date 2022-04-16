@@ -22,7 +22,6 @@ import artistRouter from "./routes/artistRoute"
 import appRouter from "./routes/appRoute"
 import imageRouter from "./routes/imageRoute"
 
-
 const app = express()
 
 //Init session
@@ -48,7 +47,6 @@ app.use("/api/artist", artistRouter)
 app.use("/api/image", imageRouter)
 
 //Dont declare the root path if in headless mode
-if (!HEADLESS)
-    app.use("/", appRouter)
+if (!HEADLESS) { app.use("/", appRouter) }
 
 export default app

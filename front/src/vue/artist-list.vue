@@ -13,7 +13,7 @@
 
 <template>
     <div class="artistList">
-        <artist-item v-for="(artist, index) in filteredArtists" :key="index" :artist="artist" />
+        <artist-item v-for="(artist, index) in artists" :key="index" :artist="artist" />
     </div>
 </template>
 
@@ -22,7 +22,6 @@ import { defineComponent } from "vue";
 import { getAllArtists } from "../fetch";
 import { Artist } from "../models";
 import artistItemVue from "./artist-item.vue";
-import { searchArtist } from "../searching"
 
 export default defineComponent({
     components: {
@@ -33,28 +32,11 @@ export default defineComponent({
 
     async created() {
         this.artists = await getAllArtists()
-        this.updateFilteredArtists("")
     },
 
     data() {
         return {
-            artists: [] as Artist[],
-            filteredArtists: [] as Artist[]
-        }
-    },
-
-    methods: {
-        updateFilteredArtists(query: string) {
-            var filtered = searchArtist(query, this.artists)
-            this.filteredArtists.splice(0, this.filteredArtists.length)
-
-            filtered.forEach(a => this.filteredArtists.push(a))
-        }
-    },
-
-    watch: {
-        queryString(newQ, oldQ) {
-            this.updateFilteredArtists(newQ)
+            artists: [] as Artist[]
         }
     }
 })

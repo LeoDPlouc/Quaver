@@ -12,9 +12,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Request, Response, NextFunction } from "express"
-import logger from "../utils/logger"
+import { logRequest } from "../utils/logger"
 
 export default function protect(req: Request, res: Response, next: NextFunction) {
-    logger.info(`${req.ip} ${req.url}`)
+    logRequest(req)
     next()
 }

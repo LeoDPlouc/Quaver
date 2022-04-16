@@ -14,25 +14,50 @@
 import { IMigration } from "../migration"
 import { getAlbumMBIdLegacy } from "../legacy/legacyCode"
 import { albumModel } from "../../models/albumModel"
-import logger from "../../../../utils/logger"
+import { logError, logInfo } from "../../../../utils/logger"
+import { Failable } from "../../../../utils/Failable"
 
 export const migration0: IMigration = {
     //Add MB ID to albums
-    async up() {
-        var albums = await albumModel.find()
+    async up(): Promise<Failable<null>> {
+        try {
+            var albums = await albumModel.find()
+        } catch (err) {
+            return {
+                failure: {
+                    file: __filename,
+                    func: migration0.up.name,
+                    msg: err
+                }
+            }
+        }
 
-        for (var i = 0; i < albums.length; i++) {
-            var a = albums[i]
+        for (let i = 0; i < albums.length; i++) {
+            let a = albums[i]
 
             if (!a.mbid) {
-                logger.info(`Migration 0 -> 1 album ${a.id}`)
+                logInfo(`Migration 0 -> 1 album ${a.id}`)
 
-                a.mbid = await getAlbumMBIdLegacy(a)
+                let result = await getAlbumMBIdLegacy(a)
+
+                if (result.failure) {
+                    return {
+                        failure: {
+                            file: __filename,
+                            func: migration0.up.name,
+                            msg: "AlbumMBId fetching error",
+                            sourceFailure: result.failure
+                        }
+                    }
+                }
+                if (!result.result) { continue }
+
+                a.mbid = result.result
                 await a.save()
             }
         }
     },
-    async down() {
-
+    async down(): Promise<Failable<null>> {
+        return { result: null }
     }
 }

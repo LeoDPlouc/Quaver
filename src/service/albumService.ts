@@ -14,31 +14,126 @@
 import { createAlbumModel, findAlbumModelByName, getAlbumModel, getAlbumSongModel, getAllAlbumModels, updateAlbumModel } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapSong } from "../mappers/songMapper";
+import { Failable } from "../utils/Failable";
 
-export async function getAllAlbums(): Promise<Album[]> {
-    return (await getAllAlbumModels()).map(a => mapAlbum(a))
+export async function getAllAlbums(): Promise<Failable<Album[]>> {
+    let result = await getAllAlbumModels()
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAllAlbums.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result.map(a => mapAlbum(a)) }
 }
 
-export async function getAlbum(id: string): Promise<Album> {
+export async function getAlbum(id: string): Promise<Failable<Album>> {
+    let result = await getAlbumModel(id)
 
-    var model = await getAlbumModel(id)
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAlbum.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
 
-    if (!model) return null
-    return mapAlbum(model)
+    if (!result.result) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAlbum.name,
+                msg: "Invalid Id"
+            }
+        }
+    }
+
+    return { result: mapAlbum(result.result) }
 }
 
-export async function getAlbumSongs(id: string): Promise<Song[]> {
-    return (await getAlbumSongModel(id)).map(s => mapSong(s))
+export async function getAlbumSongs(id: string): Promise<Failable<Song[]>> {
+    let result = await getAlbumSongModel(id)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAlbumSongs.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    if (!result.result) {
+        return {
+            failure: {
+                file: __filename,
+                func: getAlbumSongs.name,
+                msg: "Invalid Id"
+            }
+        }
+    }
+
+    return { result: result.result.map(s => mapSong(s)) }
 }
 
-export async function createAlbum(album: Album): Promise<string> {
-    return await createAlbumModel(album)
+export async function createAlbum(album: Album): Promise<Failable<string>> {
+    let result = await createAlbumModel(album)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: createAlbum.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result }
 }
 
-export async function findAlbumByName(albumTitle: string, artistName?: string): Promise<Album[]> {
-    return (await findAlbumModelByName(albumTitle, artistName)).map(a => mapAlbum(a))
+export async function findAlbumByName(albumTitle: string, artistName?: string): Promise<Failable<Album[]>> {
+    let result = await findAlbumModelByName(albumTitle, artistName)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: findAlbumByName.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: result.result.map(a => mapAlbum(a)) }
 }
 
 export async function updateAlbum(album: Album) {
-    await updateAlbumModel(album)
+    let result = await updateAlbumModel(album)
+
+    if (result.failure) {
+        return {
+            failure: {
+                file: __filename,
+                func: updateAlbum.name,
+                msg: "DAO error",
+                sourceFailure: result.failure
+            }
+        }
+    }
+
+    return { result: null }
 }

@@ -1,6 +1,33 @@
 CHANGELOG
 
 ====================================================
+0.4.0-beta
+
+FrontEnd:
+- Optimised research
+- Patched a bug in song duration parsing
+- Cover are now lazily fetched to reduce number of call to the back
+- Refactored front code base
+
+BackEnd:
+- Implemented a exception system
+
+====================================================
+0.3.2-beta
+
+BackEnd:
+- Patched a bug in songCollector that keeped recreating albums and artists rather than using already existing ones
+
+====================================================
+0.3.1-beta
+
+FrontEnd:
+- Changed overflow behavior of album list in artist presentations
+
+BackEnd:
+- Refactored the code base
+
+====================================================
 0.3.0-beta
 
 FrontEnd:

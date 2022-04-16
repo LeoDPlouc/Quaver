@@ -11,20 +11,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { cleanDatabase, createDatabase, getOneAlbum } from "../util"
-import { migration1 } from "../../src/access/database/migration/migrationScripts/migration1"
-import { migration0 } from "../../src/access/database/migration/migrationScripts/migration0"
+import { router } from "./app";
 
-describe("Migration 1 up", () => {
-    beforeAll(createDatabase)
-    afterAll(cleanDatabase)
+export function openPresentation(path: string) {
+  router.push({ path });
+}
 
-    it("Migration 1 up", async () => {
-        await migration0.up()
-        await migration1.up()
+export function getCoverURL(id: string) {
+  return `/api/image/${id}/file`;
+}
 
-        var album = await getOneAlbum()
-
-        expect(album.cover).toBeDefined()
-    }, 1000000)
-})
+export function formatDuration(duration: number): string {
+  try {
+    let seconds = Number(duration) % 60;
+    let secondsString = String(seconds).split(".")[0];
+    if (secondsString.length == 1) secondsString = "0" + secondsString;
+    if (secondsString.length == 0) secondsString = "00";
+    let minutes = Number(duration) / 60;
+    let minutesString = String(minutes).split(".")[0];
+    if (minutesString.length == 0) minutesString = "0";
+    return `${minutesString}:${secondsString}`;
+  } catch (error) {}
+  return String(duration);
+}

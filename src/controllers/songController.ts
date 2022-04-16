@@ -11,123 +11,130 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Request, Response, NextFunction } from "express"
-import logger from "../utils/logger"
+import { Request, Response, } from "express"
 import { validationResult } from "express-validator"
 import { getAllSongs, getSong, updateSong } from "../service/songService"
 import { mapSongDTO } from "../mappers/songMapper"
+import { logError } from "../utils/logger"
 
 export async function getAllSongsInfoCtrl(req: Request, res: Response) {
-    try {
-        //Search all songs in the db and clean the output
-        const songs = (await getAllSongs()).map(s => mapSongDTO(s))
+    let result = await getAllSongs()
 
-        res.json({
-            status: "success",
-            statusCode: 0,
-            results: songs.length,
-            data: {
-                songs
-            }
-        })
-
-    } catch (e) {
-        logger.error(e)
+    if (result.failure) {
+        logError(result.failure)
         res.json({
             status: "fail",
             statusCode: 1,
             errorMessage: "Server error"
         })
+        return
     }
+    //Search all songs in the db and clean the output
+    const songs = result.result.map(s => mapSongDTO(s))
+
+    res.json({
+        status: "success",
+        statusCode: 0,
+        results: songs.length,
+        data: {
+            songs
+        }
+    })
 }
 
 export async function getOneSongInfoCtrl(req: Request, res: Response) {
-    var err = validationResult(req)
+    let err = validationResult(req)
     if (!err.isEmpty()) {
-        return res.json({
+        res.json({
             status: "fail",
             statusCode: 2,
             errorMessage: "Invalid request"
         })
+        return
     }
 
-    try {
-        //Search a song by id and clean the output
-        const song = mapSongDTO(await getSong(req.params.id))
+    let result = await getSong(req.params.id)
 
-        res.json({
-            status: "success",
-            statusCode: 0,
-            data: {
-                song
-            }
-        })
-
-    } catch (e) {
-        logger.error(e)
+    if (result.failure) {
+        logError(result.failure)
         res.json({
             status: "fail",
             statusCode: 1,
             errorMessage: "Server error"
         })
+        return
     }
+    //Search a song by id and clean the output
+    const song = mapSongDTO(result.result)
+
+    res.json({
+        status: "success",
+        statusCode: 0,
+        data: {
+            song
+        }
+    })
 }
 
 export async function getSongStreamCtrl(req: Request, res: Response) {
-    var err = validationResult(req)
+    let err = validationResult(req)
     if (!err.isEmpty()) {
-        return res.json({
+        res.json({
             status: "fail",
             statusCode: 2,
             errorMessage: "Invalid request"
         })
+        return
     }
 
-    try {
-        //Search a song by id and and send the file
-        const song = await getSong(req.params.id)
+    let result = await getSong(req.params.id)
 
-        res.sendFile(song.path)
-
-    } catch (e) {
-        console.error(e)
+    if (result.failure) {
+        logError(result.failure)
         res.json({
             status: "fail",
             statusCode: 1,
             errorMessage: "Server error"
         })
+        return
     }
+    //Search a song by id and and send the file
+    const song = result.result
+
+    res.sendFile(song.path)
 }
 
 export async function updateLikeCtrl(req: Request, res: Response) {
-    var err = validationResult(req)
+    let err = validationResult(req)
     if (!err.isEmpty()) {
-        return res.json({
+        res.json({
             status: "fail",
             statusCode: 2,
             errorMessage: "Invalid request"
         })
+        return
     }
 
-    try {
-        //Search a song by id
-        const song = await getSong(req.params.id)
+    let result = await getSong(req.params.id)
 
-        //Update the like field
-        song.like = Number(req.body.like)
-        updateSong(song)
-
-        res.json({
-            status: "success",
-            statusCode: 0,
-        })
-    }
-    catch (e) {
-        console.log(e)
+    if (result.failure) {
+        logError(result.failure)
         res.json({
             status: "fail",
             statusCode: 1,
             errorMessage: "Server error"
         })
+        return
     }
+    //Search a song by id
+    const song = result.result
+
+    //Update the like field
+    song.like = Number(req.body.like)
+    updateSong(song)
+
+    res.json({
+        status: "success",
+        statusCode: 0,
+    })
 }

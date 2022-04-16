@@ -1,4 +1,4 @@
- <!-- Quaver is a self-hostable music player and music library manager
+<!-- Quaver is a self-hostable music player and music library manager
  Copyright (C) 2022  DPlouc
 
  This program is free software: you can redistribute it and/or modify
@@ -15,30 +15,37 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 <template>
-  <div class="albumItem" @click="openPresentation()">
-    <img class="albumCover" :src="getCoverURL(album.cover)" />
+  <div v-show="search(queryString, album)" class="albumItem" @click="openPresentation('/album/' + album.id)">
+    <img loading="lazy" class="albumCover" :src="getCoverURL(album.cover)" />
     <div class="albumItemProp">{{ album.title }}</div>
     <div class="albumItemProp">{{ album.artist }}</div>
     <div class="albumItemProp">{{ album.year }}</div>
   </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import { defineComponent } from "vue";
-import { router } from "../app";
-import { Album } from "../models"
-import { getCoverURL } from "../fetch";
+import { Album } from "../models";
+import { search } from "../searching";
+import { getCoverURL, openPresentation } from "../util";
 
 export default defineComponent({
   props: { album: Album },
 
+  inject: ["query"],
+
+  data() {
+    return {
+      queryString: this.query,
+    };
+  },
+
   methods: {
-    openPresentation() {
-      router.push({ path: "/album/" + this.album.id })
-    },
-    getCoverURL
-  }
-})
+    openPresentation,
+    getCoverURL,
+    search,
+  },
+});
 </script>
 
 <style>
@@ -50,11 +57,13 @@ export default defineComponent({
   height: fit-content;
   margin-bottom: 10px;
 }
+
 .albumCover {
   max-height: 10vw;
   max-width: 10vw;
   object-fit: scale-down;
 }
+
 .albumItemProp {
   text-align: center;
   text-overflow: ellipsis;
