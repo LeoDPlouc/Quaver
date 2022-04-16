@@ -16,7 +16,7 @@
 
 <template>
   <div v-show="search(queryString, song)" class="songItem">
-    <div class="songItemProp songItemLike" @click="likeSong">{{ song.like }}</div>
+    <div class="songItemProp songItemLike" @click="doLike">{{ song.like }}</div>
     <div class="songItemProp songItemN">{{ song.n }}</div>
     <div class="songItemProp songItemTitle" @click="songItemTitleClicked">
       {{ song.title }}
