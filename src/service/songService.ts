@@ -11,102 +11,117 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { createSongModel, findSongModelByPath, getAllSongModels, getSongModel, updateSongModel } from "../access/database/songDAO";
+import {
+  createSongModel,
+  findSongModelByPath,
+  getAllSongModels,
+  getSongModel,
+  updateSongModel,
+} from "../access/database/songDAO";
 import { mapSong } from "../mappers/songMapper";
 import { Failable } from "../utils/Failable";
 
-
 export async function getAllSongs(): Promise<Failable<Song[]>> {
-    let result = await getAllSongModels()
+  let result = await getAllSongModels();
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAllSongs.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: getAllSongs.name,
+        msg: "DAO error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
 
-    return { result: result.result.map(s => mapSong(s)) }
+  return { result: result.result.map((s) => mapSong(s)) };
 }
 
 export async function getSong(id: string): Promise<Failable<Song>> {
-    let result = await getSongModel(id)
+  let result = await getSongModel(id);
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: getSong.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: getSong.name,
+        msg: "DAO error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
 
-    if (!result.result) {
-        return {
-            failure: {
-                file: __filename,
-                func: getSong.name,
-                msg: "Invalid Id"
-            }
-        }
-    }
+  if (!result.result) {
+    return {
+      failure: {
+        file: __filename,
+        func: getSong.name,
+        msg: "Invalid Id",
+      },
+    };
+  }
 
-    return { result: mapSong(result.result) }
+  return { result: mapSong(result.result) };
 }
 
 export async function updateSong(song: Song): Promise<Failable<null>> {
-    let result = await updateSongModel(song)
+  let result = await updateSongModel(song);
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: updateSong.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: updateSong.name,
+        msg: "DAO error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
 
-    return { result: null }
+  return { result: null };
 }
 
 export async function createSong(song: Song): Promise<Failable<string>> {
-    let result = await createSongModel(song)
+  let result = await createSongModel(song);
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: createSong.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: createSong.name,
+        msg: "DAO error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
 
-    return { result: result.result }
+  return { result: result.result };
 }
 
 export async function findSongByPath(path: string): Promise<Failable<Song>> {
-    let result = await findSongModelByPath(path)
+  let result = await findSongModelByPath(path);
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: findSongByPath.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: findSongByPath.name,
+        msg: "DAO error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
 
-    return { result: mapSong(result.result) }
+  if (!result.result) {
+    return {
+      failure: {
+        file: __filename,
+        func: findSongByPath.name,
+        msg: "No song at path " + path,
+      },
+    };
+  }
+
+  return { result: mapSong(result.result) };
 }

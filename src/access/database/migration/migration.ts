@@ -103,7 +103,7 @@ export async function Migrate(): Promise<Failable<null>> {
                     msg: err
                 }
                 logError(failure)
-                return
+                return {}
             }
         }
     }
@@ -131,8 +131,9 @@ export async function Migrate(): Promise<Failable<null>> {
                     msg: err
                 }
                 logError(failure)
-                return
+                return {}
             }
         }
     }
+    return {}
 }

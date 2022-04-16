@@ -11,20 +11,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Album, Artist, Song } from "./models";
+import { router } from "./app";
 
-export function search(queryString: any, obj: Song | Album | Artist) {
+export function openPresentation(path: string) {
+  router.push({ path });
+}
 
-    let query = queryString as string
+export function getCoverURL(id: string) {
+  return `/api/image/${id}/file`;
+}
 
-    if (!query.length) return true
-
-    let target = ""
-    if ((obj as Song).title) target = (obj as Song).title
-    if ((obj as Album).title) target = (obj as Album).title
-    if ((obj as Artist).name) target = (obj as Artist).name
-
-    if (!target) return false
-    let match = target.toLowerCase().match(query.toLowerCase())
-    return match != null && match.length > 0
+export function formatDuration(duration: number): string {
+  try {
+    let seconds = Number(duration) % 60;
+    let secondsString = String(seconds).split(".")[0];
+    if (secondsString.length == 1) secondsString = "0" + secondsString;
+    if (secondsString.length == 0) secondsString = "00";
+    let minutes = Number(duration) / 60;
+    let minutesString = String(minutes).split(".")[0];
+    if (minutesString.length == 0) minutesString = "0";
+    return `${minutesString}:${secondsString}`;
+  } catch (error) {}
+  return String(duration);
 }

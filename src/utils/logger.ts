@@ -16,26 +16,33 @@ import { createLogger, format, transports } from "winston";
 import { Failure } from "./Failable";
 
 var logger = createLogger({
-    transports: [
-        new transports.Console(),
-        new transports.File({ dirname: "logs", filename: "quaver.log" })
-    ],
-    format: format.combine(
-        format.colorize(),
-        format.timestamp(),
-        format.printf(({ timestamp, level, message }) => {
-            return `[${timestamp}] ${level}: ${message}`
-        })
-    )
-})
+  transports: [
+    new transports.Console(),
+    new transports.File({ dirname: "logs", filename: "quaver.log" }),
+  ],
+  format: format.combine(
+    format.colorize(),
+    format.timestamp(),
+    format.printf(({ timestamp, level, message }) => {
+      return `[${timestamp}] ${level}: ${message}`;
+    })
+  ),
+});
 
-var workerName: string
+var workerName: string;
 
-export function setWorkerName(name: string) { workerName = name }
+export function setWorkerName(name: string) {
+  workerName = name;
+}
 
+export function logError(error: Failure) {
+  logger.error(`${workerName} : ${JSON.stringify(error)}`);
+}
 
-export function logError(error: Failure) { logger.error(`${workerName} : ${error}`) }
+export function logInfo(info: string) {
+  logger.info(`${workerName} : ${info}`);
+}
 
-export function logInfo(info: string) { logger.info(`${workerName} : ${info}`) }
-
-export function logRequest(req: Request) { logger.info(`${req.ip} ${req.url}`) }
+export function logRequest(req: Request) {
+  logger.info(`${req.ip} ${req.url}`);
+}

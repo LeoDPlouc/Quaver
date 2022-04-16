@@ -35,7 +35,7 @@ connectToDb()
         //Apply database migration
         await Migrate().then((result) => {
             if (result.failure) {
-                logError(result.result)
+                logError(result.failure)
                 process.exit(1)
             }
         })

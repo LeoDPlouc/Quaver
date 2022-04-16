@@ -20,7 +20,8 @@
         "allowJs": true,
         "target": "ES6",
         "esModuleInterop": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "jsx": "preserve"
     },
     "files": [
         "./src/sfc.d.ts"
