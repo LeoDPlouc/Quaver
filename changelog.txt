@@ -1,6 +1,12 @@
 CHANGELOG
 
 ====================================================
+0.4.1-beta
+
+BackEnd:
+- Optimised song collector reduce database calls
+
+====================================================
 0.4.0-beta
 
 FrontEnd:
