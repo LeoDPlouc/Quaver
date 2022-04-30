@@ -14,6 +14,7 @@
 import {
   createSongModel,
   findSongModelByPath,
+  getAllSongModelPaths,
   getAllSongModels,
   getSongModel,
   updateSongModel,
@@ -96,7 +97,7 @@ export async function createSong(song: Song): Promise<Failable<string>> {
     };
   }
 
-  return { result: result.result };
+  return result;
 }
 
 export async function findSongByPath(path: string): Promise<Failable<Song>> {
@@ -124,4 +125,21 @@ export async function findSongByPath(path: string): Promise<Failable<Song>> {
   }
 
   return { result: mapSong(result.result) };
+}
+
+export async function getAllSongPaths(): Promise<Failable<string[]>> {
+  let result = await getAllSongModelPaths();
+
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: getAllSongPaths.name,
+        msg: "DAO error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
+
+  return result;
 }

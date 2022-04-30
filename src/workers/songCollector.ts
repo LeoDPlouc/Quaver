@@ -16,16 +16,20 @@ import path from "path";
 import mm from "mime-types";
 import { MUSIC_PATH } from "../config/config";
 import { connectToDb } from "../access/database/utils";
-import { createSong, findSongByPath, updateSong } from "../service/songService";
+import { createSong, getAllSongPaths } from "../service/songService";
 import { getMetadataFromFile } from "../access/file/songFile";
 import {
   createAlbum,
-  findAlbumByName,
+  getAllAlbums,
   updateAlbum,
 } from "../service/albumService";
-import { createArtist, findArtistByName } from "../service/artistService";
-import { Failure } from "../utils/Failable";
+import { createArtist, getAllArtists } from "../service/artistService";
+import { Failable, Failure } from "../utils/Failable";
 import { logError, logInfo, setWorkerName } from "../utils/logger";
+
+let songPaths: string[];
+let artists: Artist[];
+let albums: Album[];
 
 async function collect(libPath: string) {
   try {
@@ -51,10 +55,10 @@ async function collect(libPath: string) {
 
 async function registerSong(songPath: string) {
   //Only considere audio files
-  if (!(mm.lookup(path.extname(songPath)) as string).match("audio")) return;
+  if (!mm.lookup(path.extname(songPath)).match("audio")) return;
 
   //If the song doesn't already exist, extract its metadata and create a new song
-  if ((await findSongByPath(songPath)).result) return;
+  if (songPaths.find((p) => p == songPath)) return;
 
   let metadataResult = await getMetadataFromFile(songPath);
   if (metadataResult.failure) {
@@ -66,14 +70,8 @@ async function registerSong(songPath: string) {
   logInfo(`Found new song ${song.path}`);
 
   //Fetch the song's album
-  let albumResult = await findAlbumByName(song.album, song.artist);
-  if (albumResult.failure) {
-    logError(albumResult.failure);
-    return;
-  }
-  let album = albumResult.result[0];
-
-  let albumId;
+  let album = findAlbumByName(song.album, song.artist);
+  let albumId = album?.id;
   if (!album) {
     album = { artist: song.artist, title: song.album, year: song.year };
 
@@ -85,17 +83,17 @@ async function registerSong(songPath: string) {
     albumId = albumIdResult.result;
 
     logInfo(`Found new album ${album.title}`);
+
+    let failure = (await updateAlbums()).failure;
+    if (failure) {
+      logError(failure);
+      return;
+    }
   }
 
   //Fetch the song's artist
-  let artistResult = await findArtistByName(song.artist);
-  if (artistResult.failure) {
-    logError(artistResult.failure);
-    return;
-  }
-  let artist = artistResult.result[0];
-
-  let artistId;
+  let artist = findArtistByName(song.artist);
+  let artistId = artist?.id;
   if (!artist) {
     artist = { name: song.artist };
 
@@ -107,6 +105,12 @@ async function registerSong(songPath: string) {
     artistId = artistIdResult.result;
 
     logInfo(`Found new artist ${artist.name}`);
+
+    let failure = (await updateArtists()).failure;
+    if (failure) {
+      logError(failure);
+      return;
+    }
   }
 
   album.artistId = artistId;
@@ -117,6 +121,75 @@ async function registerSong(songPath: string) {
   await createSong(song);
 }
 
+async function updatePaths(): Promise<Failable<null>> {
+  let result = await getAllSongPaths();
+
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: updatePaths.name,
+        msg: "Service error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
+
+  songPaths = result.result;
+
+  return {};
+}
+
+async function updateAlbums(): Promise<Failable<null>> {
+  let result = await getAllAlbums();
+
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: updateAlbums.name,
+        msg: "Service error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
+
+  albums = result.result;
+
+  return {};
+}
+
+async function updateArtists(): Promise<Failable<null>> {
+  let result = await getAllArtists();
+
+  if (result.failure) {
+    return {
+      failure: {
+        file: __filename,
+        func: updateArtists.name,
+        msg: "Service error",
+        sourceFailure: result.failure,
+      },
+    };
+  }
+
+  artists = result.result;
+
+  return {};
+}
+
+function findArtistByName(artist: string): Artist {
+  return artists.find((a) => a.name == artist);
+}
+
+function findAlbumByName(album: string, artist: string) {
+  if (artist) {
+    return albums.find((a) => a.title == album && a.artist == artist);
+  } else {
+    return albums.find((a) => a.title == album);
+  }
+}
+
 function doWork() {
   setWorkerName("SongCollector");
   logInfo("Song collection Started");
@@ -124,7 +197,13 @@ function doWork() {
   connectToDb().then(async () => {
     //Collection run in background and is relaunched every 30 sec
     while (true) {
-      await collect(MUSIC_PATH).catch();
+      if (
+        !(await updatePaths()).failure &&
+        !(await updateAlbums()).failure &&
+        !(await updateArtists()).failure
+      ) {
+        await collect(MUSIC_PATH).catch();
+      }
       await new Promise((resolve) => setTimeout(resolve, 30000));
     }
   });
