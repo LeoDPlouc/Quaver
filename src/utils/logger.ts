@@ -13,7 +13,7 @@
 
 import { Request } from "express";
 import { createLogger, format, transports } from "winston";
-import { Failure } from "./Failable";
+import { Failure } from "./Failure";
 
 var logger = createLogger({
   transports: [
@@ -36,7 +36,7 @@ export function setWorkerName(name: string) {
 }
 
 export function logError(error: Failure) {
-  logger.error(`${workerName} : ${JSON.stringify(error)}`);
+    logger.error(`${workerName} : ${JSON.stringify(error)}`);
 }
 
 export function logInfo(info: string) {

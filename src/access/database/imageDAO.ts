@@ -12,29 +12,25 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { createFailure, Failable } from "../../utils/Failable";
+import { createFailure } from "../../utils/Failure";
 import { imageModel } from "./models/imageModel";
 
 export async function getAllImagesModels(): Promise<
-  Failable<(Image & Document<any, any, Image>)[]>
+  (Image & Document<any, any, Image>)[]
 > {
   try {
-    return { result: await imageModel.find() };
+    return await imageModel.find();
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getAllImagesModels.name),
-    };
+    throw createFailure(err, __filename, getAllImagesModels.name);
   }
 }
 
 export async function getImageModel(
   id: string
-): Promise<Failable<Image & Document<any, any, Image>>> {
+): Promise<Image & Document<any, any, Image>> {
   try {
-    return { result: await imageModel.findById(id) };
+    return await imageModel.findById(id);
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getImageModel.name),
-    };
+    createFailure(err, __filename, getImageModel.name);
   }
 }

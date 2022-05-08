@@ -12,92 +12,73 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { createFailure, Failable } from "../../utils/Failable";
+import { createFailure } from "../../utils/Failure";
 import { albumModel } from "./models/albumModel";
 import { artistModel } from "./models/artistModel";
 import { songModel } from "./models/songModel";
 
 export async function getAllArtistModels(): Promise<
-  Failable<(Artist & Document<any, any, Artist>)[]>
+  (Artist & Document<any, any, Artist>)[]
 > {
   try {
-    return { result: await artistModel.find() };
+    return await artistModel.find();
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getAllArtistModels.name),
-    };
+    throw createFailure(err, __filename, getAllArtistModels.name);
   }
 }
 
 export async function getArtistModel(
   id: string
-): Promise<Failable<Artist & Document<any, any, Artist>>> {
+): Promise<Artist & Document<any, any, Artist>> {
   try {
-    return { result: await artistModel.findById(id) };
+    return await artistModel.findById(id);
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getArtistModel.name),
-    };
+    throw createFailure(err, __filename, getArtistModel.name);
   }
 }
 
 export async function getArtistSongModels(
   id: string
-): Promise<Failable<(Song & Document<any, any, Song>)[]>> {
+): Promise<(Song & Document<any, any, Song>)[]> {
   try {
-    return { result: await songModel.find({ artistId: id }) };
+    return await songModel.find({ artistId: id });
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getArtistSongModels.name),
-    };
+    throw createFailure(err, __filename, getArtistSongModels.name);
   }
 }
 
 export async function getArtistAlbumModels(
   id: string
-): Promise<Failable<(Album & Document<any, any, Album>)[]>> {
+): Promise<(Album & Document<any, any, Album>)[]> {
   try {
-    return { result: await albumModel.find({ artistId: id }) };
+    return await albumModel.find({ artistId: id });
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getArtistAlbumModels.name),
-    };
+    throw createFailure(err, __filename, getArtistAlbumModels.name);
   }
 }
 
-export async function createArtistModel(
-  artist: Artist
-): Promise<Failable<string>> {
+export async function createArtistModel(artist: Artist): Promise<string> {
   try {
-    return { result: (await artistModel.create(artist)).id };
+    return (await artistModel.create(artist)).id;
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, createArtistModel.name),
-    };
+    throw createFailure(err, __filename, createArtistModel.name);
   }
 }
 
 export async function findArtistModelByName(
   name: string
-): Promise<Failable<(Artist & Document<any, any, Artist>)[]>> {
+): Promise<(Artist & Document<any, any, Artist>)[]> {
   try {
-    return { result: await artistModel.find({ name: name }) };
+    return await artistModel.find({ name: name });
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, findArtistModelByName.name),
-    };
+    throw createFailure(err, __filename, findArtistModelByName.name);
   }
 }
 
-export async function updateArtistModel(
-  artist: Artist
-): Promise<Failable<null>> {
+export async function updateArtistModel(artist: Artist): Promise<void> {
   try {
     await artistModel.findByIdAndUpdate(artist.id, artist);
-    return { result: null };
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, updateArtistModel.name),
-    };
+    throw createFailure(err, __filename, updateArtistModel.name);
   }
 }

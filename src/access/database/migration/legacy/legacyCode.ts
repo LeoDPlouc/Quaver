@@ -17,12 +17,10 @@ import { mbApi } from "../../../api/musicbrainzApi";
 import { caApi } from "../../../api/coverArtArchive";
 import { saveImage } from "../../../file/imageFile";
 import { imageModel } from "../../models/imageModel";
-import { createFailure, Failable } from "../../../../utils/Failable";
+import { createFailure } from "../../../../utils/Failure";
 import { logInfo } from "../../../../utils/logger";
 
-export async function getAlbumMBIdLegacy(
-  album: Album
-): Promise<Failable<string>> {
+export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
   let query = `release:${album.title as string}`;
 
   //Add more info to the query if available
@@ -33,18 +31,18 @@ export async function getAlbumMBIdLegacy(
   try {
     var result = await mbApi.search<IReleaseList>("release", { query });
   } catch (err) {
-    return { failure: createFailure(err, __filename, getAlbumMBIdLegacy.name) };
+    throw createFailure(err, __filename, getAlbumMBIdLegacy.name);
   }
 
   if (!result.releases.length) {
-    return { result: null };
+    return null;
   }
-  return { result: result.releases[0].id };
+  return result.releases[0].id;
 }
 
 export async function getAlbumCoverLegacy(
   album: Album & Document<any, any, Album>
-): Promise<Failable<Image & Document<any, any, Image>>> {
+): Promise<Image & Document<any, any, Image>> {
   //Fetch Cover art
   let p = new Promise<any>((resolve, reject) => {
     caApi.release(album.mbid, { piece: "front" }, (err, data) => {
@@ -56,9 +54,7 @@ export async function getAlbumCoverLegacy(
   try {
     var { image, extension } = await p;
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getAlbumCoverLegacy.name),
-    };
+    throw createFailure(err, __filename, getAlbumCoverLegacy.name);
   }
 
   if (image) {
@@ -68,9 +64,7 @@ export async function getAlbumCoverLegacy(
     try {
       var path = await saveImage(image, extension);
     } catch (err) {
-      return {
-        failure: createFailure(err, __filename, getAlbumCoverLegacy.name),
-      };
+      throw createFailure(err, __filename, getAlbumCoverLegacy.name);
     }
 
     var newCover = new imageModel({ path });
@@ -78,19 +72,17 @@ export async function getAlbumCoverLegacy(
     try {
       await newCover.save();
     } catch (err) {
-      return {
-        failure: createFailure(err, __filename, getAlbumCoverLegacy.name),
-      };
+      throw createFailure(err, __filename, getAlbumCoverLegacy.name);
     }
 
-    return { result: newCover };
+    return newCover;
   }
-  return { result: null };
+  return null;
 }
 
 export async function getAlbumCoverLegacy2(
   album: Album & Document<any, any, Album>
-): Promise<Failable<Image & Document<any, any, Image>>> {
+): Promise<Image & Document<any, any, Image>> {
   let cover;
   let ext;
 
@@ -121,13 +113,7 @@ export async function getAlbumCoverLegacy2(
     try {
       var path = await saveImage(cover, ext);
     } catch (err) {
-      return {
-        failure: {
-          file: __filename,
-          func: getAlbumCoverLegacy2.name,
-          msg: err,
-        },
-      };
+      throw createFailure(err, __filename, getAlbumCoverLegacy2.name);
     }
 
     var newCover = new imageModel({ path });
@@ -135,16 +121,10 @@ export async function getAlbumCoverLegacy2(
     try {
       await newCover.save();
     } catch (err) {
-      return {
-        failure: {
-          file: __filename,
-          func: getAlbumCoverLegacy2.name,
-          msg: err,
-        },
-      };
+      throw createFailure(err, __filename, getAlbumCoverLegacy2.name);
     }
 
-    return { result: newCover };
+    return newCover;
   }
-  return { result: null };
+  return null;
 }

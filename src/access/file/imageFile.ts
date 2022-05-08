@@ -15,12 +15,12 @@ import { v4 } from "uuid";
 import path from "path";
 import { IMAGES_PATH } from "../../config/config";
 import fs from "fs/promises";
-import { createFailure, Failable } from "../../utils/Failable";
+import { createFailure } from "../../utils/Failure";
 
 export async function saveImage(
   data: string,
   extension: string
-): Promise<Failable<string>> {
+): Promise<string> {
   //Create an UUID for the name of the file
   let filename = v4() + extension;
   let p = path.resolve(IMAGES_PATH, filename);
@@ -28,22 +28,18 @@ export async function saveImage(
   try {
     await fs.writeFile(p, data, { encoding: "binary" });
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, saveImage.name),
-    };
+    throw createFailure(err, __filename, saveImage.name);
   }
 
-  return { result: p };
+  return p;
 }
 
-export async function deleteImage(path: string): Promise<Failable<null>> {
+export async function deleteImage(path: string): Promise<null> {
   try {
     await fs.rm(path);
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, deleteImage.name),
-    };
+    throw createFailure(err, __filename, deleteImage.name);
   }
 
-  return { result: null };
+  return null;
 }

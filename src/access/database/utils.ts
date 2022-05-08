@@ -19,7 +19,7 @@ import {
   MONGO_PORT,
   MONGO_USER,
 } from "../../config/config";
-import { createFailure, Failure } from "../../utils/Failable";
+import { createFailure, Failure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
 
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`;
