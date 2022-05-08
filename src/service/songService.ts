@@ -20,19 +20,19 @@ import {
   updateSongModel,
 } from "../access/database/songDAO";
 import { mapSong } from "../mappers/songMapper";
-import { Failable } from "../utils/Failable";
+import { createFailure, Failable } from "../utils/Failable";
 
 export async function getAllSongs(): Promise<Failable<Song[]>> {
   let result = await getAllSongModels();
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: getAllSongs.name,
-        msg: "DAO error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "DAO error",
+        __filename,
+        getAllSongs.name,
+        result.failure
+      ),
     };
   }
 
@@ -44,22 +44,18 @@ export async function getSong(id: string): Promise<Failable<Song>> {
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: getSong.name,
-        msg: "DAO error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "DAO error",
+        __filename,
+        getSong.name,
+        result.failure
+      ),
     };
   }
 
   if (!result.result) {
     return {
-      failure: {
-        file: __filename,
-        func: getSong.name,
-        msg: "Invalid Id",
-      },
+      failure: createFailure("Invalid Id", __filename, getSong.name),
     };
   }
 
@@ -71,12 +67,12 @@ export async function updateSong(song: Song): Promise<Failable<null>> {
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: updateSong.name,
-        msg: "DAO error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "DAO error",
+        __filename,
+        updateSong.name,
+        result.failure
+      ),
     };
   }
 
@@ -88,12 +84,12 @@ export async function createSong(song: Song): Promise<Failable<string>> {
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: createSong.name,
-        msg: "DAO error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "DAO error",
+        __filename,
+        createSong.name,
+        result.failure
+      ),
     };
   }
 
@@ -105,22 +101,22 @@ export async function findSongByPath(path: string): Promise<Failable<Song>> {
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: findSongByPath.name,
-        msg: "DAO error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "DAO error",
+        __filename,
+        findSongByPath.name,
+        result.failure
+      ),
     };
   }
 
   if (!result.result) {
     return {
-      failure: {
-        file: __filename,
-        func: findSongByPath.name,
-        msg: "No song at path " + path,
-      },
+      failure: createFailure(
+        "No song at path " + path,
+        __filename,
+        findSongByPath.name
+      ),
     };
   }
 
@@ -132,12 +128,12 @@ export async function getAllSongPaths(): Promise<Failable<string[]>> {
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: getAllSongPaths.name,
-        msg: "DAO error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "DAO error",
+        __filename,
+        getAllSongPaths.name,
+        result.failure
+      ),
     };
   }
 

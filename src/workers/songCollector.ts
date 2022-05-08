@@ -24,7 +24,7 @@ import {
   updateAlbum,
 } from "../service/albumService";
 import { createArtist, getAllArtists } from "../service/artistService";
-import { Failable, Failure } from "../utils/Failable";
+import { createFailure, Failable, Failure } from "../utils/Failable";
 import { logError, logInfo, setWorkerName } from "../utils/logger";
 
 let songPaths: string[];
@@ -35,12 +35,7 @@ async function collect(libPath: string) {
   try {
     var paths = await fs.readdir(libPath, { withFileTypes: true });
   } catch (err) {
-    let failure: Failure = {
-      file: __filename,
-      func: collect.name,
-      msg: err,
-    };
-    logError(failure);
+    logError(createFailure(err, __filename, collect.name));
   }
 
   for (var i = 0; i < paths.length; i++) {
@@ -126,12 +121,12 @@ async function updatePaths(): Promise<Failable<null>> {
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: updatePaths.name,
-        msg: "Service error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "Service error",
+        __filename,
+        updatePaths.name,
+        result.failure
+      ),
     };
   }
 
@@ -145,12 +140,12 @@ async function updateAlbums(): Promise<Failable<null>> {
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: updateAlbums.name,
-        msg: "Service error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "Service error",
+        __filename,
+        updateAlbums.name,
+        result.failure
+      ),
     };
   }
 
@@ -164,12 +159,12 @@ async function updateArtists(): Promise<Failable<null>> {
 
   if (result.failure) {
     return {
-      failure: {
-        file: __filename,
-        func: updateArtists.name,
-        msg: "Service error",
-        sourceFailure: result.failure,
-      },
+      failure: createFailure(
+        "Service error",
+        __filename,
+        updateArtists.name,
+        result.failure
+      ),
     };
   }
 
