@@ -13,44 +13,28 @@
 
 import { getAllImagesModels, getImageModel } from "../access/database/imageDAO";
 import { mapImage } from "../mappers/imageMapper";
-import { createFailure, Failable } from "../utils/Failable";
+import { createFailure } from "../utils/Failure";
 
-export async function getAllImages(): Promise<Failable<Image[]>> {
-  let result = await getAllImagesModels();
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        getAllImages.name,
-        result.failure
-      ),
-    };
+export async function getAllImages(): Promise<Image[]> {
+  try {
+    var result = await getAllImagesModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAllImages.name, err);
   }
 
-  return { result: result.result.map((i) => mapImage(i)) };
+  return result.map((i) => mapImage(i));
 }
 
-export async function getImage(id: string): Promise<Failable<Image>> {
-  let result = await getImageModel(id);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        getImage.name,
-        result.failure
-      ),
-    };
+export async function getImage(id: string): Promise<Image> {
+  try {
+    var result = await getImageModel(id);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getImage.name, err);
   }
 
-  if (!result.result) {
-    return {
-      failure: createFailure("Invalid Id", __filename, getImage.name),
-    };
+  if (!result) {
+    throw createFailure("Invalid Id", __filename, getImage.name);
   }
 
-  return { result: mapImage(result.result) };
+  return mapImage(result);
 }

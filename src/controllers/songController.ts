@@ -11,130 +11,128 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Request, Response, } from "express"
-import { validationResult } from "express-validator"
-import { getAllSongs, getSong, updateSong } from "../service/songService"
-import { mapSongDTO } from "../mappers/songMapper"
-import { logError } from "../utils/logger"
+import { Request, Response } from "express";
+import { validationResult } from "express-validator";
+import { getAllSongs, getSong, updateSong } from "../service/songService";
+import { mapSongDTO } from "../mappers/songMapper";
+import { logError } from "../utils/logger";
 
 export async function getAllSongsInfoCtrl(req: Request, res: Response) {
-    let result = await getAllSongs()
-
-    if (result.failure) {
-        logError(result.failure)
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-        return
-    }
-    //Search all songs in the db and clean the output
-    const songs = result.result.map(s => mapSongDTO(s))
-
+  try {
+    var result = await getAllSongs();
+  } catch (err) {
+    logError(err);
     res.json({
-        status: "success",
-        statusCode: 0,
-        results: songs.length,
-        data: {
-            songs
-        }
-    })
+      status: "fail",
+      statusCode: 1,
+      errorMessage: "Server error",
+    });
+    return;
+  }
+
+  //Search all songs in the db and clean the output
+  const songs = result.map((s) => mapSongDTO(s));
+
+  res.json({
+    status: "success",
+    statusCode: 0,
+    results: songs.length,
+    data: {
+      songs,
+    },
+  });
 }
 
 export async function getOneSongInfoCtrl(req: Request, res: Response) {
-    let err = validationResult(req)
-    if (!err.isEmpty()) {
-        res.json({
-            status: "fail",
-            statusCode: 2,
-            errorMessage: "Invalid request"
-        })
-        return
-    }
-
-    let result = await getSong(req.params.id)
-
-    if (result.failure) {
-        logError(result.failure)
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-        return
-    }
-    //Search a song by id and clean the output
-    const song = mapSongDTO(result.result)
-
+  let err = validationResult(req);
+  if (!err.isEmpty()) {
     res.json({
-        status: "success",
-        statusCode: 0,
-        data: {
-            song
-        }
-    })
+      status: "fail",
+      statusCode: 2,
+      errorMessage: "Invalid request",
+    });
+    return;
+  }
+
+  try {
+    var result = await getSong(req.params.id);
+  } catch (err) {
+    logError(err);
+    res.json({
+      status: "fail",
+      statusCode: 1,
+      errorMessage: "Server error",
+    });
+    return;
+  }
+
+  //Search a song by id and clean the output
+  const song = mapSongDTO(result);
+
+  res.json({
+    status: "success",
+    statusCode: 0,
+    data: {
+      song,
+    },
+  });
 }
 
 export async function getSongStreamCtrl(req: Request, res: Response) {
-    let err = validationResult(req)
-    if (!err.isEmpty()) {
-        res.json({
-            status: "fail",
-            statusCode: 2,
-            errorMessage: "Invalid request"
-        })
-        return
-    }
+  let err = validationResult(req);
+  if (!err.isEmpty()) {
+    res.json({
+      status: "fail",
+      statusCode: 2,
+      errorMessage: "Invalid request",
+    });
+    return;
+  }
 
-    let result = await getSong(req.params.id)
+  try {
+    var result = await getSong(req.params.id);
+  } catch (err) {
+    logError(err);
+    res.json({
+      status: "fail",
+      statusCode: 1,
+      errorMessage: "Server error",
+    });
+    return;
+  }
 
-    if (result.failure) {
-        logError(result.failure)
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-        return
-    }
-    //Search a song by id and and send the file
-    const song = result.result
-
-    res.sendFile(song.path)
+  res.sendFile(result.path);
 }
 
 export async function updateLikeCtrl(req: Request, res: Response) {
-    let err = validationResult(req)
-    if (!err.isEmpty()) {
-        res.json({
-            status: "fail",
-            statusCode: 2,
-            errorMessage: "Invalid request"
-        })
-        return
-    }
-
-    let result = await getSong(req.params.id)
-
-    if (result.failure) {
-        logError(result.failure)
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-        return
-    }
-    //Search a song by id
-    const song = result.result
-
-    //Update the like field
-    song.like = Number(req.body.like)
-    updateSong(song)
-
+  let err = validationResult(req);
+  if (!err.isEmpty()) {
     res.json({
-        status: "success",
-        statusCode: 0,
-    })
+      status: "fail",
+      statusCode: 2,
+      errorMessage: "Invalid request",
+    });
+    return;
+  }
+
+  try {
+    var result = await getSong(req.params.id);
+  } catch (err) {
+    logError(err);
+    res.json({
+      status: "fail",
+      statusCode: 1,
+      errorMessage: "Server error",
+    });
+    return;
+  }
+
+  //Update the like field
+  result.like = Number(req.body.like);
+  updateSong(result);
+
+  res.json({
+    status: "success",
+    statusCode: 0,
+  });
 }

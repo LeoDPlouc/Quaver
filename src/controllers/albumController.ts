@@ -11,109 +11,108 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Request, Response } from "express"
-import { validationResult } from "express-validator"
-import { getAlbum, getAlbumSongs, getAllAlbums } from "../service/albumService"
-import { mapAlbumDTO } from "../mappers/albumMapper"
-import { mapSongDTO } from "../mappers/songMapper"
-import { logError } from "../utils/logger"
+import { Request, Response } from "express";
+import { validationResult } from "express-validator";
+import { getAlbum, getAlbumSongs, getAllAlbums } from "../service/albumService";
+import { mapAlbumDTO } from "../mappers/albumMapper";
+import { mapSongDTO } from "../mappers/songMapper";
+import { logError } from "../utils/logger";
 
 export async function getAllAlbumsCtrl(req: Request, res: Response) {
-    let result = await getAllAlbums()
-
-    if (result.failure) {
-        logError(result.failure)
-
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-        return
-    }
-
-
-    //Search all albums in the db and clean the output
-    const albums = result.result.map(a => mapAlbumDTO(a))
+  try {
+    var result = await getAllAlbums();
+  } catch (err) {
+    logError(err);
 
     res.json({
-        status: "success",
-        statusCode: 0,
-        results: albums.length,
-        data: {
-            albums
-        }
-    })
+      status: "fail",
+      statusCode: 1,
+      errorMessage: "Server error",
+    });
+    return;
+  }
+
+  //Search all albums in the db and clean the output
+  const albums = result.map((a) => mapAlbumDTO(a));
+
+  res.json({
+    status: "success",
+    statusCode: 0,
+    results: albums.length,
+    data: {
+      albums,
+    },
+  });
 }
 
 export async function getAlbumCtrl(req: Request, res: Response) {
-    let err = validationResult(req)
-    if (!err.isEmpty()) {
-        res.json({
-            status: "fail",
-            statusCode: 2,
-            errorMessage: "Invalid request"
-        })
-        return
-    }
+  let err = validationResult(req);
+  if (!err.isEmpty()) {
+    res.json({
+      status: "fail",
+      statusCode: 2,
+      errorMessage: "Invalid request",
+    });
+    return;
+  }
 
-    //Search an album by id and clean the output
-    let result = await getAlbum(req.params.id)
-
-    if (result.failure) {
-        logError(result.failure)
-
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-        return
-    }
-
-    const album = mapAlbumDTO(result.result)
+  //Search an album by id and clean the output
+  try {
+    var result = await getAlbum(req.params.id);
+  } catch (err) {
+    logError(err);
 
     res.json({
-        status: "success",
-        statusCode: 0,
-        data: {
-            album
-        }
-    })
+      status: "fail",
+      statusCode: 1,
+      errorMessage: "Server error",
+    });
+    return;
+  }
+
+  const album = mapAlbumDTO(result);
+
+  res.json({
+    status: "success",
+    statusCode: 0,
+    data: {
+      album,
+    },
+  });
 }
 
 export async function getAlbumSongsCtrl(req: Request, res: Response) {
-    let err = validationResult(req)
-    if (!err.isEmpty()) {
-        res.json({
-            status: "fail",
-            statusCode: 2,
-            errorMessage: "Invalid request"
-        })
-        return
-    }
-
-    let result = await getAlbumSongs(req.params.id)
-
-    if (result.failure) {
-        logError(result.failure)
-        res.json({
-            status: "fail",
-            statusCode: 1,
-            errorMessage: "Server error"
-        })
-        return
-    }
-
-    //Search songs by albumid in the db and clean the output
-    const songs = result.result.map(s => mapSongDTO(s))
-
+  let err = validationResult(req);
+  if (!err.isEmpty()) {
     res.json({
-        status: "success",
-        results: songs.length,
-        statusCode: 0,
-        data: {
-            songs: songs
-        }
-    })
+      status: "fail",
+      statusCode: 2,
+      errorMessage: "Invalid request",
+    });
+    return;
+  }
+
+  try {
+    var result = await getAlbumSongs(req.params.id);
+  } catch (err) {
+    logError(err);
+    res.json({
+      status: "fail",
+      statusCode: 1,
+      errorMessage: "Server error",
+    });
+    return;
+  }
+
+  //Search songs by albumid in the db and clean the output
+  const songs = result.map((s) => mapSongDTO(s));
+
+  res.json({
+    status: "success",
+    results: songs.length,
+    statusCode: 0,
+    data: {
+      songs: songs,
+    },
+  });
 }

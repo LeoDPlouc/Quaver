@@ -11,103 +11,81 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { albumModel } from "../../models/albumModel"
-import { IMigration } from "../migration"
-import { getAlbumCoverLegacy2 } from "../legacy/legacyCode"
-import { logError, logInfo } from "../../../../utils/logger"
-import { Failable, Failure } from "../../../../utils/Failable"
+import { albumModel } from "../../models/albumModel";
+import { IMigration } from "../migration";
+import { getAlbumCoverLegacy2 } from "../legacy/legacyCode";
+import { logInfo } from "../../../../utils/logger";
+import { createFailure } from "../../../../utils/Failure";
 
 export const migration3: IMigration = {
-    //Download album covers
-    async up(): Promise<Failable<null>> {
-        try {
-            var albums = await albumModel.find()
-        } catch (err) {
-            return {
-                failure: {
-                    file: __filename,
-                    func: migration3.up.name,
-                    msg: err
-                }
-            }
+  //Download album covers
+  async up(): Promise<void> {
+    try {
+      try {
+        var albums = await albumModel.find();
+      } catch (err) {
+        throw createFailure(err, __filename, migration3.up.name);
+      }
+
+      for (let i = 0; i < albums.length; i++) {
+        let a = albums[i];
+
+        if (!a.cover) {
+          logInfo(`Migration 3 -> 4 album ${a.id}`);
+
+          let cover = await getAlbumCoverLegacy2(a);
+          if (!cover) {
+            continue;
+          }
+
+          await cover.save();
+
+          a.cover = cover.id;
+          await a.save();
         }
-
-        for (let i = 0; i < albums.length; i++) {
-            let a = albums[i]
-
-            try {
-                if (!a.cover) {
-                    logInfo(`Migration 3 -> 4 album ${a.id}`)
-
-                    let result = await getAlbumCoverLegacy2(a)
-
-                    if (result.failure) {
-                        return {
-                            failure: {
-                                file: __filename,
-                                func: migration3.up.name,
-                                msg: "Album cover fetching error",
-                                sourceFailure: result.failure
-                            }
-                        }
-                    }
-                    if (!result.result) { continue }
-
-                    let cover = result.result
-                    if (cover) {
-                        await cover.save()
-
-                        a.cover = cover.id
-                        await a.save()
-                    }
-                }
-            } catch (err) {
-                return {
-                    failure: {
-                        file: __filename,
-                        func: migration3.up.name,
-                        msg: err
-                    }
-                }
-            }
-        }
-    },
-
-    //Remove MB ID list and keep only one
-    async down(): Promise<Failable<null>> {
-        try {
-            var albums = await albumModel.find()
-        } catch (err) {
-            return {
-                failure: {
-                    file: __filename,
-                    func: migration3.down.name,
-                    msg: err
-                }
-            }
-        }
-
-        for (let i = 0; i < albums.length; i++) {
-            let a = albums[i]
-
-            if (a.mbids) {
-                logInfo(`Migration 3 -> 2 album ${a.id}`)
-
-                a.mbid = a.mbids[0]
-                a.mbids = undefined
-
-                try {
-                    await a.save()
-                } catch (err) {
-                    return {
-                        failure: {
-                            file: __filename,
-                            func: migration3.down.name,
-                            msg: err
-                        }
-                    }
-                }
-            }
-        }
+      }
+    } catch (err) {
+      throw createFailure(
+        "Migration error",
+        __filename,
+        migration3.up.name,
+        err
+      );
     }
-}
+  },
+
+  //Remove MB ID list and keep only one
+  async down(): Promise<void> {
+    try {
+      try {
+        var albums = await albumModel.find();
+      } catch (err) {
+        throw createFailure(err, __filename, migration3.down.name);
+      }
+
+      for (let i = 0; i < albums.length; i++) {
+        let a = albums[i];
+
+        if (a.mbids) {
+          logInfo(`Migration 3 -> 2 album ${a.id}`);
+
+          a.mbid = a.mbids[0];
+          a.mbids = undefined;
+
+          try {
+            await a.save();
+          } catch (err) {
+            throw createFailure(err, __filename, migration3.down.name);
+          }
+        }
+      }
+    } catch (err) {
+      throw createFailure(
+        "Migration error",
+        __filename,
+        migration3.down.name,
+        err
+      );
+    }
+  },
+};

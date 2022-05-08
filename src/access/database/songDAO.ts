@@ -12,74 +12,59 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { createFailure, Failable } from "../../utils/Failable";
+import { createFailure } from "../../utils/Failure";
 import { songModel } from "./models/songModel";
 
 export async function getAllSongModels(): Promise<
-  Failable<(Song & Document<any, any, Song>)[]>
+  (Song & Document<any, any, Song>)[]
 > {
   try {
-    return { result: await songModel.find() };
+    return await songModel.find();
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getAllSongModels.name),
-    };
+    throw createFailure(err, __filename, getAllSongModels.name);
   }
 }
 
 export async function getSongModel(
   id: string
-): Promise<Failable<Song & Document<any, any, Song>>> {
+): Promise<Song & Document<any, any, Song>> {
   try {
-    return { result: await songModel.findById(id) };
+    return await songModel.findById(id);
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getSongModel.name),
-    };
+    throw createFailure(err, __filename, getSongModel.name);
   }
 }
 
-export async function updateSongModel(song: Song): Promise<Failable<null>> {
+export async function updateSongModel(song: Song): Promise<void> {
   try {
     await songModel.findByIdAndUpdate(song.id, song);
-    return { result: null };
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, updateSongModel.name),
-    };
+    throw createFailure(err, __filename, updateSongModel.name);
   }
 }
 
-export async function createSongModel(song: Song): Promise<Failable<string>> {
+export async function createSongModel(song: Song): Promise<string> {
   try {
-    return { result: (await songModel.create(song)).id };
+    return (await songModel.create(song)).id;
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, createSongModel.name),
-    };
+    throw createFailure(err, __filename, createSongModel.name);
   }
 }
 
 export async function findSongModelByPath(
   path: string
-): Promise<Failable<Song & Document<any, any, Song>>> {
+): Promise<Song & Document<any, any, Song>> {
   try {
-    return { result: (await songModel.find({ path }))[0] };
+    return (await songModel.find({ path }))[0];
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, findSongModelByPath.name),
-    };
+    throw createFailure(err, __filename, findSongModelByPath.name);
   }
 }
 
-export async function getAllSongModelPaths(): Promise<Failable<string[]>> {
+export async function getAllSongModelPaths(): Promise<string[]> {
   try {
-    return {
-      result: (await songModel.find({}, { path: 1 })).map((s) => s.path),
-    };
+    return (await songModel.find({}, { path: 1 })).map((s) => s.path);
   } catch (err) {
-    return {
-      failure: createFailure(err, __filename, getAllSongModelPaths.name),
-    };
+    throw createFailure(err, __filename, getAllSongModelPaths.name);
   }
 }

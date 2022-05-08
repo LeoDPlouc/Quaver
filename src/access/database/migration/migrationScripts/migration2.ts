@@ -11,115 +11,93 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IMigration } from "../migration"
-import { albumModel } from "../../models/albumModel"
-import { imageModel } from "../../models/imageModel"
-import { getAlbumMBId } from "../../../api/musicbrainzApi"
-import { deleteImage } from "../../../file/imageFile"
-import { Failable, Failure } from "../../../../utils/Failable"
-import { logError, logInfo } from "../../../../utils/logger"
+import { IMigration } from "../migration";
+import { albumModel } from "../../models/albumModel";
+import { imageModel } from "../../models/imageModel";
+import { getAlbumMBId } from "../../../api/musicbrainzApi";
+import { deleteImage } from "../../../file/imageFile";
+import { logInfo } from "../../../../utils/logger";
+import { createFailure } from "../../../../utils/Failure";
 
 export const migration2: IMigration = {
-    //Remove single MB ID and fetch all fiting MB IDs 
-    async up(): Promise<Failable<null>> {
+  //Remove single MB ID and fetch all fiting MB IDs
+  async up(): Promise<void> {
+    try {
+      try {
+        var albums = await albumModel.find();
+      } catch (err) {
+        throw createFailure(err, __filename, migration2.up.name);
+      }
+
+      for (let i = 0; i < albums.length; i++) {
+        let a = albums[i];
+
+        logInfo(`Migration 2 -> 3 album ${a.id}`);
+
+        let mbids = await getAlbumMBId(a);
+        if (!mbids) {
+          continue;
+        }
+
+        a.mbids = mbids;
+        a.mbid = undefined;
+
         try {
-            var albums = await albumModel.find()
+          await a.save();
         } catch (err) {
-            return {
-                failure: {
-                    file: __filename,
-                    func: migration2.up.name,
-                    msg: err
-                }
-            }
+          throw createFailure(err, __filename, migration2.up.name);
         }
-
-        for (let i = 0; i < albums.length; i++) {
-            let a = albums[i]
-
-            logInfo(`Migration 2 -> 3 album ${a.id}`)
-
-            let result = await getAlbumMBId(a)
-
-            if (result.failure) {
-                return {
-                    failure: {
-                        file: __filename,
-                        func: migration2.up.name,
-                        msg: "AlbumMBId fetching error",
-                        sourceFailure: result.failure
-                    }
-                }
-            }
-            if (!result.result) { continue }
-
-
-            a.mbids = result.result
-            a.mbid = undefined
-
-            try {
-                await a.save()
-            } catch (err) {
-                return {
-                    failure: {
-                        file: __filename,
-                        func: migration2.up.name,
-                        msg: err
-                    }
-                }
-            }
-        }
-    },
-
-    //Remove album covers
-    async down(): Promise<Failable<null>> {
-        try {
-            var albums = await albumModel.find()
-        } catch (err) {
-            return {
-                failure: {
-                    file: __filename,
-                    func: migration2.down.name,
-                    msg: err
-                }
-            }
-        }
-
-        for (let i = 0; i < albums.length; i++) {
-            let a = albums[i]
-
-            if (a.cover) {
-                logInfo(`Migration 2 -> 1 album ${a.id}`)
-
-                try {
-                    var cover = await imageModel.findById(a.cover)
-                } catch (err) {
-                    return {
-                        failure: {
-                            file: __filename,
-                            func: migration2.down.name,
-                            msg: err
-                        }
-                    }
-                }
-
-                deleteImage(cover.path)
-                cover.delete()
-
-                a.cover = undefined
-
-                try {
-                    await a.save()
-                } catch (err) {
-                    return {
-                        failure: {
-                            file: __filename,
-                            func: migration2.down.name,
-                            msg: err
-                        }
-                    }
-                }
-            }
-        }
+      }
+    } catch (err) {
+      throw createFailure(
+        "Migration error",
+        __filename,
+        migration2.up.name,
+        err
+      );
     }
-}
+  },
+
+  //Remove album covers
+  async down(): Promise<void> {
+    try {
+      try {
+        var albums = await albumModel.find();
+      } catch (err) {
+        throw createFailure(err, __filename, migration2.down.name);
+      }
+
+      for (let i = 0; i < albums.length; i++) {
+        let a = albums[i];
+
+        if (a.cover) {
+          logInfo(`Migration 2 -> 1 album ${a.id}`);
+
+          try {
+            var cover = await imageModel.findById(a.cover);
+          } catch (err) {
+            throw createFailure(err, __filename, migration2.down.name);
+          }
+
+          deleteImage(cover.path);
+          cover.delete();
+
+          a.cover = undefined;
+
+          try {
+            await a.save();
+          } catch (err) {
+            throw createFailure(err, __filename, migration2.down.name);
+          }
+        }
+      }
+    } catch (err) {
+      throw createFailure(
+        "Migration error",
+        __filename,
+        migration2.down.name,
+        err
+      );
+    }
+  },
+};

@@ -24,7 +24,7 @@ import {
   updateAlbum,
 } from "../service/albumService";
 import { createArtist, getAllArtists } from "../service/artistService";
-import { createFailure, Failable, Failure } from "../utils/Failable";
+import { createFailure } from "../utils/Failure";
 import { logError, logInfo, setWorkerName } from "../utils/logger";
 
 let songPaths: string[];
@@ -35,13 +35,20 @@ async function collect(libPath: string) {
   try {
     var paths = await fs.readdir(libPath, { withFileTypes: true });
   } catch (err) {
-    logError(createFailure(err, __filename, collect.name));
+    throw createFailure(err, __filename, collect.name);
   }
 
   for (var i = 0; i < paths.length; i++) {
     var fullPath = path.join(libPath, paths[i].name);
 
-    if (paths[i].isDirectory()) await collect(fullPath);
+    if (paths[i].isDirectory()) {
+      try {
+        await collect(fullPath);
+      } catch (err) {
+        logError(err);
+        continue;
+      }
+    }
 
     if (paths[i].isFile())
       await registerSong(path.resolve(fullPath)).catch(() => {});
@@ -49,128 +56,81 @@ async function collect(libPath: string) {
 }
 
 async function registerSong(songPath: string) {
-  //Only considere audio files
-  if (!mm.lookup(path.extname(songPath)).match("audio")) return;
+  try {
+    //Only considere audio files
+    if (!mm.lookup(path.extname(songPath)).match("audio")) return;
 
-  //If the song doesn't already exist, extract its metadata and create a new song
-  if (songPaths.find((p) => p == songPath)) return;
+    //If the song doesn't already exist, extract its metadata and create a new song
+    if (songPaths.find((p) => p == songPath)) return;
 
-  let metadataResult = await getMetadataFromFile(songPath);
-  if (metadataResult.failure) {
-    logError(metadataResult.failure);
-    return;
+    let song = await getMetadataFromFile(songPath);
+
+    logInfo(`Found new song ${song.path}`);
+
+    //Fetch the song's album
+    let album = findAlbumByName(song.album, song.artist);
+    let albumId = album?.id;
+    if (!album) {
+      album = { artist: song.artist, title: song.album, year: song.year };
+
+      albumId = await createAlbum(album);
+
+      logInfo(`Found new album ${album.title}`);
+
+      await updateAlbums();
+    }
+
+    //Fetch the song's artist
+    let artist = findArtistByName(song.artist);
+    let artistId = artist?.id;
+    if (!artist) {
+      artist = { name: song.artist };
+
+      artistId = await createArtist(artist);
+
+      logInfo(`Found new artist ${artist.name}`);
+
+      await updateArtists();
+    }
+
+    album.artistId = artistId;
+    await updateAlbum(album);
+
+    song.artistId = artistId;
+    song.albumId = albumId;
+    await createSong(song);
+  } catch (err) {
+    throw createFailure(
+      "Song collection error",
+      __filename,
+      registerSong.name,
+      err
+    );
   }
-  let song = metadataResult.result;
-
-  logInfo(`Found new song ${song.path}`);
-
-  //Fetch the song's album
-  let album = findAlbumByName(song.album, song.artist);
-  let albumId = album?.id;
-  if (!album) {
-    album = { artist: song.artist, title: song.album, year: song.year };
-
-    let albumIdResult = await createAlbum(album);
-    if (albumIdResult.failure) {
-      logError(albumIdResult.failure);
-      return;
-    }
-    albumId = albumIdResult.result;
-
-    logInfo(`Found new album ${album.title}`);
-
-    let failure = (await updateAlbums()).failure;
-    if (failure) {
-      logError(failure);
-      return;
-    }
-  }
-
-  //Fetch the song's artist
-  let artist = findArtistByName(song.artist);
-  let artistId = artist?.id;
-  if (!artist) {
-    artist = { name: song.artist };
-
-    let artistIdResult = await createArtist(artist);
-    if (artistIdResult.failure) {
-      logError(artistIdResult.failure);
-      return;
-    }
-    artistId = artistIdResult.result;
-
-    logInfo(`Found new artist ${artist.name}`);
-
-    let failure = (await updateArtists()).failure;
-    if (failure) {
-      logError(failure);
-      return;
-    }
-  }
-
-  album.artistId = artistId;
-  await updateAlbum(album);
-
-  song.artistId = artistId;
-  song.albumId = albumId;
-  await createSong(song);
 }
 
-async function updatePaths(): Promise<Failable<null>> {
-  let result = await getAllSongPaths();
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "Service error",
-        __filename,
-        updatePaths.name,
-        result.failure
-      ),
-    };
+async function updatePaths(): Promise<void> {
+  try {
+    songPaths = await getAllSongPaths();
+  } catch (err) {
+    throw createFailure("Path update error", __filename, updatePaths.name, err);
   }
-
-  songPaths = result.result;
-
-  return {};
 }
 
-async function updateAlbums(): Promise<Failable<null>> {
-  let result = await getAllAlbums();
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "Service error",
-        __filename,
-        updateAlbums.name,
-        result.failure
-      ),
-    };
+async function updateAlbums(): Promise<void> {
+  try {
+    albums = await getAllAlbums();
+  } catch (err) {
+    throw createFailure("Service error", __filename, updateAlbums.name, err);
   }
-
-  albums = result.result;
-
-  return {};
 }
 
-async function updateArtists(): Promise<Failable<null>> {
-  let result = await getAllArtists();
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "Service error",
-        __filename,
-        updateArtists.name,
-        result.failure
-      ),
-    };
+async function updateArtists(): Promise<void> {
+  try {
+    artists = await getAllArtists();
+  } catch (err) {
+    throw createFailure("Service error", __filename, updateArtists.name, err);
   }
-
-  artists = result.result;
-
-  return {};
 }
 
 function findArtistByName(artist: string): Artist {
@@ -192,13 +152,16 @@ function doWork() {
   connectToDb().then(async () => {
     //Collection run in background and is relaunched every 30 sec
     while (true) {
-      if (
-        !(await updatePaths()).failure &&
-        !(await updateAlbums()).failure &&
-        !(await updateArtists()).failure
-      ) {
+      try {
+        await updatePaths();
+        await updateAlbums();
+        await updateArtists();
+
         await collect(MUSIC_PATH).catch();
+      } catch (err) {
+        logError(err);
       }
+
       await new Promise((resolve) => setTimeout(resolve, 30000));
     }
   });

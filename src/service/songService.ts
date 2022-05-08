@@ -20,121 +20,73 @@ import {
   updateSongModel,
 } from "../access/database/songDAO";
 import { mapSong } from "../mappers/songMapper";
-import { createFailure, Failable } from "../utils/Failable";
+import { createFailure } from "../utils/Failure";
 
-export async function getAllSongs(): Promise<Failable<Song[]>> {
-  let result = await getAllSongModels();
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        getAllSongs.name,
-        result.failure
-      ),
-    };
+export async function getAllSongs(): Promise<Song[]> {
+  try {
+    var result = await getAllSongModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAllSongs.name, err);
   }
 
-  return { result: result.result.map((s) => mapSong(s)) };
+  return result.map((s) => mapSong(s));
 }
 
-export async function getSong(id: string): Promise<Failable<Song>> {
-  let result = await getSongModel(id);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        getSong.name,
-        result.failure
-      ),
-    };
+export async function getSong(id: string): Promise<Song> {
+  try {
+    var result = await getSongModel(id);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getSong.name, err);
   }
 
-  if (!result.result) {
-    return {
-      failure: createFailure("Invalid Id", __filename, getSong.name),
-    };
+  if (!result) {
+    throw createFailure("Invalid Id", __filename, getSong.name);
   }
 
-  return { result: mapSong(result.result) };
+  return mapSong(result);
 }
 
-export async function updateSong(song: Song): Promise<Failable<null>> {
-  let result = await updateSongModel(song);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        updateSong.name,
-        result.failure
-      ),
-    };
+export async function updateSong(song: Song): Promise<void> {
+  try {
+    var result = await updateSongModel(song);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, updateSong.name, err);
   }
-
-  return { result: null };
 }
 
-export async function createSong(song: Song): Promise<Failable<string>> {
-  let result = await createSongModel(song);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        createSong.name,
-        result.failure
-      ),
-    };
+export async function createSong(song: Song): Promise<string> {
+  try {
+    var result = await createSongModel(song);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, createSong.name, err);
   }
 
   return result;
 }
 
-export async function findSongByPath(path: string): Promise<Failable<Song>> {
-  let result = await findSongModelByPath(path);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        findSongByPath.name,
-        result.failure
-      ),
-    };
+export async function findSongByPath(path: string): Promise<Song> {
+  try {
+    var result = await findSongModelByPath(path);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, findSongByPath.name, err);
   }
 
-  if (!result.result) {
-    return {
-      failure: createFailure(
-        "No song at path " + path,
-        __filename,
-        findSongByPath.name
-      ),
-    };
+  if (!result) {
+    throw createFailure(
+      "No song at path " + path,
+      __filename,
+      findSongByPath.name
+    );
   }
 
-  return { result: mapSong(result.result) };
+  return mapSong(result);
 }
 
-export async function getAllSongPaths(): Promise<Failable<string[]>> {
-  let result = await getAllSongModelPaths();
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        getAllSongPaths.name,
-        result.failure
-      ),
-    };
+export async function getAllSongPaths(): Promise<string[]> {
+  try {
+    var result = await getAllSongModelPaths();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAllSongPaths.name, err);
   }
 
   return result;

@@ -21,121 +21,73 @@ import {
 } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapSong } from "../mappers/songMapper";
-import { createFailure, Failable } from "../utils/Failable";
+import { createFailure } from "../utils/Failure";
 
-export async function getAllAlbums(): Promise<Failable<Album[]>> {
-  let result = await getAllAlbumModels();
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        getAllAlbums.name,
-        result.failure
-      ),
-    };
+export async function getAllAlbums(): Promise<Album[]> {
+  try {
+    var result = await getAllAlbumModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAllAlbums.name, err);
   }
 
-  return { result: result.result.map((a) => mapAlbum(a)) };
+  return result.map((a) => mapAlbum(a));
 }
 
-export async function getAlbum(id: string): Promise<Failable<Album>> {
-  let result = await getAlbumModel(id);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        getAlbum.name,
-        result.failure
-      ),
-    };
+export async function getAlbum(id: string): Promise<Album> {
+  try {
+    var result = await getAlbumModel(id);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAlbum.name, err);
   }
 
-  if (!result.result) {
-    return {
-      failure: createFailure("Invalid Id", __filename, getAlbum.name),
-    };
+  if (!result) {
+    throw createFailure("Invalid Id", __filename, getAlbum.name);
   }
 
-  return { result: mapAlbum(result.result) };
+  return mapAlbum(result);
 }
 
-export async function getAlbumSongs(id: string): Promise<Failable<Song[]>> {
-  let result = await getAlbumSongModel(id);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        getAlbumSongs.name,
-        result.failure
-      ),
-    };
+export async function getAlbumSongs(id: string): Promise<Song[]> {
+  try {
+    var result = await getAlbumSongModel(id);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAlbumSongs.name, err);
   }
 
-  if (!result.result) {
-    return {
-      failure: createFailure("Invalid Id", __filename, getAlbumSongs.name),
-    };
+  if (!result) {
+    throw createFailure("Invalid Id", __filename, getAlbumSongs.name);
   }
 
-  return { result: result.result.map((s) => mapSong(s)) };
+  return result.map((s) => mapSong(s));
 }
 
-export async function createAlbum(album: Album): Promise<Failable<string>> {
-  let result = await createAlbumModel(album);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        createAlbum.name,
-        result.failure
-      ),
-    };
+export async function createAlbum(album: Album): Promise<string> {
+  try {
+    var result = await createAlbumModel(album);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, createAlbum.name, err);
   }
 
-  return { result: result.result };
+  return result;
 }
 
 export async function findAlbumByName(
   albumTitle: string,
   artistName?: string
-): Promise<Failable<Album[]>> {
-  let result = await findAlbumModelByName(albumTitle, artistName);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        findAlbumByName.name,
-        result.failure
-      ),
-    };
+): Promise<Album[]> {
+  try {
+    var result = await findAlbumModelByName(albumTitle, artistName);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, findAlbumByName.name, err);
   }
 
-  return { result: result.result.map((a) => mapAlbum(a)) };
+  return result.map((a) => mapAlbum(a));
 }
 
-export async function updateAlbum(album: Album) {
-  let result = await updateAlbumModel(album);
-
-  if (result.failure) {
-    return {
-      failure: createFailure(
-        "DAO error",
-        __filename,
-        updateAlbum.name,
-        result.failure
-      ),
-    };
+export async function updateAlbum(album: Album): Promise<void> {
+  try {
+    await updateAlbumModel(album);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, updateAlbum.name, err);
   }
-
-  return { result: null };
 }
