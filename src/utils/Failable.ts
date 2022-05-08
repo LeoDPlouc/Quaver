@@ -12,13 +12,22 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export interface Failable<T> {
-    failure?: Failure
-    result?: T
+  failure?: Failure;
+  result?: T;
 }
 
 export interface Failure {
-    msg: string,
-    file: string,
-    func: string,
-    sourceFailure?: Failure
+  msg: string;
+  file: string;
+  func: string;
+  sourceFailure?: Failure;
+}
+
+export function createFailure(
+  msg: string,
+  file: string,
+  func: string,
+  sourceFailure?: Failure
+): Failure {
+  return { msg, file, func, sourceFailure };
 }

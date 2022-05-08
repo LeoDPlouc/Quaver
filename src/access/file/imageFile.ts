@@ -11,44 +11,39 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { v4 } from "uuid"
-import path from "path"
-import { IMAGES_PATH } from "../../config/config"
-import fs from "fs/promises"
-import { Failable } from "../../utils/Failable"
+import { v4 } from "uuid";
+import path from "path";
+import { IMAGES_PATH } from "../../config/config";
+import fs from "fs/promises";
+import { createFailure, Failable } from "../../utils/Failable";
 
-export async function saveImage(data: string, extension: string): Promise<Failable<string>> {
-    //Create an UUID for the name of the file
-    let filename = v4() + extension
-    let p = path.resolve(IMAGES_PATH, filename)
+export async function saveImage(
+  data: string,
+  extension: string
+): Promise<Failable<string>> {
+  //Create an UUID for the name of the file
+  let filename = v4() + extension;
+  let p = path.resolve(IMAGES_PATH, filename);
 
-    try {
-        await fs.writeFile(p, data, { encoding: "binary" })
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: saveImage.name,
-                msg: err
-            }
-        }
-    }
+  try {
+    await fs.writeFile(p, data, { encoding: "binary" });
+  } catch (err) {
+    return {
+      failure: createFailure(err, __filename, saveImage.name),
+    };
+  }
 
-    return { result: p }
+  return { result: p };
 }
 
 export async function deleteImage(path: string): Promise<Failable<null>> {
-    try {
-        await fs.rm(path)
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: deleteImage.name,
-                msg: err
-            }
-        }
-    }
+  try {
+    await fs.rm(path);
+  } catch (err) {
+    return {
+      failure: createFailure(err, __filename, deleteImage.name),
+    };
+  }
 
-    return { result: null }
+  return { result: null };
 }

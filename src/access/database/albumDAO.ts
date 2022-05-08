@@ -12,95 +12,79 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { Failable } from "../../utils/Failable";
+import { createFailure, Failable } from "../../utils/Failable";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";
 
-export async function getAllAlbumModels(): Promise<Failable<(Album & Document<any, any, Album>)[]>> {
-    try {
-        return { result: await albumModel.find() }
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAllAlbumModels.name,
-                msg: err
-            }
-        }
-    }
+export async function getAllAlbumModels(): Promise<
+  Failable<(Album & Document<any, any, Album>)[]>
+> {
+  try {
+    return { result: await albumModel.find() };
+  } catch (err) {
+    return { failure: createFailure(err, __filename, getAllAlbumModels.name) };
+  }
 }
 
-export async function getAlbumModel(id: string): Promise<Failable<Album & Document<any, any, Album>>> {
-    try {
-        return { result: await albumModel.findById(id) }
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAlbumModel.name,
-                msg: err
-            }
-        }
-    }
+export async function getAlbumModel(
+  id: string
+): Promise<Failable<Album & Document<any, any, Album>>> {
+  try {
+    return { result: await albumModel.findById(id) };
+  } catch (err) {
+    return {
+      failure: createFailure(err, __filename, getAlbumModel.name),
+    };
+  }
 }
 
-export async function getAlbumSongModel(id: string): Promise<Failable<(Song & Document<any, any, Song>)[]>> {
-    try {
-        return { result: await songModel.find({ albumId: id }) }
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAlbumSongModel.name,
-                msg: err
-            }
-        }
-    }
+export async function getAlbumSongModel(
+  id: string
+): Promise<Failable<(Song & Document<any, any, Song>)[]>> {
+  try {
+    return { result: await songModel.find({ albumId: id }) };
+  } catch (err) {
+    return {
+      failure: createFailure(err, __filename, getAlbumSongModel.name),
+    };
+  }
 }
 
-export async function createAlbumModel(album: Album): Promise<Failable<string>> {
-    try {
-        return { result: (await albumModel.create(album)).id }
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: createAlbumModel.name,
-                msg: err
-            }
-        }
-    }
+export async function createAlbumModel(
+  album: Album
+): Promise<Failable<string>> {
+  try {
+    return { result: (await albumModel.create(album)).id };
+  } catch (err) {
+    return {
+      failure: createFailure(err, __filename, createAlbumModel.name),
+    };
+  }
 }
 
-export async function findAlbumModelByName(albumTitle: string, artistName?: string): Promise<Failable<(Album & Document<any, any, Album>)[]>> {
+export async function findAlbumModelByName(
+  albumTitle: string,
+  artistName?: string
+): Promise<Failable<(Album & Document<any, any, Album>)[]>> {
+  var query: Album = { title: albumTitle };
+  if (artistName) query.artist = artistName;
 
-    var query: Album = { title: albumTitle }
-    if (artistName) query.artist = artistName
-
-    try {
-        return { result: await albumModel.find(query) }
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: findAlbumModelByName.name,
-                msg: err
-            }
-        }
-    }
+  try {
+    return { result: await albumModel.find(query) };
+  } catch (err) {
+    return {
+      failure: createFailure(err, __filename, findAlbumModelByName.name),
+    };
+  }
 }
 
 export async function updateAlbumModel(album: Album): Promise<Failable<null>> {
-    try {
-        await albumModel.findByIdAndUpdate(album.id, album)
-        return { result: null }
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: updateAlbumModel.name,
-                msg: err
-            }
-        }
-    }
+  try {
+    await albumModel.findByIdAndUpdate(album.id, album);
+    return { result: null };
+  } catch (err) {
+    return {
+      failure: createFailure(err, __filename, updateAlbumModel.name),
+    };
+  }
 }
