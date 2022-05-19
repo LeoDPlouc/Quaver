@@ -45,11 +45,23 @@ describe("Image", () => {
 
             expect(res.body.statusCode).toBe(2)
         })
+
+        it("Should fail with null id", async () => {
+            var res = await request(app).get("/api/image/null").expect(200)
+
+            expect(res.body.statusCode).toBe(2)
+        })
     })
 
     describe("Get /image/:id/file", () => {
         it("Should fail with id undefined", async () => {
             var res = await request(app).get("/api/image/undefined/file").expect(200)
+
+            expect(res.body.statusCode).toBe(2)
+        })
+
+        it("Should fail with null id", async () => {
+            var res = await request(app).get("/api/image/null/file").expect(200)
 
             expect(res.body.statusCode).toBe(2)
         })

@@ -28,14 +28,14 @@ router.route("/")
 router.route("/:id")
     .get(
         protect,
-        param("id").not().equals("undefined"),
+        param("id").not().equals("undefined").not().equals("null"),
         getAlbumCtrl
     )
 
 router.route("/:id/songs")
     .get(
         protect,
-        param("id").not().equals("undefined"),
+        param("id").not().equals("undefined").not().equals("null"),
         getAlbumSongsCtrl
     )
 

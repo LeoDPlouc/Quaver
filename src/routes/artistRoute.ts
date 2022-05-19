@@ -11,38 +11,42 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Router } from "express"
-import { getAllArtistsCtrl, getArtistAlbumsCtrl, getArtistSongsCtrl, getOneArtistCtrl } from "../controllers/artistController"
-import { protect } from "../middleware/authMiddleware"
-import { param } from "express-validator"
+import { Router } from "express";
+import {
+  getAllArtistsCtrl,
+  getArtistAlbumsCtrl,
+  getArtistSongsCtrl,
+  getOneArtistCtrl,
+} from "../controllers/artistController";
+import { protect } from "../middleware/authMiddleware";
+import { param } from "express-validator";
 
-const router = Router()
+const router = Router();
 
-router.route("/")
-    .get(
-        protect,
-        getAllArtistsCtrl
-    )
+router.route("/").get(protect, getAllArtistsCtrl);
 
-router.route("/:id")
-    .get(
-        protect,
-        param("id").not().equals("undefined"),
-        getOneArtistCtrl
-    )
+router
+  .route("/:id")
+  .get(
+    protect,
+    param("id").not().equals("undefined").not().equals("null"),
+    getOneArtistCtrl
+  );
 
-router.route("/:id/songs")
-    .get(
-        protect,
-        param("id").not().equals("undefined"),
-        getArtistSongsCtrl
-    )
+router
+  .route("/:id/songs")
+  .get(
+    protect,
+    param("id").not().equals("undefined").not().equals("null"),
+    getArtistSongsCtrl
+  );
 
-router.route("/:id/albums")
-    .get(
-        protect,
-        param("id").not().equals("undefined"),
-        getArtistAlbumsCtrl
-    )
+router
+  .route("/:id/albums")
+  .get(
+    protect,
+    param("id").not().equals("undefined").not().equals("null"),
+    getArtistAlbumsCtrl
+  );
 
-export = router
+export = router;

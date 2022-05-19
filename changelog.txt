@@ -1,6 +1,13 @@
 CHANGELOG
 
 ====================================================
+0.5.0-beta
+
+BackEnd:
+- Changed the failable system
+- Added validation for null id in API
+
+====================================================
 0.4.1-beta
 
 BackEnd:
