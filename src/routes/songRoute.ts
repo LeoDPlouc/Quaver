@@ -11,38 +11,42 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Router } from "express"
-import { getAllSongsInfoCtrl, getOneSongInfoCtrl, getSongStreamCtrl, updateLikeCtrl } from "../controllers/songController"
-import { protect } from "../middleware/authMiddleware"
-import { param, body } from "express-validator"
+import { Router } from "express";
+import {
+  getAllSongsInfoCtrl,
+  getOneSongInfoCtrl,
+  getSongStreamCtrl,
+  updateLikeCtrl,
+} from "../controllers/songController";
+import { protect } from "../middleware/authMiddleware";
+import { param, body } from "express-validator";
 
-const router = Router()
+const router = Router();
 
-router.route("/")
-    .get(
-        protect,
-        getAllSongsInfoCtrl
-    )
+router.route("/").get(protect, getAllSongsInfoCtrl);
 
-router.route("/:id")
-    .get(
-        protect,
-        param("id").not().equals("undefined"),
-        getOneSongInfoCtrl
-    )
+router
+  .route("/:id")
+  .get(
+    protect,
+    param("id").not().equals("undefined").not().equals("null"),
+    getOneSongInfoCtrl
+  );
 
-router.route("/:id/stream")
-    .get(
-        protect,
-        param("id").not().equals("undefined"),
-        getSongStreamCtrl
-    )
+router
+  .route("/:id/stream")
+  .get(
+    protect,
+    param("id").not().equals("undefined").not().equals("null"),
+    getSongStreamCtrl
+  );
 
-router.route("/:id/like")
-    .patch(
-        param("id").not().equals("undefined"),
-        body("like").isIn([-1, 0, 1]),
-        updateLikeCtrl
-    )
+router
+  .route("/:id/like")
+  .patch(
+    param("id").not().equals("undefined").not().equals("null"),
+    body("like").isIn([-1, 0, 1]),
+    updateLikeCtrl
+  );
 
-export = router
+export = router;

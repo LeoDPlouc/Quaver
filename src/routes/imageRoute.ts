@@ -28,7 +28,7 @@ router.route("/")
 router.route("/:id")
     .get(
         protect,
-        param("id").not().equals("undefined"),
+        param("id").not().equals("undefined").not().equals("null"),
         getOneImageInfoCtrl
     )
 
@@ -36,7 +36,7 @@ router.route("/:id")
 router.route("/:id/file")
     .get(
         protect,
-        param("id").not().equals("undefined"),
+        param("id").not().equals("undefined").not().equals("null"),
         getImageFileCtrl
     )
 
