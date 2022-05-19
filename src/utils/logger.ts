@@ -29,18 +29,12 @@ var logger = createLogger({
   ),
 });
 
-var workerName: string;
-
-export function setWorkerName(name: string) {
-  workerName = name;
-}
-
 export function logError(error: Failure) {
-    logger.error(`${workerName} : ${JSON.stringify(error)}`);
+  logger.error(`${JSON.stringify(error)}`);
 }
 
-export function logInfo(info: string) {
-  logger.info(`${workerName} : ${info}`);
+export function logInfo(info: String, source: String) {
+  logger.info(`${source} :  ${info}`);
 }
 
 export function logRequest(req: Request) {

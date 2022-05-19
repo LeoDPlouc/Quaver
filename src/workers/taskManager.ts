@@ -11,13 +11,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Path from "path"
-import { Worker } from "worker_threads"
+import { Worker } from "worker_threads";
+import { connectToDb } from "../access/database/utils";
+import songCollector from "./tasks/songCollector";
 
 function getWorker(path: string) {
-    return new Worker(Path.join(__dirname, path), { env: process.env })
+  return new Worker(path, { env: { ...process.env, IS_PROC: "true" } });
 }
 
-export function runSongCollector() {
-    const worker = getWorker("songCollector.js")
+export function runTaskManager() {
+  getWorker(__filename);
+}
+
+async function runTasks() {
+  await connectToDb("Task Manager").then(async () => {
+    await songCollector();
+  });
+
+  setTimeout(() => {
+    runTasks;
+  }, 60 * 1000);
+}
+
+if (process.env.IS_PROC) {
+  (async () => await runTasks())();
 }

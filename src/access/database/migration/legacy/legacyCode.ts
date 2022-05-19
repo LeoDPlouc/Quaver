@@ -58,7 +58,7 @@ export async function getAlbumCoverLegacy(
   }
 
   if (image) {
-    logInfo(`Found new cover for ${album.id}`);
+    logInfo(`Found new cover for ${album.id}`, "Migration");
     //Save the image cover on the hard drive
 
     try {
@@ -107,7 +107,7 @@ export async function getAlbumCoverLegacy2(
   }
 
   if (cover) {
-    logInfo(`Found new cover for ${album.id}`);
+    logInfo(`Found new cover for ${album.id}`, "Migration");
     //Save the image cover on the hard drive
 
     try {
