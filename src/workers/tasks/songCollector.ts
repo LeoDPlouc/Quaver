@@ -14,18 +14,17 @@
 import fs from "fs/promises";
 import path from "path";
 import mm from "mime-types";
-import { MUSIC_PATH } from "../config/config";
-import { connectToDb } from "../access/database/utils";
-import { createSong, getAllSongPaths } from "../service/songService";
-import { getMetadataFromFile } from "../access/file/songFile";
+import { MUSIC_PATH } from "../../config/config";
+import { createSong, getAllSongPaths } from "../../service/songService";
+import { getMetadataFromFile } from "../../access/file/songFile";
 import {
   createAlbum,
   getAllAlbums,
   updateAlbum,
-} from "../service/albumService";
-import { createArtist, getAllArtists } from "../service/artistService";
-import { createFailure } from "../utils/Failure";
-import { logError, logInfo, setWorkerName } from "../utils/logger";
+} from "../../service/albumService";
+import { createArtist, getAllArtists } from "../../service/artistService";
+import { createFailure } from "../../utils/Failure";
+import { logError, logInfo } from "../../utils/logger";
 
 let songPaths: string[];
 let artists: Artist[];
@@ -65,7 +64,7 @@ async function registerSong(songPath: string) {
 
     let song = await getMetadataFromFile(songPath);
 
-    logInfo(`Found new song ${song.path}`);
+    logInfo(`Found new song ${song.path}`, "Song Collector");
 
     //Fetch the song's album
     let album = findAlbumByName(song.album, song.artist);
@@ -75,7 +74,7 @@ async function registerSong(songPath: string) {
 
       albumId = await createAlbum(album);
 
-      logInfo(`Found new album ${album.title}`);
+      logInfo(`Found new album ${album.title}`, "Song Collector");
 
       await updateAlbums();
     }
@@ -88,7 +87,7 @@ async function registerSong(songPath: string) {
 
       artistId = await createArtist(artist);
 
-      logInfo(`Found new artist ${artist.name}`);
+      logInfo(`Found new artist ${artist.name}`, "Song Collector");
 
       await updateArtists();
     }
@@ -145,26 +144,17 @@ function findAlbumByName(album: string, artist: string) {
   }
 }
 
-function doWork() {
-  setWorkerName("SongCollector");
-  logInfo("Song collection Started");
+export default async function doWork() {
+  logInfo("Song collection Started", "Song Collector");
 
-  connectToDb().then(async () => {
-    //Collection run in background and is relaunched every 30 sec
-    while (true) {
-      try {
-        await updatePaths();
-        await updateAlbums();
-        await updateArtists();
+  //Collection run in background and is relaunched every 30 sec
+  try {
+    await updatePaths();
+    await updateAlbums();
+    await updateArtists();
 
-        await collect(MUSIC_PATH).catch();
-      } catch (err) {
-        logError(err);
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 30000));
-    }
-  });
+    await collect(MUSIC_PATH);
+  } catch (err) {
+    logError(err);
+  }
 }
-
-doWork();

@@ -31,7 +31,7 @@ export const migration3: IMigration = {
         let a = albums[i];
 
         if (!a.cover) {
-          logInfo(`Migration 3 -> 4 album ${a.id}`);
+          logInfo(`Migration 3 -> 4 album ${a.id}`, "Migration");
 
           let cover = await getAlbumCoverLegacy2(a);
           if (!cover) {
@@ -67,7 +67,7 @@ export const migration3: IMigration = {
         let a = albums[i];
 
         if (a.mbids) {
-          logInfo(`Migration 3 -> 2 album ${a.id}`);
+          logInfo(`Migration 3 -> 2 album ${a.id}`, "Migration");
 
           a.mbid = a.mbids[0];
           a.mbids = undefined;

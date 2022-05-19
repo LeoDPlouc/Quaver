@@ -13,9 +13,9 @@
 
 import mongoose from "mongoose";
 import { APP_PORT } from "./config/config";
-import { runSongCollector } from "./workers/workers";
+import { runTaskManager } from "./workers/taskManager";
 import { Migrate } from "./access/database/migration/migration";
-import { logError, logInfo, setWorkerName } from "./utils/logger";
+import { logError, logInfo } from "./utils/logger";
 import app from "./app";
 import { connectToDb } from "./access/database/utils";
 
@@ -26,19 +26,21 @@ declare module "express-session" {
   }
 }
 
-setWorkerName("App");
-
 //Connect to the db
-connectToDb().then(async () => {
+connectToDb("App").then(async () => {
   //Apply database migration
-  await Migrate().catch((err) => {
+  try {
+    await Migrate();
+  } catch (err) {
     logError(err);
     process.exit(1);
-  });
+  }
 
   //Start collection of the songs
-  runSongCollector();
+  runTaskManager();
 
   //Open server
-  app.listen(APP_PORT, () => logInfo(`listening on port ${APP_PORT}`));
+  app.listen(APP_PORT, () =>
+    logInfo(`listening on port ${APP_PORT}`, "Migration")
+  );
 });

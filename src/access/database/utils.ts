@@ -24,7 +24,7 @@ import { logError, logInfo } from "../../utils/logger";
 
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`;
 
-export async function connectToDb() {
+export async function connectToDb(source: String) {
   await mongoose
     .connect(mongoUrl, {
       useNewUrlParser: true,
@@ -32,7 +32,7 @@ export async function connectToDb() {
       useFindAndModify: false,
       dbName: "quaver",
     })
-    .then(() => logInfo("Successfully connected to database"))
+    .then(() => logInfo("Successfully connected to database", source))
     .catch((err) => {
       let failure: Failure = createFailure(err, __filename, connectToDb.name);
       logError(failure);

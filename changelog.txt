@@ -6,6 +6,7 @@ CHANGELOG
 BackEnd:
 - Changed the failable system
 - Added validation for null id in API
+- Changed worker system to a task manager
 
 ====================================================
 0.4.1-beta

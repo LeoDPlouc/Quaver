@@ -32,7 +32,7 @@ export const migration2: IMigration = {
       for (let i = 0; i < albums.length; i++) {
         let a = albums[i];
 
-        logInfo(`Migration 2 -> 3 album ${a.id}`);
+        logInfo(`Migration 2 -> 3 album ${a.id}`, "Migration");
 
         let mbids = await getAlbumMBId(a);
         if (!mbids) {
@@ -71,7 +71,7 @@ export const migration2: IMigration = {
         let a = albums[i];
 
         if (a.cover) {
-          logInfo(`Migration 2 -> 1 album ${a.id}`);
+          logInfo(`Migration 2 -> 1 album ${a.id}`, "Migration");
 
           try {
             var cover = await imageModel.findById(a.cover);
