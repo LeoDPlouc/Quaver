@@ -12,43 +12,50 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { APP_VERSION } from "../../config/appConfig";
-import coverart from "coverart"
+import coverart from "coverart";
 
-interface imageFileData {
-    data: string,
-    extension: string
+export interface imageFileData {
+  data: string;
+  extension: string;
 }
 
 //Ne plus exporter lors du nettoyage des dépréciés
-export const caApi = new coverart({ useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)` })
+export const caApi = new coverart({
+  useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)`,
+});
 
 export async function getAlbumCover(mbids: string[]): Promise<imageFileData> {
-    let cover
-    let ext
+  let cover;
+  let ext;
 
-    let i = 0
-    //Try fetching cover art for every MB ID
-    while (!cover && i < mbids.length) {
-        try {
-            //Fetch Cover art
-            let p = new Promise<any>((resolve, reject) => {
-                caApi.release(mbids[i], { piece: "front" }, (err, data) => {
-                    if (err) { reject(err) }
-                    resolve(data)
-                })
-            })
-            let { image, extension } = await p
-            cover = image
-            ext = extension
-        }
-        catch { }
-        finally { i++ }
+  let i = 0;
+  //Try fetching cover art for every MB ID
+  while (!cover && i < mbids.length) {
+    try {
+      //Fetch Cover art
+      let p = new Promise<any>((resolve, reject) => {
+        caApi.release(mbids[i], { piece: "front" }, (err, data) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(data);
+        });
+      });
+      let { image, extension } = await p;
+      cover = image;
+      ext = extension;
+    } catch {
+    } finally {
+      i++;
     }
+  }
 
-    if (!cover) { return null }
+  if (!cover) {
+    return null;
+  }
 
-    return {
-        data: cover,
-        extension: ext
-    }
+  return {
+    data: cover,
+    extension: ext,
+  };
 }

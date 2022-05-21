@@ -34,3 +34,11 @@ export async function getImageModel(
     createFailure(err, __filename, getImageModel.name);
   }
 }
+
+export async function createImageModel(image: Image): Promise<string> {
+  try {
+    return (await imageModel.create(image)).id;
+  } catch (err) {
+    throw createFailure(err, __filename, createImageModel.name);
+  }
+}

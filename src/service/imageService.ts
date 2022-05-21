@@ -11,9 +11,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getAllImagesModels, getImageModel } from "../access/database/imageDAO";
+import { imageFileData } from "../access/api/coverArtArchive";
+import {
+  createImageModel,
+  getAllImagesModels,
+  getImageModel,
+} from "../access/database/imageDAO";
 import { mapImage } from "../mappers/imageMapper";
 import { createFailure } from "../utils/Failure";
+import { saveImage } from "../access/file/imageFile";
 
 export async function getAllImages(): Promise<Image[]> {
   try {
@@ -37,4 +43,26 @@ export async function getImage(id: string): Promise<Image> {
   }
 
   return mapImage(result);
+}
+
+export async function saveImageFile(fileData: imageFileData): Promise<string> {
+  if (!fileData) return;
+  try {
+    return await saveImage(fileData.data, fileData.extension);
+  } catch (err) {
+    throw createFailure(
+      "File acces error",
+      __filename,
+      saveImageFile.name,
+      err
+    );
+  }
+}
+
+export async function createImage(image: Image): Promise<string> {
+  try {
+    return await createImageModel(image);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, createImage.name, err);
+  }
 }

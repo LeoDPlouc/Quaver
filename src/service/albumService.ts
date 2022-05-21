@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getMBId, getMetadataFromMB } from "../access/api/musicbrainzApi";
+import { getAlbumCover, imageFileData } from "../access/api/coverArtArchive";
 import {
   createAlbumModel,
   findAlbumModelByName,
@@ -20,6 +21,7 @@ import {
   getAllAlbumModels,
   getMbidlessAlbumModels,
   getUpdatableAlbumModels,
+  getCoverlessAlbumModels,
   updateAlbumModel,
 } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
@@ -105,6 +107,16 @@ export async function getMbidlessAlbum(): Promise<Album[]> {
   return result.map((a) => mapAlbum(a));
 }
 
+export async function getCoverlessAlbums(): Promise<Album[]> {
+  try {
+    var result = await getCoverlessAlbumModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getCoverlessAlbums.name, err);
+  }
+
+  return result.map((a) => mapAlbum(a));
+}
+
 export async function getAlbumMbid(album: Album): Promise<string[]> {
   try {
     return getMBId(album);
@@ -123,4 +135,8 @@ export async function getUpdatableAlbum(): Promise<Album[]> {
   } catch (err) {
     throw createFailure("DAO error", __filename, getUpdatableAlbum.name);
   }
+}
+
+export async function getCover(album: Album): Promise<imageFileData> {
+  return await getAlbumCover(album.mbids);
 }
