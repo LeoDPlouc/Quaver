@@ -75,3 +75,13 @@ export async function updateAlbumModel(album: Album): Promise<void> {
     throw createFailure(err, __filename, updateAlbumModel.name);
   }
 }
+
+export async function getMbidlessAlbumModels(): Promise<
+  (Album & Document<any, any, Album>)[]
+> {
+  try {
+    return await albumModel.find({ mbids: { $size: 0 } });
+  } catch (err) {
+    throw createFailure(err, __filename, getMbidlessAlbumModels.name);
+  }
+}

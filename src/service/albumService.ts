@@ -11,12 +11,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { getMBId, getMetadataFromMB } from "../access/api/musicbrainzApi";
 import {
   createAlbumModel,
   findAlbumModelByName,
   getAlbumModel,
   getAlbumSongModel,
   getAllAlbumModels,
+  getMbidlessAlbumModels,
   updateAlbumModel,
 } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
@@ -90,4 +92,26 @@ export async function updateAlbum(album: Album): Promise<void> {
   } catch (err) {
     throw createFailure("DAO error", __filename, updateAlbum.name, err);
   }
+}
+
+export async function getMbidlessAlbum(): Promise<Album[]> {
+  try {
+    var result = await getMbidlessAlbumModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getMbidlessAlbum.name);
+  }
+
+  return result.map((a) => mapAlbum(a));
+}
+
+export async function getAlbumMbid(album: Album): Promise<string[]> {
+  try {
+    return getMBId(album);
+  } catch (err) {
+    throw createFailure("API error", __filename, getAlbumMbid.name);
+  }
+}
+
+export async function getAlbumMetadata(album: Album): Promise<Album> {
+  return getMetadataFromMB(album.mbids);
 }

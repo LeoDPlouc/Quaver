@@ -14,6 +14,7 @@
 import { Worker } from "worker_threads";
 import { connectToDb } from "../access/database/utils";
 import songCollector from "./tasks/songCollector";
+import metadataGrabber from "./tasks/metadataGrabber";
 
 function getWorker(path: string) {
   return new Worker(path, { env: { ...process.env, IS_PROC: "true" } });
@@ -26,6 +27,7 @@ export function runTaskManager() {
 async function runTasks() {
   await connectToDb("Task Manager").then(async () => {
     await songCollector();
+    await metadataGrabber();
   });
 
   setTimeout(() => {
