@@ -37,7 +37,11 @@ if (process.env.IS_PROC) {
   (async () => {
     while (true) {
       await runTasks();
-      await new Promise((resolve) => setTimeout(() => {}, 60 * 1000));
+      await new Promise<never>((resolve) =>
+        setTimeout(() => {
+          resolve(null);
+        }, 60 * 1000)
+      );
     }
   })();
 }
