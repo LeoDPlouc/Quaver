@@ -11,30 +11,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Worker } from "worker_threads";
-import { connectToDb } from "../access/database/utils";
-import songCollector from "./tasks/songCollector";
-import metadataGrabber from "./tasks/metadataGrabber";
+import {
+  getAlbumMbid,
+  getMbidlessAlbum,
+  updateAlbum,
+} from "../../service/albumService";
+import { createFailure } from "../../utils/Failure";
+import { logError, logInfo } from "../../utils/logger";
 
-function getWorker(path: string) {
-  return new Worker(path, { env: { ...process.env, IS_PROC: "true" } });
+async function grabMbids() {
+  let albums = await getMbidlessAlbum();
+
+  for (let i = 0; i < albums.length; i++) {
+    try {
+      let mbids = await getAlbumMbid(albums[i]);
+      albums[i].mbids = mbids;
+      updateAlbum(albums[i]);
+      logInfo(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
+    } catch (err) {
+      logError(createFailure("Task error", __filename, grabMbids.name, err));
+    }
+  }
 }
 
-export function runTaskManager() {
-  getWorker(__filename);
-}
-
-async function runTasks() {
-  await connectToDb("Task Manager").then(async () => {
-    await songCollector();
-    await metadataGrabber();
-  });
-
-  setTimeout(() => {
-    runTasks;
-  }, 60 * 1000);
-}
-
-if (process.env.IS_PROC) {
-  (async () => await runTasks())();
+export default async function doWork() {
+  logInfo("Metadata grabber started", "Metadata Grabber");
+  await grabMbids();
 }

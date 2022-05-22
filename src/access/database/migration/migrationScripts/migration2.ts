@@ -14,7 +14,7 @@
 import { IMigration } from "../migration";
 import { albumModel } from "../../models/albumModel";
 import { imageModel } from "../../models/imageModel";
-import { getAlbumMBId } from "../../../api/musicbrainzApi";
+import { getMBId } from "../../../api/musicbrainzApi";
 import { deleteImage } from "../../../file/imageFile";
 import { logInfo } from "../../../../utils/logger";
 import { createFailure } from "../../../../utils/Failure";
@@ -34,7 +34,7 @@ export const migration2: IMigration = {
 
         logInfo(`Migration 2 -> 3 album ${a.id}`, "Migration");
 
-        let mbids = await getAlbumMBId(a);
+        let mbids = await getMBId(a);
         if (!mbids) {
           continue;
         }

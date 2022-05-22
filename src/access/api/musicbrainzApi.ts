@@ -22,18 +22,18 @@ export const mbApi = new MusicBrainzApi({
   appContactInfo: "https://github.com/LeoDPlouc/Quaver",
 });
 
-export async function getAlbumMBId(album: Album): Promise<string[]> {
+export async function getMBId(album: Album): Promise<string[]> {
   //Build query with available info
   let query = `release:${album.title as string}`;
 
   if (album.artist) {
-    query += ` and artist:${album.artist}`;
+    query += ` AND artist:${album.artist}`;
   }
 
   try {
     var result = await mbApi.search<IReleaseList>("release", { query });
   } catch (err) {
-    throw createFailure(err, __filename, getAlbumMBId.name);
+    throw createFailure(err, __filename, getMBId.name);
   }
   //Only keep ids of the release with score 100
   var releases = result.releases.filter((release) => release.score == 100);
