@@ -13,6 +13,8 @@
 
 import {
   getAlbumMbid,
+  getAlbumMetadata,
+  getAllAlbums,
   getMbidlessAlbum,
   updateAlbum,
 } from "../../service/albumService";
@@ -25,8 +27,11 @@ async function grabMbids() {
   for (let i = 0; i < albums.length; i++) {
     try {
       let mbids = await getAlbumMbid(albums[i]);
+      if (!mbids.length) return;
+
       albums[i].mbids = mbids;
-      updateAlbum(albums[i]);
+      await updateAlbum(albums[i]);
+
       logInfo(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
       logError(createFailure("Task error", __filename, grabMbids.name, err));
@@ -34,7 +39,29 @@ async function grabMbids() {
   }
 }
 
+async function updateMetadata() {
+  let albums = await getAllAlbums();
+
+  for (let i = 0; i < albums.length; i++) {
+    try {
+      let metadata = await getAlbumMetadata(albums[i]);
+
+      if (metadata.title) albums[i].title = metadata.title;
+      if (metadata.artist) albums[i].artist = metadata.artist;
+      if (metadata.year) albums[i].year = metadata.year;
+
+      await updateAlbum(albums[i]);
+      logInfo(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
+    } catch (err) {
+      logError(
+        createFailure("Task error", __filename, updateMetadata.name, err)
+      );
+    }
+  }
+}
+
 export default async function doWork() {
   logInfo("Metadata grabber started", "Metadata Grabber");
   await grabMbids();
+  await updateMetadata();
 }

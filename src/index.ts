@@ -18,6 +18,8 @@ import { Migrate } from "./access/database/migration/migration";
 import { logError, logInfo } from "./utils/logger";
 import app from "./app";
 import { connectToDb } from "./access/database/utils";
+import { getAlbumMbid } from "./service/albumService";
+import { getMetadataFromMB } from "./access/api/musicbrainzApi";
 
 //Declare the objects stored in session
 declare module "express-session" {

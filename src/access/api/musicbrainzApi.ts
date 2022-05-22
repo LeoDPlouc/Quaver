@@ -14,6 +14,7 @@
 import { IReleaseList, MusicBrainzApi } from "musicbrainz-api";
 import { APP_VERSION } from "../../config/appConfig";
 import { createFailure } from "../../utils/Failure";
+import { logError } from "../../utils/logger";
 
 //Ne plus exporter lors du nettoyage des dépréciés
 export const mbApi = new MusicBrainzApi({
@@ -40,4 +41,22 @@ export async function getMBId(album: Album): Promise<string[]> {
   var ids = releases.map((release) => release.id);
 
   return ids;
+}
+
+export async function getMetadataFromMB(mbids: string[]): Promise<Album> {
+  let album: Album = {};
+
+  for (let i = 0; i < mbids.length; i++) {
+    try {
+      let release = await mbApi.getRelease(mbids[i]);
+
+      if (!album.artist) album.artist = release["artist-credit"]?.[0]?.name;
+      if (!album.title) album.title = release.title;
+      if (!album.year) album.year = new Date(release.date).getFullYear();
+    } catch (err) {
+      logError(createFailure(err, __filename, getMetadataFromMB.name));
+    }
+  }
+
+  return album;
 }

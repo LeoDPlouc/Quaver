@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getMBId } from "../access/api/musicbrainzApi";
+import { getMBId, getMetadataFromMB } from "../access/api/musicbrainzApi";
 import {
   createAlbumModel,
   findAlbumModelByName,
@@ -110,4 +110,8 @@ export async function getAlbumMbid(album: Album): Promise<string[]> {
   } catch (err) {
     throw createFailure("API error", __filename, getAlbumMbid.name);
   }
+}
+
+export async function getAlbumMetadata(album: Album): Promise<Album> {
+  return getMetadataFromMB(album.mbids);
 }
