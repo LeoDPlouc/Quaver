@@ -16,6 +16,7 @@ import {
   getAlbumMetadata,
   getAllAlbums,
   getMbidlessAlbum,
+  getUpdatableAlbum,
   updateAlbum,
 } from "../../service/albumService";
 import { createFailure } from "../../utils/Failure";
@@ -40,7 +41,7 @@ async function grabMbids() {
 }
 
 async function updateMetadata() {
-  let albums = await getAllAlbums();
+  let albums = await getUpdatableAlbum();
 
   for (let i = 0; i < albums.length; i++) {
     try {
@@ -49,6 +50,8 @@ async function updateMetadata() {
       if (metadata.title) albums[i].title = metadata.title;
       if (metadata.artist) albums[i].artist = metadata.artist;
       if (metadata.year) albums[i].year = metadata.year;
+
+      albums[i].lastUpdated = Date.now();
 
       await updateAlbum(albums[i]);
       logInfo(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");

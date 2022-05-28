@@ -12,12 +12,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 interface Album {
-    id?: string,
-    title?: string,
-    artist?: string,
-    artistId?: string,
-    cover?: string,
-    year?: number,
-    mbid?: string,
-    mbids?: string[]
+  id?: string;
+  title?: string;
+  artist?: string;
+  artistId?: string;
+  cover?: string;
+  year?: number;
+  mbid?: string;
+  mbids?: string[];
+  lastUpdated?: number;
 }
