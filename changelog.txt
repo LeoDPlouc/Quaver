@@ -8,6 +8,7 @@ BackEnd:
 - Added validation for null id in API
 - Changed worker system to a task manager system
 - Added metadata grabber task with auto refresh
+- Added cover grabber task
 
 ====================================================
 0.4.1-beta

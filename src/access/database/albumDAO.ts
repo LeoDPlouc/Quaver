@@ -101,3 +101,13 @@ export async function getUpdatableAlbumModels(): Promise<
     throw createFailure(err, __filename, getUpdatableAlbumModels.name);
   }
 }
+
+export async function getCoverlessAlbumModels(): Promise<
+  (Album & Document<any, any, Album>)[]
+> {
+  try {
+    return await albumModel.find({ cover: { $eq: null } });
+  } catch (err) {
+    throw createFailure(err, __filename, getCoverlessAlbumModels.name);
+  }
+}

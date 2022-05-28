@@ -15,6 +15,7 @@ import { Worker } from "worker_threads";
 import { connectToDb } from "../access/database/utils";
 import songCollector from "./tasks/songCollector";
 import metadataGrabber from "./tasks/metadataGrabber";
+import coverGrabber from "./tasks/coverGrabber";
 
 function getWorker(path: string) {
   return new Worker(path, { env: { ...process.env, IS_PROC: "true" } });
@@ -28,13 +29,19 @@ async function runTasks() {
   await connectToDb("Task Manager").then(async () => {
     await songCollector();
     await metadataGrabber();
+    await coverGrabber();
   });
-
-  setTimeout(() => {
-    runTasks;
-  }, 60 * 1000);
 }
 
 if (process.env.IS_PROC) {
-  (async () => await runTasks())();
+  (async () => {
+    while (true) {
+      await runTasks();
+      await new Promise<never>((resolve) =>
+        setTimeout(() => {
+          resolve(null);
+        }, 60 * 1000)
+      );
+    }
+  })();
 }
