@@ -14,7 +14,7 @@
 import { Request, Response, NextFunction } from "express"
 import { logRequest } from "../utils/logger"
 
-export default function protect(req: Request, res: Response, next: NextFunction) {
+export default function logRequestMiddleware(req: Request, res: Response, next: NextFunction) {
     logRequest(req)
     next()
 }

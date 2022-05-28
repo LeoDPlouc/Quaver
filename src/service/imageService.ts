@@ -11,50 +11,58 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getAllImagesModels, getImageModel } from "../access/database/imageDAO";
+import { imageFileData } from "../access/api/coverArtArchive";
+import {
+  createImageModel,
+  getAllImagesModels,
+  getImageModel,
+} from "../access/database/imageDAO";
 import { mapImage } from "../mappers/imageMapper";
-import { Failable } from "../utils/Failable";
+import { createFailure } from "../utils/Failure";
+import { saveImage } from "../access/file/imageFile";
 
-export async function getAllImages(): Promise<Failable<Image[]>> {
-    let result = await getAllImagesModels()
+export async function getAllImages(): Promise<Image[]> {
+  try {
+    var result = await getAllImagesModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAllImages.name, err);
+  }
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAllImages.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
-
-    return { result: result.result.map(i => mapImage(i)) }
+  return result.map((i) => mapImage(i));
 }
 
-export async function getImage(id: string): Promise<Failable<Image>> {
-    let result = await getImageModel(id)
+export async function getImage(id: string): Promise<Image> {
+  try {
+    var result = await getImageModel(id);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getImage.name, err);
+  }
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: getImage.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+  if (!result) {
+    throw createFailure("Invalid Id", __filename, getImage.name);
+  }
 
-    if (!result.result) {
-        return {
-            failure: {
-                file: __filename,
-                func: getImage.name,
-                msg: "Invalid Id"
-            }
-        }
-    }
+  return mapImage(result);
+}
 
-    return { result: mapImage(result.result) }
+export async function saveImageFile(fileData: imageFileData): Promise<string> {
+  if (!fileData) return;
+  try {
+    return await saveImage(fileData.data, fileData.extension);
+  } catch (err) {
+    throw createFailure(
+      "File acces error",
+      __filename,
+      saveImageFile.name,
+      err
+    );
+  }
+}
+
+export async function createImage(image: Image): Promise<string> {
+  try {
+    return await createImageModel(image);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, createImage.name, err);
+  }
 }

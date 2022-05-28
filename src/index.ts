@@ -11,38 +11,38 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import mongoose from "mongoose"
-import { APP_PORT } from "./config/config"
-import { runSongCollector } from "./workers/workers"
-import { Migrate } from "./access/database/migration/migration"
-import { logError, logInfo, setWorkerName } from "./utils/logger"
-import app from "./app"
-import { connectToDb } from "./access/database/utils"
-import { Failure } from "./utils/Failable"
+import mongoose from "mongoose";
+import { APP_PORT } from "./config/config";
+import { runTaskManager } from "./workers/taskManager";
+import { Migrate } from "./access/database/migration/migration";
+import { logError, logInfo } from "./utils/logger";
+import app from "./app";
+import { connectToDb } from "./access/database/utils";
+import { getAlbumMbid } from "./service/albumService";
+import { getMetadataFromMB } from "./access/api/musicbrainzApi";
 
 //Declare the objects stored in session
-declare module 'express-session' {
-    interface SessionData {
-        user: User & mongoose.Document<any, any, User>
-    }
+declare module "express-session" {
+  interface SessionData {
+    user: User & mongoose.Document<any, any, User>;
+  }
 }
 
-setWorkerName("App")
-
 //Connect to the db
-connectToDb()
-    .then(async () => {
-        //Apply database migration
-        await Migrate().then((result) => {
-            if (result.failure) {
-                logError(result.failure)
-                process.exit(1)
-            }
-        })
+connectToDb("App").then(async () => {
+  //Apply database migration
+  try {
+    await Migrate();
+  } catch (err) {
+    logError(err);
+    process.exit(1);
+  }
 
-        //Start collection of the songs
-        runSongCollector()
+  //Start collection of the songs
+  runTaskManager();
 
-        //Open server
-        app.listen(APP_PORT, () => logInfo(`listening on port ${APP_PORT}`))
-    })
+  //Open server
+  app.listen(APP_PORT, () =>
+    logInfo(`listening on port ${APP_PORT}`, "Migration")
+  );
+});

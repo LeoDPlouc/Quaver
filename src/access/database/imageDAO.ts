@@ -12,33 +12,33 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { Failable } from "../../utils/Failable";
+import { createFailure } from "../../utils/Failure";
 import { imageModel } from "./models/imageModel";
 
-export async function getAllImagesModels(): Promise<Failable<(Image & Document<any, any, Image>)[]>> {
-    try {
-        return { result: await imageModel.find() }
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAllImagesModels.name,
-                msg: err
-            }
-        }
-    }
+export async function getAllImagesModels(): Promise<
+  (Image & Document<any, any, Image>)[]
+> {
+  try {
+    return await imageModel.find();
+  } catch (err) {
+    throw createFailure(err, __filename, getAllImagesModels.name);
+  }
 }
 
-export async function getImageModel(id: string): Promise<Failable<Image & Document<any, any, Image>>> {
-    try {
-        return { result: await imageModel.findById(id) }
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: getImageModel.name,
-                msg: err
-            }
-        }
-    }
+export async function getImageModel(
+  id: string
+): Promise<Image & Document<any, any, Image>> {
+  try {
+    return await imageModel.findById(id);
+  } catch (err) {
+    createFailure(err, __filename, getImageModel.name);
+  }
+}
+
+export async function createImageModel(image: Image): Promise<string> {
+  try {
+    return (await imageModel.create(image)).id;
+  } catch (err) {
+    throw createFailure(err, __filename, createImageModel.name);
+  }
 }

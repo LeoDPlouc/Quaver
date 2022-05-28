@@ -11,129 +11,132 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { createAlbumModel, findAlbumModelByName, getAlbumModel, getAlbumSongModel, getAllAlbumModels, updateAlbumModel } from "../access/database/albumDAO";
+import { getMBId, getMetadataFromMB } from "../access/api/musicbrainzApi";
+import { getAlbumCover, imageFileData } from "../access/api/coverArtArchive";
+import {
+  createAlbumModel,
+  findAlbumModelByName,
+  getAlbumModel,
+  getAlbumSongModel,
+  getAllAlbumModels,
+  getMbidlessAlbumModels,
+  getUpdatableAlbumModels,
+  getCoverlessAlbumModels,
+  updateAlbumModel,
+} from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapSong } from "../mappers/songMapper";
-import { Failable } from "../utils/Failable";
+import { createFailure } from "../utils/Failure";
 
-export async function getAllAlbums(): Promise<Failable<Album[]>> {
-    let result = await getAllAlbumModels()
+export async function getAllAlbums(): Promise<Album[]> {
+  try {
+    var result = await getAllAlbumModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAllAlbums.name, err);
+  }
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAllAlbums.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
-
-    return { result: result.result.map(a => mapAlbum(a)) }
+  return result.map((a) => mapAlbum(a));
 }
 
-export async function getAlbum(id: string): Promise<Failable<Album>> {
-    let result = await getAlbumModel(id)
+export async function getAlbum(id: string): Promise<Album> {
+  try {
+    var result = await getAlbumModel(id);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAlbum.name, err);
+  }
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAlbum.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+  if (!result) {
+    throw createFailure("Invalid Id", __filename, getAlbum.name);
+  }
 
-    if (!result.result) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAlbum.name,
-                msg: "Invalid Id"
-            }
-        }
-    }
-
-    return { result: mapAlbum(result.result) }
+  return mapAlbum(result);
 }
 
-export async function getAlbumSongs(id: string): Promise<Failable<Song[]>> {
-    let result = await getAlbumSongModel(id)
+export async function getAlbumSongs(id: string): Promise<Song[]> {
+  try {
+    var result = await getAlbumSongModel(id);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getAlbumSongs.name, err);
+  }
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAlbumSongs.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+  if (!result) {
+    throw createFailure("Invalid Id", __filename, getAlbumSongs.name);
+  }
 
-    if (!result.result) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAlbumSongs.name,
-                msg: "Invalid Id"
-            }
-        }
-    }
-
-    return { result: result.result.map(s => mapSong(s)) }
+  return result.map((s) => mapSong(s));
 }
 
-export async function createAlbum(album: Album): Promise<Failable<string>> {
-    let result = await createAlbumModel(album)
+export async function createAlbum(album: Album): Promise<string> {
+  try {
+    var result = await createAlbumModel(album);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, createAlbum.name, err);
+  }
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: createAlbum.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
-
-    return { result: result.result }
+  return result;
 }
 
-export async function findAlbumByName(albumTitle: string, artistName?: string): Promise<Failable<Album[]>> {
-    let result = await findAlbumModelByName(albumTitle, artistName)
+export async function findAlbumByName(
+  albumTitle: string,
+  artistName?: string
+): Promise<Album[]> {
+  try {
+    var result = await findAlbumModelByName(albumTitle, artistName);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, findAlbumByName.name, err);
+  }
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: findAlbumByName.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
-
-    return { result: result.result.map(a => mapAlbum(a)) }
+  return result.map((a) => mapAlbum(a));
 }
 
-export async function updateAlbum(album: Album) {
-    let result = await updateAlbumModel(album)
+export async function updateAlbum(album: Album): Promise<void> {
+  try {
+    await updateAlbumModel(album);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, updateAlbum.name, err);
+  }
+}
 
-    if (result.failure) {
-        return {
-            failure: {
-                file: __filename,
-                func: updateAlbum.name,
-                msg: "DAO error",
-                sourceFailure: result.failure
-            }
-        }
-    }
+export async function getMbidlessAlbum(): Promise<Album[]> {
+  try {
+    var result = await getMbidlessAlbumModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getMbidlessAlbum.name);
+  }
 
-    return { result: null }
+  return result.map((a) => mapAlbum(a));
+}
+
+export async function getCoverlessAlbums(): Promise<Album[]> {
+  try {
+    var result = await getCoverlessAlbumModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getCoverlessAlbums.name, err);
+  }
+
+  return result.map((a) => mapAlbum(a));
+}
+
+export async function getAlbumMbid(album: Album): Promise<string[]> {
+  try {
+    return getMBId(album);
+  } catch (err) {
+    throw createFailure("API error", __filename, getAlbumMbid.name);
+  }
+}
+
+export async function getAlbumMetadata(album: Album): Promise<Album> {
+  return getMetadataFromMB(album.mbids);
+}
+
+export async function getUpdatableAlbum(): Promise<Album[]> {
+  try {
+    return await getUpdatableAlbumModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getUpdatableAlbum.name);
+  }
+}
+
+export async function getCover(album: Album): Promise<imageFileData> {
+  return await getAlbumCover(album.mbids);
 }

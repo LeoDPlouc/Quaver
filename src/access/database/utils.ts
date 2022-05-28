@@ -11,32 +11,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-import { MONGO_IP, MONGO_PASSWORD, MONGO_PORT, MONGO_USER } from "../../config/config"
-import { Failure } from "../../utils/Failable"
-import { logError, logInfo } from "../../utils/logger"
+import {
+  MONGO_IP,
+  MONGO_PASSWORD,
+  MONGO_PORT,
+  MONGO_USER,
+} from "../../config/config";
+import { createFailure, Failure } from "../../utils/Failure";
+import { logError, logInfo } from "../../utils/logger";
 
-const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`
+const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`;
 
-export async function connectToDb() {
-    await mongoose
-        .connect(mongoUrl, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-            dbName: "quaver"
-        })
-        .then(() => logInfo("Successfully connected to database"))
-        .catch((err) => {
-            let failure: Failure = {
-                file: __filename,
-                func: connectToDb.name,
-                msg: err
-            }
-            logError(failure)
-            //retry connection
-            setTimeout(connectToDb, 5000)
-        })
+export async function connectToDb(source: String) {
+  await mongoose
+    .connect(mongoUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      dbName: "quaver",
+    })
+    .then(() => logInfo("Successfully connected to database", source))
+    .catch((err) => {
+      let failure: Failure = createFailure(err, __filename, connectToDb.name);
+      logError(failure);
+      //retry connection
+      setTimeout(connectToDb, 5000);
+    });
 }
-

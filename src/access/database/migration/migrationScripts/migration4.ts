@@ -11,17 +11,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Failable } from "../../../../utils/Failable"
-import { IMigration } from "../migration"
-import { migration2 } from "./migration2"
+import { createFailure } from "../../../../utils/Failure";
+import { IMigration } from "../migration";
+import { migration2 } from "./migration2";
 
 export const migration4: IMigration = {
-    async up(): Promise<Failable<null>> {
-        return { result: null }
-    },
+  async up(): Promise<void> {},
 
-    //Remove MB ID list and keep only one
-    async down(): Promise<Failable<null>> {
-        return migration2.down()
+  //Remove MB ID list and keep only one
+  async down(): Promise<void> {
+    try {
+      return migration2.down();
+    } catch (err) {
+      throw createFailure(
+        "Migration error",
+        __filename,
+        migration4.down.name,
+        err
+      );
     }
-}
+  },
+};

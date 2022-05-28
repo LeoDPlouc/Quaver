@@ -11,72 +11,48 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FpcalcResult } from "fpcalc"
-import { FPCALC_PATH } from "../../config/config"
-import fp from "fpcalc-async"
-import { parseFile } from "music-metadata"
-import Path from "path"
-import { Failable, Failure } from "../../utils/Failable"
+import { FpcalcResult } from "fpcalc";
+import { FPCALC_PATH } from "../../config/config";
+import fp from "fpcalc-async";
+import { parseFile } from "music-metadata";
+import Path from "path";
+import { createFailure } from "../../utils/Failure";
 
-export async function getAcoustid(songPath: string): Promise<Failable<string>> {
-    let fingerprint: FpcalcResult<string>
+export async function getAcoustid(songPath: string): Promise<string> {
+  let fingerprint: FpcalcResult<string>;
 
-    //If fpcalc isn't in PATH, use fpcalc with its path
-    try {
-        if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH })
-        else fingerprint = await fp(songPath)
-    } catch (err) {
-        let failure: Failure = {
-            file: __filename,
-            func: getAcoustid.name,
-            msg: err
-        }
-        return { failure }
-    }
+  //If fpcalc isn't in PATH, use fpcalc with its path
+  try {
+    if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH });
+    else fingerprint = await fp(songPath);
+  } catch (err) {
+    throw createFailure(err, __filename, getAcoustid.name);
+  }
 
-    return { result: fingerprint.fingerprint }
-
+  return fingerprint.fingerprint;
 }
 
-export async function getMetadataFromFile(songPath: string): Promise<Failable<Song>> {
-    try {
-        var tag = await parseFile(songPath)
-    } catch (err) {
-        let failure: Failure = {
-            file: __filename,
-            func: getMetadataFromFile.name,
-            msg: err
-        }
-        return { failure }
-    }
+export async function getMetadataFromFile(songPath: string): Promise<Song> {
+  try {
+    var tag = await parseFile(songPath);
+  } catch (err) {
+    throw createFailure(err, __filename, getMetadataFromFile.name);
+  }
 
+  let format = Path.extname(songPath);
 
-    let format = Path.extname(songPath)
+  let fp = await getAcoustid(songPath);
 
-    let result = await getAcoustid(songPath)
-    if(result.failure){
-        let failure: Failure = {
-            file: __filename,
-            func: getMetadataFromFile.name,
-            msg: "AcoustId parsing error",
-            sourceFailure: result.failure
-        }
-        return { failure }
-    }
-    let fp = result.result
-
-    return {
-        result: {
-            title: tag.common.title,
-            n: tag.common.track.no,
-            artist: tag.common.albumartist,
-            album: tag.common.album,
-            year: tag.common.year,
-            duration: tag.format.duration,
-            like: 0,
-            path: songPath,
-            format: format,
-            acoustid: fp
-        }
-    }
+  return {
+    title: tag.common.title,
+    n: tag.common.track.no,
+    artist: tag.common.albumartist,
+    album: tag.common.album,
+    year: tag.common.year,
+    duration: tag.format.duration,
+    like: 0,
+    path: songPath,
+    format: format,
+    acoustid: fp,
+  };
 }

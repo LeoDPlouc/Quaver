@@ -13,36 +13,50 @@
 
 import { IReleaseList, MusicBrainzApi } from "musicbrainz-api";
 import { APP_VERSION } from "../../config/appConfig";
-import { Failable } from "../../utils/Failable";
+import { createFailure } from "../../utils/Failure";
+import { logError } from "../../utils/logger";
 
 //Ne plus exporter lors du nettoyage des dépréciés
 export const mbApi = new MusicBrainzApi({
-    appName: "Quaver",
-    appVersion: APP_VERSION,
-    appContactInfo: "https://github.com/LeoDPlouc/Quaver"
-})
+  appName: "Quaver",
+  appVersion: APP_VERSION,
+  appContactInfo: "https://github.com/LeoDPlouc/Quaver",
+});
 
-export async function getAlbumMBId(album: Album): Promise<Failable<string[]>> {
+export async function getMBId(album: Album): Promise<string[]> {
+  //Build query with available info
+  let query = `release:${album.title as string}`;
 
-    //Build query with available info
-    let query = `release:${album.title as string}`
+  if (album.artist) {
+    query += ` AND artist:${album.artist}`;
+  }
 
-    if (album.artist) { query += ` and artist:${album.artist}` }
+  try {
+    var result = await mbApi.search<IReleaseList>("release", { query });
+  } catch (err) {
+    throw createFailure(err, __filename, getMBId.name);
+  }
+  //Only keep ids of the release with score 100
+  var releases = result.releases.filter((release) => release.score == 100);
+  var ids = releases.map((release) => release.id);
 
+  return ids;
+}
+
+export async function getMetadataFromMB(mbids: string[]): Promise<Album> {
+  let album: Album = {};
+
+  for (let i = 0; i < mbids.length; i++) {
     try {
-        var result = await mbApi.search<IReleaseList>("release", { query })
-    } catch (err) {
-        return {
-            failure: {
-                file: __filename,
-                func: getAlbumMBId.name,
-                msg: err
-            }
-        }
-    }
-    //Only keep ids of the release with score 100
-    var releases = result.releases.filter(release => release.score == 100)
-    var ids = releases.map(release => release.id)
+      let release = await mbApi.getRelease(mbids[i]);
 
-    return { result: ids }
+      if (!album.artist) album.artist = release["artist-credit"]?.[0]?.name;
+      if (!album.title) album.title = release.title;
+      if (!album.year) album.year = new Date(release.date).getFullYear();
+    } catch (err) {
+      logError(createFailure(err, __filename, getMetadataFromMB.name));
+    }
+  }
+
+  return album;
 }
