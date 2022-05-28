@@ -11,30 +11,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { Schema, model } from "mongoose";
 
 const albumSchema = new Schema<Album>({
-    title: {
-        type: String
-    },
-    artist: {
-        type: String
-    },
-    artistId: {
-        type: String
-    },
-    cover: {
-        type: String
-    },
-    year: {
-        type: Number
-    },
-    mbid: {
-        type: String
-    },
-    mbids: {
-        type: [String]
-    }
-})
+  title: {
+    type: String,
+  },
+  artist: {
+    type: String,
+  },
+  artistId: {
+    type: String,
+  },
+  cover: {
+    type: String,
+  },
+  year: {
+    type: Number,
+  },
+  mbid: {
+    type: String,
+  },
+  mbids: {
+    type: [String],
+  },
+  lastUpdated: {
+    type: Number,
+  },
+});
 
-export const albumModel = model<Album>("Album", albumSchema)
+export const albumModel = model<Album>("Album", albumSchema);

@@ -85,3 +85,19 @@ export async function getMbidlessAlbumModels(): Promise<
     throw createFailure(err, __filename, getMbidlessAlbumModels.name);
   }
 }
+
+export async function getUpdatableAlbumModels(): Promise<
+  (Album & Document<any, any, Album>)[]
+> {
+  try {
+    return await albumModel.find({
+      $or: [
+        { lastUpdated: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
+        { lastUpdated: { $exists: false } },
+        { lastUpdated: null },
+      ],
+    });
+  } catch (err) {
+    throw createFailure(err, __filename, getUpdatableAlbumModels.name);
+  }
+}

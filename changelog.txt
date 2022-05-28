@@ -6,7 +6,8 @@ CHANGELOG
 BackEnd:
 - Changed the failable system
 - Added validation for null id in API
-- Changed worker system to a task manager
+- Changed worker system to a task manager system
+- Added metadata grabber task with auto refresh
 
 ====================================================
 0.4.1-beta
