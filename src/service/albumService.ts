@@ -19,6 +19,7 @@ import {
   getAlbumSongModel,
   getAllAlbumModels,
   getMbidlessAlbumModels,
+  getUpdatableAlbumModels,
   updateAlbumModel,
 } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
@@ -114,4 +115,12 @@ export async function getAlbumMbid(album: Album): Promise<string[]> {
 
 export async function getAlbumMetadata(album: Album): Promise<Album> {
   return getMetadataFromMB(album.mbids);
+}
+
+export async function getUpdatableAlbum(): Promise<Album[]> {
+  try {
+    return await getUpdatableAlbumModels();
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getUpdatableAlbum.name);
+  }
 }
