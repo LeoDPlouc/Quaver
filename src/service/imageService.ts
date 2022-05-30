@@ -20,6 +20,15 @@ import {
 import { mapImage } from "../mappers/imageMapper";
 import { createFailure } from "../utils/Failure";
 import { saveImage } from "../access/file/imageFile";
+import Jimp from "jimp";
+
+export interface resizedImage {
+  tiny: imageFileData;
+  small?: imageFileData;
+  medium?: imageFileData;
+  large?: imageFileData;
+  verylarge?: imageFileData;
+}
 
 export async function getAllImages(): Promise<Image[]> {
   try {
@@ -65,4 +74,60 @@ export async function createImage(image: Image): Promise<string> {
   } catch (err) {
     throw createFailure("DAO error", __filename, createImage.name, err);
   }
+}
+
+export async function makeResizing(
+  fileData: imageFileData
+): Promise<resizedImage> {
+  let resizes: resizedImage;
+
+  let buffer = Buffer.from(fileData.data, "binary");
+  let img = await Jimp.read(buffer);
+
+  try {
+    let height = img.getHeight();
+
+    if (height >= 2560) {
+      resizes.verylarge = {
+        data: await resizeImage(img, 2560),
+        extension: ".jpg",
+      };
+    }
+
+    if (height >= 1080) {
+      resizes.large = {
+        data: await resizeImage(img, 1080),
+        extension: ".jpg",
+      };
+    }
+
+    if (height >= 540) {
+      resizes.medium = {
+        data: await resizeImage(img, 540),
+        extension: ".jpg",
+      };
+    }
+
+    if (height >= 220) {
+      resizes.small = {
+        data: await resizeImage(img, 220),
+        extension: ".jpg",
+      };
+    }
+
+    resizes.tiny = {
+      data: await resizeImage(img, 110),
+      extension: ".jpg",
+    };
+
+    return resizes;
+  } catch (err) {
+    throw createFailure(err, __filename, makeResizing.name);
+  }
+}
+
+async function resizeImage(data: Jimp, size: number): Promise<string> {
+  return (
+    await data.clone().scaleToFit(1080, 1080).getBufferAsync(Jimp.MIME_JPEG)
+  ).toString("binary");
 }

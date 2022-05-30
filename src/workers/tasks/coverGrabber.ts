@@ -16,7 +16,11 @@ import {
   getCoverlessAlbums,
   updateAlbum,
 } from "../../service/albumService";
-import { createImage, saveImageFile } from "../../service/imageService";
+import {
+  createImage,
+  makeResizing,
+  saveImageFile,
+} from "../../service/imageService";
 import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
 
@@ -25,8 +29,22 @@ async function updateAlbumCover(album: Album) {
     let coverData = await getCover(album);
     if (!coverData) return;
 
-    let path = await saveImageFile(coverData);
-    let id = await createImage({ path });
+    let resizes = await makeResizing(coverData);
+
+    let tinyPath = await saveImageFile(resizes.tiny);
+    if (resizes.small) var smallPath = await saveImageFile(resizes.small);
+    if (resizes.medium) var mediumPath = await saveImageFile(resizes.medium);
+    if (resizes.large) var largePath = await saveImageFile(resizes.large);
+    if (resizes.verylarge)
+      var verylargePath = await saveImageFile(resizes.verylarge);
+
+    let id = await createImage({
+      path: tinyPath,
+      large: largePath,
+      small: smallPath,
+      medium: mediumPath,
+      verylarge: verylargePath,
+    });
 
     album.cover = id;
     updateAlbum(album);

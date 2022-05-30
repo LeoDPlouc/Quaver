@@ -12,6 +12,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 interface Image {
-    id?: string,
-    path: string
+  id?: string;
+  //DEPRECIATED
+  path: string;
+
+  //DEPRECIATED : use require
+  tiny?: string;
+  small?: string;
+  medium?: string;
+  large?: string;
+  verylarge?: string;
 }
