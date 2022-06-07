@@ -23,3 +23,11 @@ interface Image {
   large?: string;
   verylarge?: string;
 }
+
+enum ImageSize {
+  tiny = "tiny",
+  small = "small",
+  medium = "medium",
+  large = "large",
+  verylarge = "veryLarge",
+}

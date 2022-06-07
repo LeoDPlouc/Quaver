@@ -11,33 +11,45 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Router } from "express"
+import { Router } from "express";
 
-import { getAllImagesInfoCtrl, getImageFileCtrl, getOneImageInfoCtrl } from "../controllers/imageController"
-import { protect } from "../middleware/authMiddleware"
-import { param } from "express-validator"
+import {
+  getAllImagesInfoCtrl,
+  getImageFileCtrl,
+  getImageFileWithSizeCtrl,
+  getOneImageInfoCtrl,
+} from "../controllers/imageController";
+import { protect } from "../middleware/authMiddleware";
+import { param } from "express-validator";
 
-const router = Router()
+const router = Router();
 
-router.route("/")
-    .get(
-        protect,
-        getAllImagesInfoCtrl
-    )
+router.route("/").get(protect, getAllImagesInfoCtrl);
 
-router.route("/:id")
-    .get(
-        protect,
-        param("id").not().equals("undefined").not().equals("null"),
-        getOneImageInfoCtrl
-    )
+router
+  .route("/:id")
+  .get(
+    protect,
+    param("id").not().equals("undefined").not().equals("null"),
+    getOneImageInfoCtrl
+  );
 
+// DEPRECIATED
+router
+  .route("/:id/file")
+  .get(
+    protect,
+    param("id").not().equals("undefined").not().equals("null"),
+    getImageFileCtrl
+  );
 
-router.route("/:id/file")
-    .get(
-        protect,
-        param("id").not().equals("undefined").not().equals("null"),
-        getImageFileCtrl
-    )
+router
+  .route("/:id/file/:size")
+  .get(
+    protect,
+    param("id").not().equals("undefined").not().equals("null"),
+    param("size").not().equals("undefined").not().equals("null"),
+    getImageFileWithSizeCtrl
+  );
 
-export = router
+export = router;

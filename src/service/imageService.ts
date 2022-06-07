@@ -79,7 +79,7 @@ export async function createImage(image: Image): Promise<string> {
 export async function makeResizing(
   fileData: imageFileData
 ): Promise<resizedImage> {
-  let resizes: resizedImage;
+  let resizes: resizedImage = { tiny: null };
 
   let buffer = Buffer.from(fileData.data, "binary");
   let img = await Jimp.read(buffer);
@@ -122,12 +122,16 @@ export async function makeResizing(
 
     return resizes;
   } catch (err) {
-    throw createFailure(err, __filename, makeResizing.name);
+    throw createFailure("Resize error", __filename, makeResizing.name, err);
   }
 }
 
 async function resizeImage(data: Jimp, size: number): Promise<string> {
-  return (
-    await data.clone().scaleToFit(1080, 1080).getBufferAsync(Jimp.MIME_JPEG)
-  ).toString("binary");
+  try {
+    return (
+      await data.clone().scaleToFit(size, size).getBufferAsync(Jimp.MIME_JPEG)
+    ).toString("binary");
+  } catch (err) {
+    throw createFailure(err, __filename, resizeImage.name);
+  }
 }

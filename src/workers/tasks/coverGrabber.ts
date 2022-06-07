@@ -40,6 +40,7 @@ async function updateAlbumCover(album: Album) {
 
     let id = await createImage({
       path: tinyPath,
+      tiny: tinyPath,
       large: largePath,
       small: smallPath,
       medium: mediumPath,
