@@ -1,4 +1,4 @@
-#node_modules
+node_modules
 Dockerfile
 .dockerignore
 .git
@@ -7,3 +7,9 @@ LICENSE
 README.MD
 docker-compose*
 build
+.vscode
+dist
+images
+logs
+music
+publish

@@ -11,12 +11,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { Schema, model } from "mongoose";
 
 const imageSchema = new Schema<Image>({
-    path: {
-        type: String,
-        require: [true, "Image must have a path"]
-    }
-})
-export const imageModel = model<Image>("Image", imageSchema)
+  //DEPRECIATED
+  path: {
+    type: String,
+    require: [true, "Image must have a path"],
+  },
+
+  //DEPRECIATED : add require
+  tiny: {
+    type: String,
+  },
+  small: {
+    type: String,
+  },
+  medium: {
+    type: String,
+  },
+  large: {
+    type: String,
+  },
+  verylarge: {
+    type: String,
+  },
+});
+export const imageModel = model<Image>("Image", imageSchema);

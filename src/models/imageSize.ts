@@ -11,15 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface Image {
-  id?: string;
-  //DEPRECIATED
-  path: string;
-
-  //DEPRECIATED : use require
-  tiny?: string;
-  small?: string;
-  medium?: string;
-  large?: string;
-  verylarge?: string;
+export enum ImageSize {
+  tiny = "tiny",
+  small = "small",
+  medium = "medium",
+  large = "large",
+  verylarge = "veryLarge",
 }

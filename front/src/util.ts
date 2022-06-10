@@ -12,13 +12,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { router } from "./app";
+import { ImageSize } from "./models";
 
 export function openPresentation(path: string) {
   router.push({ path });
 }
 
-export function getCoverURL(id: string) {
-  return `/api/image/${id}/file`;
+export function getCoverURL(id: string, size: ImageSize | string) {
+  return `/api/image/${id}/file/${size}`;
 }
 
 export function formatDuration(duration: number): string {

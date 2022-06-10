@@ -16,6 +16,7 @@ import { validationResult } from "express-validator";
 import { getAllImages, getImage } from "../service/imageService";
 import { mapImageDTO } from "../mappers/imageMapper";
 import { logError } from "../utils/logger";
+import { ImageSize } from "../models/imageSize";
 
 export async function getAllImagesInfoCtrl(req: Request, res: Response) {
   try {
@@ -100,5 +101,80 @@ export async function getImageFileCtrl(req: Request, res: Response) {
     return;
   }
 
-  res.sendFile(result.path);
+  if (result.tiny) {
+    res.sendFile(result.tiny);
+  } else {
+    res.sendFile(result.path);
+  }
+}
+
+// DEPRECIATED - retirer le fallback sur path
+
+export async function getImageFileWithSizeCtrl(req: Request, res: Response) {
+  let err = validationResult(req);
+  if (!err.isEmpty()) {
+    res.json({
+      status: "fail",
+      statusCode: 2,
+      errorMessage: "Invalid request",
+    });
+    return;
+  }
+
+  try {
+    var result = await getImage(req.params.id);
+  } catch (err) {
+    logError(err);
+    res.json({
+      status: "fail",
+      statusCode: 1,
+      errorMessage: "Server error",
+    });
+    return;
+  }
+
+  let size = req.params.size;
+
+  if (size == ImageSize.verylarge) {
+    if (result.verylarge) {
+      res.sendFile(result.verylarge);
+      return;
+    } else {
+      size = ImageSize.large;
+    }
+  }
+
+  if (size == ImageSize.large) {
+    if (result.large) {
+      res.sendFile(result.large);
+      return;
+    } else {
+      size = ImageSize.medium;
+    }
+  }
+
+  if (size == ImageSize.medium) {
+    if (result.medium) {
+      res.sendFile(result.medium);
+      return;
+    } else {
+      size = ImageSize.small;
+    }
+  }
+
+  if (size == ImageSize.small) {
+    if (result.small) {
+      res.sendFile(result.small);
+      return;
+    } else {
+      size = ImageSize.tiny;
+    }
+  }
+
+  if (size == ImageSize.tiny && result.tiny) {
+    res.sendFile(result.tiny);
+    return;
+  } else {
+    res.sendFile(result.path);
+  }
 }

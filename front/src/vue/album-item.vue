@@ -15,8 +15,12 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 <template>
-  <div v-show="search(queryString, album)" class="albumItem" @click="openPresentation('/album/' + album.id)">
-    <img loading="lazy" class="albumCover" :src="getCoverURL(album.cover)" />
+  <div
+    v-show="search(queryString, album)"
+    class="albumItem"
+    @click="openPresentation('/album/' + album.id)"
+  >
+    <cover class="albumCover" :cover-id="album.cover" :size="size" />
     <div class="albumItemProp">{{ album.title }}</div>
     <div class="albumItemProp">{{ album.artist }}</div>
     <div class="albumItemProp">{{ album.year }}</div>
@@ -28,8 +32,12 @@ import { defineComponent } from "vue";
 import { Album } from "../models";
 import { search } from "../searching";
 import { getCoverURL, openPresentation } from "../util";
+import { ImageSize } from "../models";
+import coverVue from "./cover.vue";
 
 export default defineComponent({
+  components: { cover: coverVue },
+
   props: { album: Album },
 
   inject: ["query"],
@@ -37,6 +45,7 @@ export default defineComponent({
   data() {
     return {
       queryString: this.query,
+      size: ImageSize.small,
     };
   },
 
@@ -59,9 +68,8 @@ export default defineComponent({
 }
 
 .albumCover {
-  max-height: 10vw;
-  max-width: 10vw;
-  object-fit: scale-down;
+  height: 10vw;
+  width: 10vw;
 }
 
 .albumItemProp {

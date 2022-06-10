@@ -1,6 +1,15 @@
 CHANGELOG
 
 ====================================================
+0.5.1-beta
+
+BackEnd:
+- Cover are now declined in different sizes when fetch
+
+FrontEnd:
+- Cover are fetched with optimal size to reduce bandwith consumption and loading time
+
+====================================================
 0.5.0-beta
 
 BackEnd:
