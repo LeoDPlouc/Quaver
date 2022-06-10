@@ -17,7 +17,7 @@
 <template>
   <div>
     <div class="artistPresentationHeader">
-      <cover-mosaic :artist="artist"></cover-mosaic>
+      <cover-mosaic :artist="artist" :size="size" />
       <div class="artistPresentationInfos">
         <div class="artistPresentationInfo">{{ artist.name }}</div>
       </div>
@@ -32,14 +32,18 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Artist } from "../models";
+import { Artist, ImageSize } from "../models";
 import songList from "./song-list.vue";
 import AlbumList from "./album-list.vue";
 import { getArtist } from "../fetch";
 import coverMosaicVue from "./cover-mosaic.vue";
 
 export default defineComponent({
-  components: { songList: songList, albumList: AlbumList, coverMosaic: coverMosaicVue },
+  components: {
+    songList: songList,
+    albumList: AlbumList,
+    coverMosaic: coverMosaicVue,
+  },
 
   emits: ["song-changed"],
 
@@ -50,6 +54,7 @@ export default defineComponent({
   data() {
     return {
       artist: {} as Artist,
+      size: ImageSize.small,
     };
   },
 });

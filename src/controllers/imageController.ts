@@ -16,6 +16,7 @@ import { validationResult } from "express-validator";
 import { getAllImages, getImage } from "../service/imageService";
 import { mapImageDTO } from "../mappers/imageMapper";
 import { logError } from "../utils/logger";
+import { ImageSize } from "../models/imageSize";
 
 export async function getAllImagesInfoCtrl(req: Request, res: Response) {
   try {
@@ -134,35 +135,35 @@ export async function getImageFileWithSizeCtrl(req: Request, res: Response) {
 
   let size = req.params.size;
 
-  if (size == ImageSize.verylarge) {
+  if (size == ImageSize.verylarge && result.verylarge) {
     res.sendFile(result.verylarge);
     return;
   } else {
     size = ImageSize.large;
   }
 
-  if (size == ImageSize.large) {
+  if (size == ImageSize.large && result.large) {
     res.sendFile(result.large);
     return;
   } else {
     size = ImageSize.medium;
   }
 
-  if (size == ImageSize.medium) {
+  if (size == ImageSize.medium && result.medium) {
     res.sendFile(result.medium);
     return;
   } else {
     size = ImageSize.small;
   }
 
-  if (size == ImageSize.small) {
+  if (size == ImageSize.small && result.small) {
     res.sendFile(result.small);
     return;
   } else {
     size = ImageSize.tiny;
   }
 
-  if (size == ImageSize.tiny) {
+  if (size == ImageSize.tiny && result.tiny) {
     res.sendFile(result.tiny);
     return;
   } else {

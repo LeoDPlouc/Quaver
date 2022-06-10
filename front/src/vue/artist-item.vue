@@ -20,7 +20,11 @@
     class="artistItem"
     @click="openPresentation('/artist/' + artist.id)"
   >
-    <cover-mosaic :artist="artist" :isFetching="false"></cover-mosaic>
+    <cover-mosaic
+      :artist="artist"
+      :isFetching="false"
+      :size="size"
+    ></cover-mosaic>
     <div class="artistItemProp">{{ artist.name }}</div>
   </div>
 </template>
@@ -28,7 +32,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { getArtistAlbums } from "../fetch";
-import { Album, Artist } from "../models";
+import { Album, Artist, ImageSize } from "../models";
 import { search } from "../searching";
 import { openPresentation } from "../util";
 import coverMosaicVue from "./cover-mosaic.vue";
@@ -52,6 +56,7 @@ export default defineComponent({
     return {
       albumsCover: [] as string[],
       queryString: this.query,
+      size: ImageSize.small,
     };
   },
 });
