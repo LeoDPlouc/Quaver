@@ -16,7 +16,12 @@ import { Document } from "mongoose"
 export function mapImage(data: Image & Document<any, any, Image>): Image {
     let cleanedData: Image = {
         id: data.id,
-        path: data.path
+        path: data.path,
+        tiny: data.tiny,
+        small: data.small,
+        medium: data.medium,
+        large: data.large,
+        verylarge: data.verylarge
     }
     return cleanedData
 }
