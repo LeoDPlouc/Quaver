@@ -102,12 +102,18 @@ export async function getUpdatableAlbumModels(): Promise<
   }
 }
 
-export async function getCoverlessAlbumModels(): Promise<
+export async function getToCoverGrabAlbumsModels(): Promise<
   (Album & Document<any, any, Album>)[]
 > {
   try {
-    return await albumModel.find({ cover: { $eq: null } });
+    return await albumModel.find({
+      $or: [
+        { cover: { $eq: null } },
+        { lastCoverUpdate: null },
+        { lastCoverUpdate: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
+      ],
+    });
   } catch (err) {
-    throw createFailure(err, __filename, getCoverlessAlbumModels.name);
+    throw createFailure(err, __filename, getToCoverGrabAlbumsModels.name);
   }
 }

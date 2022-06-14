@@ -21,7 +21,7 @@ import {
   getAllAlbumModels,
   getMbidlessAlbumModels,
   getUpdatableAlbumModels,
-  getCoverlessAlbumModels,
+  getToCoverGrabAlbumsModels,
   updateAlbumModel,
 } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
@@ -107,11 +107,16 @@ export async function getMbidlessAlbum(): Promise<Album[]> {
   return result.map((a) => mapAlbum(a));
 }
 
-export async function getCoverlessAlbums(): Promise<Album[]> {
+export async function getToCoverGrabAlbums(): Promise<Album[]> {
   try {
-    var result = await getCoverlessAlbumModels();
+    var result = await getToCoverGrabAlbumsModels();
   } catch (err) {
-    throw createFailure("DAO error", __filename, getCoverlessAlbums.name, err);
+    throw createFailure(
+      "DAO error",
+      __filename,
+      getToCoverGrabAlbums.name,
+      err
+    );
   }
 
   return result.map((a) => mapAlbum(a));

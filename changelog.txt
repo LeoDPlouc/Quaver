@@ -5,6 +5,7 @@ CHANGELOG
 
 BackEnd:
 - Cover are now declined in different sizes when fetch
+- Automatic cover updates
 
 FrontEnd:
 - Cover are fetched with optimal size to reduce bandwith consumption and loading time
