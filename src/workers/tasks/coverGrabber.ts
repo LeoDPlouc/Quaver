@@ -13,7 +13,7 @@
 
 import {
   getCover,
-  getCoverlessAlbums,
+  getToCoverGrabAlbums,
   updateAlbum,
 } from "../../service/albumService";
 import {
@@ -48,8 +48,9 @@ async function updateAlbumCover(album: Album) {
     });
 
     album.cover = id;
+    album.lastCoverUpdate = Date.now();
     updateAlbum(album);
-    logInfo(`Found new cover for album ${album.id}`, "Cover Grabber");
+    logInfo(`Updated cover of album ${album.id}`, "Cover Grabber");
   } catch (err) {
     throw createFailure("Task failure", __filename, updateAlbumCover.name, err);
   }
@@ -57,7 +58,7 @@ async function updateAlbumCover(album: Album) {
 
 export default async function doWork() {
   logInfo("Cover grabber startded", "Cover Grabber");
-  let albums = await getCoverlessAlbums();
+  let albums = await getToCoverGrabAlbums();
 
   for (let i = 0; i < albums.length; i++) {
     try {

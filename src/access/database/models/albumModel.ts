@@ -38,6 +38,9 @@ const albumSchema = new Schema<Album>({
   lastUpdated: {
     type: Number,
   },
+  lastCoverUpdate: {
+    type: Number,
+  },
 });
 
 export const albumModel = model<Album>("Album", albumSchema);

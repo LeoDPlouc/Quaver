@@ -21,4 +21,5 @@ interface Album {
   mbid?: string;
   mbids?: string[];
   lastUpdated?: number;
+  lastCoverUpdate?: number;
 }
