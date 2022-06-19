@@ -14,12 +14,13 @@
 import { imageFileData } from "../access/api/coverArtArchive";
 import {
   createImageModel,
+  deleteImageModel,
   getAllImagesModels,
   getImageModel,
 } from "../access/database/imageDAO";
 import { mapImage } from "../mappers/imageMapper";
 import { createFailure } from "../utils/Failure";
-import { saveImage } from "../access/file/imageFile";
+import { deleteImageFile, saveImage } from "../access/file/imageFile";
 import Jimp from "jimp";
 
 export interface resizedImage {
@@ -133,5 +134,26 @@ async function resizeImage(data: Jimp, size: number): Promise<string> {
     ).toString("binary");
   } catch (err) {
     throw createFailure(err, __filename, resizeImage.name);
+  }
+}
+
+export async function deleteImage(id: string): Promise<void> {
+  try {
+    await deleteImageModel(id);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, deleteImage.name, err);
+  }
+}
+
+export async function deleteAllImageFiles(image: Image): Promise<void> {
+  try {
+    await deleteImageFile(image?.path);
+    await deleteImageFile(image?.tiny);
+    await deleteImageFile(image?.small);
+    await deleteImageFile(image?.medium);
+    await deleteImageFile(image?.large);
+    await deleteImageFile(image?.verylarge);
+  } catch (err) {
+    throw createFailure("File access error", __filename, deleteImage.name, err);
   }
 }

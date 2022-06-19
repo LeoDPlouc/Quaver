@@ -42,3 +42,11 @@ export async function createImageModel(image: Image): Promise<string> {
     throw createFailure(err, __filename, createImageModel.name);
   }
 }
+
+export async function deleteImageModel(id: string): Promise<void> {
+  try {
+    await imageModel.findByIdAndDelete(id);
+  } catch (err) {
+    throw createFailure(err, __filename, deleteImageModel.name);
+  }
+}

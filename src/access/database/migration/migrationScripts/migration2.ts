@@ -15,7 +15,7 @@ import { IMigration } from "../migration";
 import { albumModel } from "../../models/albumModel";
 import { imageModel } from "../../models/imageModel";
 import { getMBId } from "../../../api/musicbrainzApi";
-import { deleteImage } from "../../../file/imageFile";
+import { deleteImageFile } from "../../../file/imageFile";
 import { logInfo } from "../../../../utils/logger";
 import { createFailure } from "../../../../utils/Failure";
 
@@ -79,7 +79,7 @@ export const migration2: IMigration = {
             throw createFailure(err, __filename, migration2.down.name);
           }
 
-          deleteImage(cover.path);
+          deleteImageFile(cover.path);
           cover.delete();
 
           a.cover = undefined;

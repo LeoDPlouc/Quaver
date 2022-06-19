@@ -16,6 +16,7 @@ import { connectToDb } from "../access/database/utils";
 import songCollector from "./tasks/songCollector";
 import metadataGrabber from "./tasks/metadataGrabber";
 import coverGrabber from "./tasks/coverGrabber";
+import coverCleaner from "./tasks/coverCleaner";
 
 function getWorker(path: string) {
   return new Worker(path, { env: { ...process.env, IS_PROC: "true" } });
@@ -30,6 +31,7 @@ async function runTasks() {
     await songCollector();
     await metadataGrabber();
     await coverGrabber();
+    await coverCleaner();
   });
 }
 

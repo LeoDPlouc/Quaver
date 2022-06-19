@@ -34,11 +34,11 @@ export async function saveImage(
   return p;
 }
 
-export async function deleteImage(path: string): Promise<null> {
+export async function deleteImageFile(path: string): Promise<null> {
   try {
     await fs.rm(path);
   } catch (err) {
-    throw createFailure(err, __filename, deleteImage.name);
+    throw createFailure(err, __filename, deleteImageFile.name);
   }
 
   return null;
