@@ -19,43 +19,47 @@ export interface imageFileData {
   extension: string;
 }
 
-//Ne plus exporter lors du nettoyage des dépréciés
+//DEPRECIATED Ne plus exporter lors du nettoyage des dépréciés, déplacer dans la class
 export const caApi = new coverart({
   useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)`,
 });
 
-export async function getAlbumCover(mbids: string[]): Promise<imageFileData> {
-  let cover;
-  let ext;
+class CoverArtArchiveAccess {
+  public async getAlbumCover(mbids: string[]): Promise<imageFileData> {
+    let cover;
+    let ext;
 
-  let i = 0;
-  //Try fetching cover art for every MB ID
-  while (!cover && i < mbids.length) {
-    try {
-      //Fetch Cover art
-      let p = new Promise<any>((resolve, reject) => {
-        caApi.release(mbids[i], { piece: "front" }, (err, data) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(data);
+    let i = 0;
+    //Try fetching cover art for every MB ID
+    while (!cover && i < mbids.length) {
+      try {
+        //Fetch Cover art
+        let p = new Promise<any>((resolve, reject) => {
+          caApi.release(mbids[i], { piece: "front" }, (err, data) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(data);
+          });
         });
-      });
-      let { image, extension } = await p;
-      cover = image;
-      ext = extension;
-    } catch {
-    } finally {
-      i++;
+        let { image, extension } = await p;
+        cover = image;
+        ext = extension;
+      } catch {
+      } finally {
+        i++;
+      }
     }
-  }
 
-  if (!cover) {
-    return null;
-  }
+    if (!cover) {
+      return null;
+    }
 
-  return {
-    data: cover,
-    extension: ext,
-  };
+    return {
+      data: cover,
+      extension: ext,
+    };
+  }
 }
+
+export const coverArtArchiveAccess = new CoverArtArchiveAccess();

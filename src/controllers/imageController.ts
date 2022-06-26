@@ -13,14 +13,14 @@
 
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { getAllImages, getImage } from "../service/imageService";
 import { mapImageDTO } from "../mappers/imageMapper";
 import { logError } from "../utils/logger";
 import { ImageSize } from "../models/imageSize";
+import { imageService } from "../service/imageService";
 
 export async function getAllImagesInfoCtrl(req: Request, res: Response) {
   try {
-    var result = await getAllImages();
+    var result = await imageService.getAllImages();
   } catch (err) {
     logError(err);
     res.json({
@@ -56,7 +56,7 @@ export async function getOneImageInfoCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getImage(req.params.id);
+    var result = await imageService.getImage(req.params.id);
   } catch (err) {
     logError(err);
     res.json({
@@ -90,7 +90,7 @@ export async function getImageFileCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getImage(req.params.id);
+    var result = await imageService.getImage(req.params.id);
   } catch (err) {
     logError(err);
     res.json({
@@ -122,7 +122,7 @@ export async function getImageFileWithSizeCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getImage(req.params.id);
+    var result = await imageService.getImage(req.params.id);
   } catch (err) {
     logError(err);
     res.json({

@@ -13,20 +13,15 @@
 
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import {
-  getAllArtists,
-  getArtist,
-  getArtistAlbums,
-  getArtistSongs,
-} from "../service/artistService";
 import { mapArtistDTO } from "../mappers/artistMapper";
 import { mapSongDTO } from "../mappers/songMapper";
 import { mapAlbumDTO } from "../mappers/albumMapper";
 import { logError } from "../utils/logger";
+import { artistService } from "../service/artistService";
 
 export async function getAllArtistsCtrl(req: Request, res: Response) {
   try {
-    var result = await getAllArtists();
+    var result = await artistService.getAllArtists();
   } catch (err) {
     logError(err);
     res.json({
@@ -62,7 +57,7 @@ export async function getOneArtistCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getArtist(req.params.id);
+    var result = await artistService.getArtist(req.params.id);
   } catch (err) {
     logError(err);
     res.json({
@@ -97,7 +92,7 @@ export async function getArtistSongsCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getArtistSongs(req.params.id);
+    var result = await artistService.getArtistSongs(req.params.id);
   } catch (err) {
     logError(err);
     res.json({
@@ -133,7 +128,7 @@ export async function getArtistAlbumsCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getArtistAlbums(req.params.id);
+    var result = await artistService.getArtistAlbums(req.params.id);
   } catch (err) {
     logError(err);
     res.json({

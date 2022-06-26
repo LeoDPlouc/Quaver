@@ -15,16 +15,11 @@ import fs from "fs/promises";
 import path from "path";
 import mm from "mime-types";
 import { MUSIC_PATH } from "../../config/config";
-import { createSong, getAllSongPaths } from "../../service/songService";
-import { getMetadataFromFile } from "../../access/file/songFile";
-import {
-  createAlbum,
-  getAllAlbums,
-  updateAlbum,
-} from "../../service/albumService";
-import { createArtist, getAllArtists } from "../../service/artistService";
 import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
+import { albumService } from "../../service/albumService";
+import { songService } from "../../service/songService";
+import { artistService } from "../../service/artistService";
 
 let songPaths: string[];
 let artists: Artist[];
@@ -62,7 +57,7 @@ async function registerSong(songPath: string) {
     //If the song doesn't already exist, extract its metadata and create a new song
     if (songPaths.find((p) => p == songPath)) return;
 
-    let song = await getMetadataFromFile(songPath);
+    let song = await songService.getMetadataFromFile(songPath);
 
     logInfo(`Found new song ${song.path}`, "Song Collector");
 
@@ -72,7 +67,7 @@ async function registerSong(songPath: string) {
     if (!album) {
       album = { artist: song.artist, title: song.album, year: song.year };
 
-      albumId = await createAlbum(album);
+      albumId = await albumService.createAlbum(album);
 
       logInfo(`Found new album ${album.title}`, "Song Collector");
 
@@ -85,7 +80,7 @@ async function registerSong(songPath: string) {
     if (!artist) {
       artist = { name: song.artist };
 
-      artistId = await createArtist(artist);
+      artistId = await artistService.createArtist(artist);
 
       logInfo(`Found new artist ${artist.name}`, "Song Collector");
 
@@ -93,11 +88,11 @@ async function registerSong(songPath: string) {
     }
 
     album.artistId = artistId;
-    await updateAlbum(album);
+    await albumService.updateAlbum(album);
 
     song.artistId = artistId;
     song.albumId = albumId;
-    await createSong(song);
+    await songService.createSong(song);
   } catch (err) {
     throw createFailure(
       "Song collection error",
@@ -110,7 +105,7 @@ async function registerSong(songPath: string) {
 
 async function updatePaths(): Promise<void> {
   try {
-    songPaths = await getAllSongPaths();
+    songPaths = await songService.getAllSongPaths();
   } catch (err) {
     throw createFailure("Path update error", __filename, updatePaths.name, err);
   }
@@ -118,7 +113,7 @@ async function updatePaths(): Promise<void> {
 
 async function updateAlbums(): Promise<void> {
   try {
-    albums = await getAllAlbums();
+    albums = await albumService.getAllAlbums();
   } catch (err) {
     throw createFailure("Service error", __filename, updateAlbums.name, err);
   }
@@ -126,7 +121,7 @@ async function updateAlbums(): Promise<void> {
 
 async function updateArtists(): Promise<void> {
   try {
-    artists = await getAllArtists();
+    artists = await artistService.getAllArtists();
   } catch (err) {
     throw createFailure("Service error", __filename, updateArtists.name, err);
   }

@@ -16,47 +16,57 @@ import { APP_VERSION } from "../../config/appConfig";
 import { createFailure } from "../../utils/Failure";
 import { logError } from "../../utils/logger";
 
-//Ne plus exporter lors du nettoyage des dépréciés
+//DEPRCIATED Ne plus exporter lors du nettoyage des dépréciés, mettre dans la class
 export const mbApi = new MusicBrainzApi({
   appName: "Quaver",
   appVersion: APP_VERSION,
   appContactInfo: "https://github.com/LeoDPlouc/Quaver",
 });
 
-export async function getMBId(album: Album): Promise<string[]> {
-  //Build query with available info
-  let query = `release:${album.title as string}`;
+class MusicBrainzApiAccess {
+  public async getMBId(
+    this: MusicBrainzApiAccess,
+    album: Album
+  ): Promise<string[]> {
+    //Build query with available info
+    let query = `release:${album.title as string}`;
 
-  if (album.artist) {
-    query += ` AND artist:${album.artist}`;
-  }
-
-  try {
-    var result = await mbApi.search<IReleaseList>("release", { query });
-  } catch (err) {
-    throw createFailure(err, __filename, getMBId.name);
-  }
-  //Only keep ids of the release with score 100
-  var releases = result.releases.filter((release) => release.score == 100);
-  var ids = releases.map((release) => release.id);
-
-  return ids;
-}
-
-export async function getMetadataFromMB(mbids: string[]): Promise<Album> {
-  let album: Album = {};
-
-  for (let i = 0; i < mbids.length; i++) {
-    try {
-      let release = await mbApi.getRelease(mbids[i]);
-
-      if (!album.artist) album.artist = release["artist-credit"]?.[0]?.name;
-      if (!album.title) album.title = release.title;
-      if (!album.year) album.year = new Date(release.date).getFullYear();
-    } catch (err) {
-      logError(createFailure(err, __filename, getMetadataFromMB.name));
+    if (album.artist) {
+      query += ` AND artist:${album.artist}`;
     }
+
+    try {
+      var result = await mbApi.search<IReleaseList>("release", { query });
+    } catch (err) {
+      throw createFailure(err, __filename, this.getMBId.name);
+    }
+    //Only keep ids of the release with score 100
+    var releases = result.releases.filter((release) => release.score == 100);
+    var ids = releases.map((release) => release.id);
+
+    return ids;
   }
 
-  return album;
+  public async getMetadataFromMB(
+    this: MusicBrainzApiAccess,
+    mbids: string[]
+  ): Promise<Album> {
+    let album: Album = {};
+
+    for (let i = 0; i < mbids.length; i++) {
+      try {
+        let release = await mbApi.getRelease(mbids[i]);
+
+        if (!album.artist) album.artist = release["artist-credit"]?.[0]?.name;
+        if (!album.title) album.title = release.title;
+        if (!album.year) album.year = new Date(release.date).getFullYear();
+      } catch (err) {
+        logError(createFailure(err, __filename, this.getMetadataFromMB.name));
+      }
+    }
+
+    return album;
+  }
 }
+
+export const musicBrainzApiAccess = new MusicBrainzApiAccess();

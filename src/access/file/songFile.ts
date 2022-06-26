@@ -18,41 +18,49 @@ import { parseFile } from "music-metadata";
 import Path from "path";
 import { createFailure } from "../../utils/Failure";
 
-export async function getAcoustid(songPath: string): Promise<string> {
-  let fingerprint: FpcalcResult<string>;
+class SongFileAccess {
+  public async getAcoustid(
+    this: SongFileAccess,
+    songPath: string
+  ): Promise<string> {
+    let fingerprint: FpcalcResult<string>;
 
-  //If fpcalc isn't in PATH, use fpcalc with its path
-  try {
-    if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH });
-    else fingerprint = await fp(songPath);
-  } catch (err) {
-    throw createFailure(err, __filename, getAcoustid.name);
+    //If fpcalc isn't in PATH, use fpcalc with its path
+    try {
+      if (FPCALC_PATH)
+        fingerprint = await fp(songPath, { command: FPCALC_PATH });
+      else fingerprint = await fp(songPath);
+    } catch (err) {
+      throw createFailure(err, __filename, this.getAcoustid.name);
+    }
+
+    return fingerprint.fingerprint;
   }
 
-  return fingerprint.fingerprint;
-}
+  public async getMetadataFromFile(
+    this: SongFileAccess,
+    songPath: string
+  ): Promise<Song> {
+    try {
+      var tag = await parseFile(songPath);
+    } catch (err) {
+      throw createFailure(err, __filename, this.getMetadataFromFile.name);
+    }
 
-export async function getMetadataFromFile(songPath: string): Promise<Song> {
-  try {
-    var tag = await parseFile(songPath);
-  } catch (err) {
-    throw createFailure(err, __filename, getMetadataFromFile.name);
+    let format = Path.extname(songPath);
+
+    return {
+      title: tag.common.title,
+      n: tag.common.track.no,
+      artist: tag.common.albumartist,
+      album: tag.common.album,
+      year: tag.common.year,
+      duration: tag.format.duration,
+      like: 0,
+      path: songPath,
+      format: format,
+    };
   }
-
-  let format = Path.extname(songPath);
-
-  let fp = await getAcoustid(songPath);
-
-  return {
-    title: tag.common.title,
-    n: tag.common.track.no,
-    artist: tag.common.albumartist,
-    album: tag.common.album,
-    year: tag.common.year,
-    duration: tag.format.duration,
-    like: 0,
-    path: songPath,
-    format: format,
-    acoustid: fp,
-  };
 }
+
+export const songFileAccess = new SongFileAccess();

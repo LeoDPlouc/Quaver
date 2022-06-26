@@ -11,12 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getAllAlbums } from "../../service/albumService";
-import {
-  deleteImage,
-  getAllImages,
-  getTinyLessImage,
-} from "../../service/imageService";
+import { albumService } from "../../service/albumService";
+import { imageService } from "../../service/imageService";
 import { logError, logInfo } from "../../utils/logger";
 
 let images: Image[] = [];
@@ -26,7 +22,7 @@ async function cleanAlbumlessImages() {
   for (let i = 0; i < images.length; i++) {
     if (!albums.find((a) => a.cover == images[i].id)) {
       try {
-        await await deleteImage(images[i].id);
+        await await imageService.deleteImage(images[i].id);
         logInfo(`Deleted image ${images[i].id}`, "Cover Cleaner");
       } catch (err) {
         logError(err);
@@ -42,11 +38,11 @@ async function cleanTinylessImages() {
 export default async function doWork() {
   logInfo("Cover cleaner started", "Cover Cleaner");
 
-  images = await getAllImages();
-  albums = await getAllAlbums();
+  images = await imageService.getAllImages();
+  albums = await albumService.getAllAlbums();
 
   await cleanAlbumlessImages();
 
-  images = await getTinyLessImage();
-  albums = await getAllAlbums();
+  images = await imageService.getTinyLessImage();
+  albums = await albumService.getAllAlbums();
 }

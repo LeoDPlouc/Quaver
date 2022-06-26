@@ -15,10 +15,10 @@ import { IReleaseList } from "musicbrainz-api";
 import { Document } from "mongoose";
 import { mbApi } from "../../../api/musicbrainzApi";
 import { caApi } from "../../../api/coverArtArchive";
-import { saveImage } from "../../../file/imageFile";
 import { imageModel } from "../../models/imageModel";
 import { createFailure } from "../../../../utils/Failure";
 import { logInfo } from "../../../../utils/logger";
+import { imageFileAccess } from "../../../file/imageFile";
 
 export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
   let query = `release:${album.title as string}`;
@@ -62,7 +62,7 @@ export async function getAlbumCoverLegacy(
     //Save the image cover on the hard drive
 
     try {
-      var path = await saveImage(image, extension);
+      var path = await imageFileAccess.saveImage(image, extension);
     } catch (err) {
       throw createFailure(err, __filename, getAlbumCoverLegacy.name);
     }
@@ -111,7 +111,7 @@ export async function getAlbumCoverLegacy2(
     //Save the image cover on the hard drive
 
     try {
-      var path = await saveImage(cover, ext);
+      var path = await imageFileAccess.saveImage(cover, ext);
     } catch (err) {
       throw createFailure(err, __filename, getAlbumCoverLegacy2.name);
     }
