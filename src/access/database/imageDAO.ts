@@ -50,3 +50,13 @@ export async function deleteImageModel(id: string): Promise<void> {
     throw createFailure(err, __filename, deleteImageModel.name);
   }
 }
+
+export async function getTinyLessImageModel(): Promise<
+  (Image & Document<any, any, Image>)[]
+> {
+  try {
+    return await imageModel.find({ tiny: null });
+  } catch (err) {
+    throw createFailure(err, __filename, getTinyLessImageModel.name);
+  }
+}

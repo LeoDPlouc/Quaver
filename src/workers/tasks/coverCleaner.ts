@@ -12,7 +12,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getAllAlbums } from "../../service/albumService";
-import { deleteImage, getAllImages } from "../../service/imageService";
+import {
+  deleteImage,
+  getAllImages,
+  getTinyLessImage,
+} from "../../service/imageService";
 import { logError, logInfo } from "../../utils/logger";
 
 let images: Image[] = [];
@@ -22,13 +26,17 @@ async function cleanAlbumlessImages() {
   for (let i = 0; i < images.length; i++) {
     if (!albums.find((a) => a.cover == images[i].id)) {
       try {
-        await deleteImage(images[i].id);
+        await await deleteImage(images[i].id);
         logInfo(`Deleted image ${images[i].id}`, "Cover Cleaner");
       } catch (err) {
         logError(err);
       }
     }
   }
+}
+
+async function cleanTinylessImages() {
+  for (let i = 0; i < images.length; i++) {}
 }
 
 export default async function doWork() {
@@ -38,4 +46,7 @@ export default async function doWork() {
   albums = await getAllAlbums();
 
   await cleanAlbumlessImages();
+
+  images = await getTinyLessImage();
+  albums = await getAllAlbums();
 }

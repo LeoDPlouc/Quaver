@@ -17,6 +17,7 @@ import {
   deleteImageModel,
   getAllImagesModels,
   getImageModel,
+  getTinyLessImageModel,
 } from "../access/database/imageDAO";
 import { mapImage } from "../mappers/imageMapper";
 import { createFailure } from "../utils/Failure";
@@ -155,5 +156,13 @@ export async function deleteAllImageFiles(image: Image): Promise<void> {
     await deleteImageFile(image?.verylarge);
   } catch (err) {
     throw createFailure("File access error", __filename, deleteImage.name, err);
+  }
+}
+
+export async function getTinyLessImage(): Promise<Image[]> {
+  try {
+    return (await getTinyLessImageModel()).map(mapImage);
+  } catch (err) {
+    throw createFailure("DAO error", __filename, getTinyLessImage.name, err);
   }
 }
