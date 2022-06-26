@@ -11,34 +11,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  getCover,
-  getToCoverGrabAlbums,
-  updateAlbum,
-} from "../../service/albumService";
-import {
-  createImage,
-  makeResizing,
-  saveImageFile,
-} from "../../service/imageService";
+import { albumService } from "../../service/albumService";
+import { imageService } from "../../service/imageService";
 import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
 
 async function updateAlbumCover(album: Album) {
   try {
-    let coverData = await getCover(album);
+    let coverData = await albumService.getCover(album);
     if (!coverData) return;
 
-    let resizes = await makeResizing(coverData);
+    let resizes = await imageService.makeResizing(coverData);
 
-    let tinyPath = await saveImageFile(resizes.tiny);
-    if (resizes.small) var smallPath = await saveImageFile(resizes.small);
-    if (resizes.medium) var mediumPath = await saveImageFile(resizes.medium);
-    if (resizes.large) var largePath = await saveImageFile(resizes.large);
+    let tinyPath = await imageService.saveImageFile(resizes.tiny);
+    if (resizes.small)
+      var smallPath = await imageService.saveImageFile(resizes.small);
+    if (resizes.medium)
+      var mediumPath = await imageService.saveImageFile(resizes.medium);
+    if (resizes.large)
+      var largePath = await imageService.saveImageFile(resizes.large);
     if (resizes.verylarge)
-      var verylargePath = await saveImageFile(resizes.verylarge);
+      var verylargePath = await imageService.saveImageFile(resizes.verylarge);
 
-    let id = await createImage({
+    let id = await imageService.createImage({
       path: tinyPath,
       tiny: tinyPath,
       large: largePath,
@@ -49,7 +44,7 @@ async function updateAlbumCover(album: Album) {
 
     album.cover = id;
     album.lastCoverUpdate = Date.now();
-    updateAlbum(album);
+    albumService.updateAlbum(album);
     logInfo(`Updated cover of album ${album.id}`, "Cover Grabber");
   } catch (err) {
     throw createFailure("Task failure", __filename, updateAlbumCover.name, err);
@@ -58,7 +53,7 @@ async function updateAlbumCover(album: Album) {
 
 export default async function doWork() {
   logInfo("Cover grabber startded", "Cover Grabber");
-  let albums = await getToCoverGrabAlbums();
+  let albums = await albumService.getToCoverGrabAlbums();
 
   for (let i = 0; i < albums.length; i++) {
     try {

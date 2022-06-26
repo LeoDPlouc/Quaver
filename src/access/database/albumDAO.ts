@@ -16,104 +16,115 @@ import { createFailure } from "../../utils/Failure";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";
 
-export async function getAllAlbumModels(): Promise<
-  (Album & Document<any, any, Album>)[]
-> {
-  try {
-    return await albumModel.find();
-  } catch (err) {
-    throw createFailure(err, __filename, getAllAlbumModels.name);
+class AlbumDAO {
+  public async getAllAlbumModels(
+    this: AlbumDAO
+  ): Promise<(Album & Document<any, any, Album>)[]> {
+    try {
+      return await albumModel.find();
+    } catch (err) {
+      throw createFailure(err, __filename, this.getAllAlbumModels.name);
+    }
+  }
+
+  public async getAlbumModel(
+    this: AlbumDAO,
+    id: string
+  ): Promise<Album & Document<any, any, Album>> {
+    try {
+      return await albumModel.findById(id);
+    } catch (err) {
+      throw createFailure(err, __filename, this.getAlbumModel.name);
+    }
+  }
+
+  public async getAlbumSongModel(
+    this: AlbumDAO,
+    id: string
+  ): Promise<(Song & Document<any, any, Song>)[]> {
+    try {
+      return await songModel.find({ albumId: id });
+    } catch (err) {
+      throw createFailure(err, __filename, this.getAlbumSongModel.name);
+    }
+  }
+
+  public async createAlbumModel(this: AlbumDAO, album: Album): Promise<string> {
+    try {
+      return (await albumModel.create(album)).id;
+    } catch (err) {
+      throw createFailure(err, __filename, this.createAlbumModel.name);
+    }
+  }
+
+  public async findAlbumModelByName(
+    this: AlbumDAO,
+    albumTitle: string,
+    artistName?: string
+  ): Promise<(Album & Document<any, any, Album>)[]> {
+    var query: Album = { title: albumTitle };
+    if (artistName) query.artist = artistName;
+
+    try {
+      return await albumModel.find(query);
+    } catch (err) {
+      throw createFailure(err, __filename, this.findAlbumModelByName.name);
+    }
+  }
+
+  public async updateAlbumModel(this: AlbumDAO, album: Album): Promise<void> {
+    try {
+      await albumModel.findByIdAndUpdate(album.id, album);
+    } catch (err) {
+      throw createFailure(err, __filename, this.updateAlbumModel.name);
+    }
+  }
+
+  public async getMbidlessAlbumModels(
+    this: AlbumDAO
+  ): Promise<(Album & Document<any, any, Album>)[]> {
+    try {
+      return await albumModel.find({ mbids: { $size: 0 } });
+    } catch (err) {
+      throw createFailure(err, __filename, this.getMbidlessAlbumModels.name);
+    }
+  }
+
+  public async getUpdatableAlbumModels(
+    this: AlbumDAO
+  ): Promise<(Album & Document<any, any, Album>)[]> {
+    try {
+      return await albumModel.find({
+        $or: [
+          { lastUpdated: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
+          { lastUpdated: { $exists: false } },
+          { lastUpdated: null },
+        ],
+      });
+    } catch (err) {
+      throw createFailure(err, __filename, this.getUpdatableAlbumModels.name);
+    }
+  }
+
+  public async getToCoverGrabAlbumsModels(
+    this: AlbumDAO
+  ): Promise<(Album & Document<any, any, Album>)[]> {
+    try {
+      return await albumModel.find({
+        $or: [
+          { cover: { $eq: null } },
+          { lastCoverUpdate: null },
+          { lastCoverUpdate: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
+        ],
+      });
+    } catch (err) {
+      throw createFailure(
+        err,
+        __filename,
+        this.getToCoverGrabAlbumsModels.name
+      );
+    }
   }
 }
 
-export async function getAlbumModel(
-  id: string
-): Promise<Album & Document<any, any, Album>> {
-  try {
-    return await albumModel.findById(id);
-  } catch (err) {
-    throw createFailure(err, __filename, getAlbumModel.name);
-  }
-}
-
-export async function getAlbumSongModel(
-  id: string
-): Promise<(Song & Document<any, any, Song>)[]> {
-  try {
-    return await songModel.find({ albumId: id });
-  } catch (err) {
-    throw createFailure(err, __filename, getAlbumSongModel.name);
-  }
-}
-
-export async function createAlbumModel(album: Album): Promise<string> {
-  try {
-    return (await albumModel.create(album)).id;
-  } catch (err) {
-    throw createFailure(err, __filename, createAlbumModel.name);
-  }
-}
-
-export async function findAlbumModelByName(
-  albumTitle: string,
-  artistName?: string
-): Promise<(Album & Document<any, any, Album>)[]> {
-  var query: Album = { title: albumTitle };
-  if (artistName) query.artist = artistName;
-
-  try {
-    return await albumModel.find(query);
-  } catch (err) {
-    throw createFailure(err, __filename, findAlbumModelByName.name);
-  }
-}
-
-export async function updateAlbumModel(album: Album): Promise<void> {
-  try {
-    await albumModel.findByIdAndUpdate(album.id, album);
-  } catch (err) {
-    throw createFailure(err, __filename, updateAlbumModel.name);
-  }
-}
-
-export async function getMbidlessAlbumModels(): Promise<
-  (Album & Document<any, any, Album>)[]
-> {
-  try {
-    return await albumModel.find({ mbids: { $size: 0 } });
-  } catch (err) {
-    throw createFailure(err, __filename, getMbidlessAlbumModels.name);
-  }
-}
-
-export async function getUpdatableAlbumModels(): Promise<
-  (Album & Document<any, any, Album>)[]
-> {
-  try {
-    return await albumModel.find({
-      $or: [
-        { lastUpdated: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
-        { lastUpdated: { $exists: false } },
-        { lastUpdated: null },
-      ],
-    });
-  } catch (err) {
-    throw createFailure(err, __filename, getUpdatableAlbumModels.name);
-  }
-}
-
-export async function getToCoverGrabAlbumsModels(): Promise<
-  (Album & Document<any, any, Album>)[]
-> {
-  try {
-    return await albumModel.find({
-      $or: [
-        { cover: { $eq: null } },
-        { lastCoverUpdate: null },
-        { lastCoverUpdate: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
-      ],
-    });
-  } catch (err) {
-    throw createFailure(err, __filename, getToCoverGrabAlbumsModels.name);
-  }
-}
+export const albumDAO = new AlbumDAO();

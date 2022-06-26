@@ -13,13 +13,13 @@
 
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { getAllSongs, getSong, updateSong } from "../service/songService";
 import { mapSongDTO } from "../mappers/songMapper";
+import { songService } from "../service/songService";
 import { logError } from "../utils/logger";
 
 export async function getAllSongsInfoCtrl(req: Request, res: Response) {
   try {
-    var result = await getAllSongs();
+    var result = await songService.getAllSongs();
   } catch (err) {
     logError(err);
     res.json({
@@ -55,7 +55,7 @@ export async function getOneSongInfoCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getSong(req.params.id);
+    var result = await songService.getSong(req.params.id);
   } catch (err) {
     logError(err);
     res.json({
@@ -90,7 +90,7 @@ export async function getSongStreamCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getSong(req.params.id);
+    var result = await songService.getSong(req.params.id);
   } catch (err) {
     logError(err);
     res.json({
@@ -116,7 +116,7 @@ export async function updateLikeCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getSong(req.params.id);
+    var result = await songService.getSong(req.params.id);
   } catch (err) {
     logError(err);
     res.json({
@@ -129,7 +129,7 @@ export async function updateLikeCtrl(req: Request, res: Response) {
 
   //Update the like field
   result.like = Number(req.body.like);
-  updateSong(result);
+  songService.updateSong(result);
 
   res.json({
     status: "success",

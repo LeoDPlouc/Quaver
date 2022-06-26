@@ -15,30 +15,53 @@ import { Document } from "mongoose";
 import { createFailure } from "../../utils/Failure";
 import { imageModel } from "./models/imageModel";
 
-export async function getAllImagesModels(): Promise<
-  (Image & Document<any, any, Image>)[]
-> {
-  try {
-    return await imageModel.find();
-  } catch (err) {
-    throw createFailure(err, __filename, getAllImagesModels.name);
+class ImageDAO {
+  public async getAllImagesModels(
+    this: ImageDAO
+  ): Promise<(Image & Document<any, any, Image>)[]> {
+    try {
+      return await imageModel.find();
+    } catch (err) {
+      throw createFailure(err, __filename, this.getAllImagesModels.name);
+    }
+  }
+
+  public async getImageModel(
+    this: ImageDAO,
+    id: string
+  ): Promise<Image & Document<any, any, Image>> {
+    try {
+      return await imageModel.findById(id);
+    } catch (err) {
+      createFailure(err, __filename, this.getImageModel.name);
+    }
+  }
+
+  public async createImageModel(this: ImageDAO, image: Image): Promise<string> {
+    try {
+      return (await imageModel.create(image)).id;
+    } catch (err) {
+      throw createFailure(err, __filename, this.createImageModel.name);
+    }
+  }
+
+  public async deleteImageModel(this: ImageDAO, id: string): Promise<void> {
+    try {
+      await imageModel.findByIdAndDelete(id);
+    } catch (err) {
+      throw createFailure(err, __filename, this.deleteImageModel.name);
+    }
+  }
+
+  public async getTinyLessImageModel(
+    this: ImageDAO
+  ): Promise<(Image & Document<any, any, Image>)[]> {
+    try {
+      return await imageModel.find({ tiny: null });
+    } catch (err) {
+      throw createFailure(err, __filename, this.getTinyLessImageModel.name);
+    }
   }
 }
 
-export async function getImageModel(
-  id: string
-): Promise<Image & Document<any, any, Image>> {
-  try {
-    return await imageModel.findById(id);
-  } catch (err) {
-    createFailure(err, __filename, getImageModel.name);
-  }
-}
-
-export async function createImageModel(image: Image): Promise<string> {
-  try {
-    return (await imageModel.create(image)).id;
-  } catch (err) {
-    throw createFailure(err, __filename, createImageModel.name);
-  }
-}
+export const imageDAO = new ImageDAO();
