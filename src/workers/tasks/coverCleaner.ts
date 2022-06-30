@@ -13,36 +13,63 @@
 
 import { albumService } from "../../service/albumService";
 import { imageService } from "../../service/imageService";
+import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
 
-let images: Image[] = [];
-let albums: Album[] = [];
-
 async function cleanAlbumlessImages() {
+  try {
+    var images = await imageService.getAllImages();
+    var albums = await albumService.getAllAlbums();
+  } catch (err) {
+    throw createFailure(
+      "DAO error",
+      __filename,
+      cleanAlbumlessImages.name,
+      err
+    );
+  }
+
   for (let i = 0; i < images.length; i++) {
     if (!albums.find((a) => a.cover == images[i].id)) {
       try {
-        await await imageService.deleteImage(images[i].id);
+        await imageService.deleteImageModel(images[i].id);
         logInfo(`Deleted image ${images[i].id}`, "Cover Cleaner");
       } catch (err) {
-        logError(err);
+        logError(
+          createFailure("DAO error", __filename, cleanAlbumlessImages.name, err)
+        );
       }
     }
   }
 }
 
 async function cleanTinylessImages() {
-  for (let i = 0; i < images.length; i++) {}
+  try {
+    var images = await imageService.getTinyLessImage();
+  } catch (err) {
+    throw createFailure("DAO err", __filename, cleanTinylessImages.name, err);
+  }
+
+  for (let i = 0; i < images.length; i++) {
+    try {
+      await imageService.deleteImageModel(images[i].id);
+    } catch (err) {
+      logError(
+        createFailure("DAO error", __filename, cleanTinylessImages.name, err)
+      );
+    }
+  }
 }
 
 export default async function doWork() {
   logInfo("Cover cleaner started", "Cover Cleaner");
 
-  images = await imageService.getAllImages();
-  albums = await albumService.getAllAlbums();
-
-  await cleanAlbumlessImages();
-
-  images = await imageService.getTinyLessImage();
-  albums = await albumService.getAllAlbums();
+  try {
+    await cleanAlbumlessImages();
+    await cleanTinylessImages();
+  } catch (err) {
+    logError(
+      createFailure("Cover cleaner error", __filename, doWork.name, err)
+    );
+  }
 }

@@ -132,11 +132,32 @@ class ImageService {
     }
   }
 
-  public async deleteImage(this: ImageService, id: string): Promise<void> {
+  public async deleteImageModel(this: ImageService, id: string): Promise<void> {
     try {
       await imageDAO.deleteImageModel(id);
     } catch (err) {
-      throw createFailure("DAO error", __filename, this.deleteImage.name, err);
+      throw createFailure(
+        "DAO error",
+        __filename,
+        this.deleteImageModel.name,
+        err
+      );
+    }
+  }
+
+  public async deleteImageFile(
+    this: ImageService,
+    path: string
+  ): Promise<void> {
+    try {
+      await imageFileAccess.deleteImageFile(path);
+    } catch (err) {
+      throw createFailure(
+        "File access error",
+        __filename,
+        this.deleteImageFile.name,
+        err
+      );
     }
   }
 
@@ -155,7 +176,7 @@ class ImageService {
       throw createFailure(
         "File access error",
         __filename,
-        this.deleteImage.name,
+        this.deleteAllImageFiles.name,
         err
       );
     }
