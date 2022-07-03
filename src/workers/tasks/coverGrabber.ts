@@ -52,7 +52,7 @@ async function updateAlbumCover(album: Album) {
 }
 
 export default async function doWork() {
-  logInfo("Cover grabber startded", "Cover Grabber");
+  logInfo("Cover grabber started", "Cover Grabber");
   let albums = await albumService.getToCoverGrabAlbums();
 
   for (let i = 0; i < albums.length; i++) {

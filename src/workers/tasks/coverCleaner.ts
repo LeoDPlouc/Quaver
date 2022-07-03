@@ -11,7 +11,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { IMAGES_PATH } from "../../config/config";
 import { albumService } from "../../service/albumService";
+import { fileService } from "../../service/fileService";
 import { imageService } from "../../service/imageService";
 import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
@@ -61,12 +63,50 @@ async function cleanTinylessImages() {
   }
 }
 
+async function cleanImageLessFiles() {
+  try {
+    var coverFiles = (await imageService.getAllImages())
+      .map((i) => [i.large, i.medium, i.path, i.small, i.tiny, i.verylarge])
+      .reduce((tab1, tab2) => [...tab1, ...tab2], [])
+      .filter((p) => p);
+    var files = await fileService.getAllFiles(IMAGES_PATH);
+  } catch (err) {
+    logError(
+      createFailure(
+        "Cover cleaner error",
+        __filename,
+        cleanImageLessFiles.name,
+        err
+      )
+    );
+  }
+
+  for (let i = 0; i < files.length; i++) {
+    if (!coverFiles.find((p) => p == files[i])) {
+      try {
+        await imageService.deleteImageFile(files[i]);
+        logInfo(`Deleted cover ${files[i]}`, "Cover Cleaner");
+      } catch (err) {
+        logError(
+          createFailure(
+            "Cover cleaner error",
+            __filename,
+            cleanImageLessFiles.name,
+            err
+          )
+        );
+      }
+    }
+  }
+}
+
 export default async function doWork() {
   logInfo("Cover cleaner started", "Cover Cleaner");
 
   try {
     await cleanAlbumlessImages();
     await cleanTinylessImages();
+    await cleanImageLessFiles();
   } catch (err) {
     logError(
       createFailure("Cover cleaner error", __filename, doWork.name, err)

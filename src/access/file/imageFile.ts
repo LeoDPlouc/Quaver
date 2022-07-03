@@ -39,14 +39,12 @@ class ImageFileAccess {
   public async deleteImageFile(
     this: ImageFileAccess,
     path: string
-  ): Promise<null> {
+  ): Promise<void> {
     try {
       await fs.rm(path);
     } catch (err) {
       throw createFailure(err, __filename, this.deleteImageFile.name);
     }
-
-    return null;
   }
 }
 
