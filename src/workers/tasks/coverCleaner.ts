@@ -45,6 +45,40 @@ async function cleanAlbumlessImages() {
   }
 }
 
+async function cleanTinyLessFiles() {
+  try {
+    var images = await imageService.getAllImages();
+    var files = await fileService.getAllFiles(IMAGES_PATH);
+  } catch (err) {
+    logError(
+      createFailure(
+        "Cover cleaner error",
+        __filename,
+        cleanTinyLessFiles.name,
+        err
+      )
+    );
+  }
+
+  for (let i = 0; i < images.length; i++) {
+    if (!files.find((f) => f == images[i].tiny)) {
+      try {
+        imageService.deleteImageModel(images[i].id);
+        logInfo(`Deleted cover ${files[i]}`, "Cover Cleaner");
+      } catch (err) {
+        logError(
+          createFailure(
+            "Cover cleaner error",
+            __filename,
+            cleanTinyLessFiles.name,
+            err
+          )
+        );
+      }
+    }
+  }
+}
+
 async function cleanTinylessImages() {
   try {
     var images = await imageService.getTinyLessImage();
@@ -138,6 +172,7 @@ export default async function doWork() {
 
   try {
     await cleanAlbumlessImages();
+    await cleanTinyLessFiles();
     await cleanTinylessImages();
     await cleanImageLessFiles();
     await cleanAlbumCoverId();
