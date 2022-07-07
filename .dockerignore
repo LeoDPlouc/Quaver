@@ -8,8 +8,6 @@ README.MD
 docker-compose*
 build
 .vscode
-dist
 images
 logs
 music
-publish
