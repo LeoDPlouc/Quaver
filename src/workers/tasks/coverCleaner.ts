@@ -167,12 +167,45 @@ async function cleanAlbumCoverId() {
   }
 }
 
+async function cleanDeadFiles() {
+  try {
+    var images = await imageService.getAllImages();
+    var files = await fileService.getAllFiles(IMAGES_PATH);
+  } catch (err) {
+    throw createFailure("DAO err", __filename, cleanTinylessImages.name, err);
+  }
+
+  try {
+    for (let i = 0; i < images.length; i++) {
+      let isDead = ![
+        images[i].large,
+        images[i].medium,
+        images[i].small,
+        images[i].verylarge,
+      ]
+        .filter((i) => !!i)
+        .map((i) => !!files.find((f) => f == i))
+        .reduce((prev, cur) => prev && cur, true);
+
+      if (isDead) {
+        imageService.deleteImageModel(images[i].id);
+        logInfo(`Deleted image ${images[i].id}`, "Cover Cleaner");
+      }
+    }
+  } catch (err) {
+    logError(
+      createFailure("Cover cleaner error", __filename, cleanDeadFiles.name, err)
+    );
+  }
+}
+
 export default async function doWork() {
   logInfo("Cover cleaner started", "Cover Cleaner");
 
   try {
     await cleanAlbumlessImages();
     await cleanTinyLessFiles();
+    await cleanDeadFiles();
     await cleanTinylessImages();
     await cleanImageLessFiles();
     await cleanAlbumCoverId();
