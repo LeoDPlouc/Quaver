@@ -100,6 +100,39 @@ async function cleanImageLessFiles() {
   }
 }
 
+async function cleanAlbumCoverId() {
+  try {
+    var images = await imageService.getAllImages();
+    var albums = await albumService.getAllAlbums();
+  } catch (err) {
+    throw createFailure(
+      "DAO error",
+      __filename,
+      cleanAlbumlessImages.name,
+      err
+    );
+  }
+
+  try {
+    for (let i = 0; i < albums.length; i++) {
+      if (albums[i].cover && !images.find((im) => im.id == albums[i].cover)) {
+        albums[i].cover = null;
+        await albumService.updateAlbum(albums[i]);
+        logInfo(`Clean cover id for ${albums[i].id}`, "Cover Cleaner");
+      }
+    }
+  } catch (err) {
+    logError(
+      createFailure(
+        "Cover cleaner error",
+        __filename,
+        cleanAlbumCoverId.name,
+        err
+      )
+    );
+  }
+}
+
 export default async function doWork() {
   logInfo("Cover cleaner started", "Cover Cleaner");
 
@@ -107,6 +140,7 @@ export default async function doWork() {
     await cleanAlbumlessImages();
     await cleanTinylessImages();
     await cleanImageLessFiles();
+    await cleanAlbumCoverId();
   } catch (err) {
     logError(
       createFailure("Cover cleaner error", __filename, doWork.name, err)
