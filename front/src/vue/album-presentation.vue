@@ -17,10 +17,10 @@
 <template>
   <div>
     <div class="albumPresentationHeader">
-      <img
-        loading="lazy"
+      <cover
         class="albumPresentationCover"
-        :src="getCoverURL(album.cover)"
+        :cover-id="album.cover"
+        :size="size"
       />
       <div class="albumPresentationInfos">
         <div class="albumPresentationInfo">{{ album.title }}</div>
@@ -38,12 +38,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { getAlbum } from "../fetch";
-import { Album } from "../models";
+import { Album, ImageSize } from "../models";
 import { getCoverURL } from "../util";
+import coverVue from "./cover.vue";
 import songList from "./song-list.vue";
 
 export default defineComponent({
-  components: { songList },
+  components: { songList, cover: coverVue },
 
   emits: ["song-changed"],
 
@@ -54,6 +55,7 @@ export default defineComponent({
   data() {
     return {
       album: {} as Album,
+      size: ImageSize.medium,
     };
   },
 

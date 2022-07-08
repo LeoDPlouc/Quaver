@@ -13,14 +13,14 @@
 
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { getAlbum, getAlbumSongs, getAllAlbums } from "../service/albumService";
 import { mapAlbumDTO } from "../mappers/albumMapper";
 import { mapSongDTO } from "../mappers/songMapper";
+import { albumService } from "../service/albumService";
 import { logError } from "../utils/logger";
 
 export async function getAllAlbumsCtrl(req: Request, res: Response) {
   try {
-    var result = await getAllAlbums();
+    var result = await albumService.getAllAlbums();
   } catch (err) {
     logError(err);
 
@@ -58,7 +58,7 @@ export async function getAlbumCtrl(req: Request, res: Response) {
 
   //Search an album by id and clean the output
   try {
-    var result = await getAlbum(req.params.id);
+    var result = await albumService.getAlbum(req.params.id);
   } catch (err) {
     logError(err);
 
@@ -93,7 +93,7 @@ export async function getAlbumSongsCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await getAlbumSongs(req.params.id);
+    var result = await albumService.getAlbumSongs(req.params.id);
   } catch (err) {
     logError(err);
     res.json({

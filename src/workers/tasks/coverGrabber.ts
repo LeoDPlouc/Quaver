@@ -11,34 +11,49 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  getCover,
-  getCoverlessAlbums,
-  updateAlbum,
-} from "../../service/albumService";
-import { createImage, saveImageFile } from "../../service/imageService";
+import { albumService } from "../../service/albumService";
+import { imageService } from "../../service/imageService";
 import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
 
 async function updateAlbumCover(album: Album) {
   try {
-    let coverData = await getCover(album);
+    let coverData = await albumService.getCover(album);
     if (!coverData) return;
 
-    let path = await saveImageFile(coverData);
-    let id = await createImage({ path });
+    let resizes = await imageService.makeResizing(coverData);
+
+    let tinyPath = await imageService.saveImageFile(resizes.tiny);
+    if (resizes.small)
+      var smallPath = await imageService.saveImageFile(resizes.small);
+    if (resizes.medium)
+      var mediumPath = await imageService.saveImageFile(resizes.medium);
+    if (resizes.large)
+      var largePath = await imageService.saveImageFile(resizes.large);
+    if (resizes.verylarge)
+      var verylargePath = await imageService.saveImageFile(resizes.verylarge);
+
+    let id = await imageService.createImage({
+      path: tinyPath,
+      tiny: tinyPath,
+      large: largePath,
+      small: smallPath,
+      medium: mediumPath,
+      verylarge: verylargePath,
+    });
 
     album.cover = id;
-    updateAlbum(album);
-    logInfo(`Found new cover for album ${album.id}`, "Cover Grabber");
+    album.lastCoverUpdate = Date.now();
+    albumService.updateAlbum(album);
+    logInfo(`Updated cover of album ${album.id}`, "Cover Grabber");
   } catch (err) {
     throw createFailure("Task failure", __filename, updateAlbumCover.name, err);
   }
 }
 
 export default async function doWork() {
-  logInfo("Cover grabber startded", "Cover Grabber");
-  let albums = await getCoverlessAlbums();
+  logInfo("Cover grabber started", "Cover Grabber");
+  let albums = await albumService.getToCoverGrabAlbums();
 
   for (let i = 0; i < albums.length; i++) {
     try {

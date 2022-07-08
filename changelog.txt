@@ -1,6 +1,18 @@
 CHANGELOG
 
 ====================================================
+0.6.0-beta
+
+BackEnd:
+- Cover are now declined in different sizes when fetch
+- Automatic cover updates
+- Turned DAO/Access/Service into singleton class
+- Added cover cleaner cleaning dead files and dead images
+
+FrontEnd:
+- Cover are fetched with optimal size to reduce bandwith consumption and loading time
+
+====================================================
 0.5.0-beta
 
 BackEnd:

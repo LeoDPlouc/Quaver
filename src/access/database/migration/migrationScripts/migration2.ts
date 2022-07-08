@@ -14,10 +14,10 @@
 import { IMigration } from "../migration";
 import { albumModel } from "../../models/albumModel";
 import { imageModel } from "../../models/imageModel";
-import { getMBId } from "../../../api/musicbrainzApi";
-import { deleteImage } from "../../../file/imageFile";
 import { logInfo } from "../../../../utils/logger";
 import { createFailure } from "../../../../utils/Failure";
+import { musicBrainzApiAccess } from "../../../api/musicbrainzApi";
+import { imageFileAccess } from "../../../file/imageFile";
 
 export const migration2: IMigration = {
   //Remove single MB ID and fetch all fiting MB IDs
@@ -34,7 +34,7 @@ export const migration2: IMigration = {
 
         logInfo(`Migration 2 -> 3 album ${a.id}`, "Migration");
 
-        let mbids = await getMBId(a);
+        let mbids = await musicBrainzApiAccess.getMBId(a);
         if (!mbids) {
           continue;
         }
@@ -79,7 +79,7 @@ export const migration2: IMigration = {
             throw createFailure(err, __filename, migration2.down.name);
           }
 
-          deleteImage(cover.path);
+          imageFileAccess.deleteImageFile(cover.path);
           cover.delete();
 
           a.cover = undefined;

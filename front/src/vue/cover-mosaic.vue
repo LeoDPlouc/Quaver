@@ -16,10 +16,10 @@
 
 <template>
   <div v-if="!isFetching" class="coverContainer">
-    <img loading="lazy" :class="getClass(0)" :src="getCoverURL(albumsCover[0])" />
-    <img loading="lazy" :class="getClass(1)" :src="getCoverURL(albumsCover[1])" />
-    <img loading="lazy" :class="getClass(2)" :src="getCoverURL(albumsCover[2])" />
-    <img loading="lazy" :class="getClass(3)" :src="getCoverURL(albumsCover[3])" />
+    <cover :class="getClass(0)" :cover-id="albumsCover[0]" :size="size" />
+    <cover :class="getClass(1)" :cover-id="albumsCover[1]" :size="size" />
+    <cover :class="getClass(2)" :cover-id="albumsCover[2]" :size="size" />
+    <cover :class="getClass(3)" :cover-id="albumsCover[3]" :size="size" />
   </div>
 </template>
 
@@ -28,9 +28,12 @@ import { defineComponent } from "vue";
 import { getArtistAlbums } from "../fetch";
 import { Album, Artist } from "../models";
 import { getCoverURL } from "../util";
+import coverVue from "./cover.vue";
 
 export default defineComponent({
-  props: { artist: Artist },
+  components: { cover: coverVue },
+
+  props: { artist: Artist, size: String },
 
   methods: {
     getCoverURL,
@@ -95,8 +98,8 @@ export default defineComponent({
 
 <style>
 .artistCover {
-  max-height: 100%;
-  max-width: 100%;
+  height: 100%;
+  width: 100%;
   object-position: center;
 }
 
@@ -108,21 +111,21 @@ export default defineComponent({
 .artistCoverLen2Pos1 {
   grid-column: 1;
   grid-row: 1 / 3;
-  max-height: 200%;
-  max-width: 200%;
+  height: 100%;
+  width: 200%;
 }
 .artistCoverLen2Pos2 {
   grid-column: 2;
   grid-row: 1 / 3;
-  max-height: 200%;
-  max-width: 200%;
+  height: 100%;
+  width: 200%;
 }
 
 .artistCoverLen3Pos1 {
   grid-column: 1;
   grid-row: 1 / 3;
-  max-height: 200%;
-  max-width: 200%;
+  height: 200%;
+  width: 200%;
 }
 .artistCoverLen3Pos2 {
   grid-column: 2;

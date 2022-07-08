@@ -15,56 +15,62 @@ import { Document } from "mongoose";
 import { createFailure } from "../../utils/Failure";
 import { songModel } from "./models/songModel";
 
-export async function getAllSongModels(): Promise<
-  (Song & Document<any, any, Song>)[]
-> {
-  try {
-    return await songModel.find();
-  } catch (err) {
-    throw createFailure(err, __filename, getAllSongModels.name);
+class SongDAO {
+  public async getAllSongModels(
+    this: SongDAO
+  ): Promise<(Song & Document<any, any, Song>)[]> {
+    try {
+      return await songModel.find();
+    } catch (err) {
+      throw createFailure(err, __filename, this.getAllSongModels.name);
+    }
+  }
+
+  public async getSongModel(
+    this: SongDAO,
+    id: string
+  ): Promise<Song & Document<any, any, Song>> {
+    try {
+      return await songModel.findById(id);
+    } catch (err) {
+      throw createFailure(err, __filename, this.getSongModel.name);
+    }
+  }
+
+  public async updateSongModel(this: SongDAO, song: Song): Promise<void> {
+    try {
+      await songModel.findByIdAndUpdate(song.id, song);
+    } catch (err) {
+      throw createFailure(err, __filename, this.updateSongModel.name);
+    }
+  }
+
+  public async createSongModel(this: SongDAO, song: Song): Promise<string> {
+    try {
+      return (await songModel.create(song)).id;
+    } catch (err) {
+      throw createFailure(err, __filename, this.createSongModel.name);
+    }
+  }
+
+  public async findSongModelByPath(
+    this: SongDAO,
+    path: string
+  ): Promise<Song & Document<any, any, Song>> {
+    try {
+      return (await songModel.find({ path }))[0];
+    } catch (err) {
+      throw createFailure(err, __filename, this.findSongModelByPath.name);
+    }
+  }
+
+  public async getAllSongModelPaths(this: SongDAO): Promise<string[]> {
+    try {
+      return (await songModel.find({}, { path: 1 })).map((s) => s.path);
+    } catch (err) {
+      throw createFailure(err, __filename, this.getAllSongModelPaths.name);
+    }
   }
 }
 
-export async function getSongModel(
-  id: string
-): Promise<Song & Document<any, any, Song>> {
-  try {
-    return await songModel.findById(id);
-  } catch (err) {
-    throw createFailure(err, __filename, getSongModel.name);
-  }
-}
-
-export async function updateSongModel(song: Song): Promise<void> {
-  try {
-    await songModel.findByIdAndUpdate(song.id, song);
-  } catch (err) {
-    throw createFailure(err, __filename, updateSongModel.name);
-  }
-}
-
-export async function createSongModel(song: Song): Promise<string> {
-  try {
-    return (await songModel.create(song)).id;
-  } catch (err) {
-    throw createFailure(err, __filename, createSongModel.name);
-  }
-}
-
-export async function findSongModelByPath(
-  path: string
-): Promise<Song & Document<any, any, Song>> {
-  try {
-    return (await songModel.find({ path }))[0];
-  } catch (err) {
-    throw createFailure(err, __filename, findSongModelByPath.name);
-  }
-}
-
-export async function getAllSongModelPaths(): Promise<string[]> {
-  try {
-    return (await songModel.find({}, { path: 1 })).map((s) => s.path);
-  } catch (err) {
-    throw createFailure(err, __filename, getAllSongModelPaths.name);
-  }
-}
+export const songDAO = new SongDAO();

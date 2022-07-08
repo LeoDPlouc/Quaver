@@ -17,29 +17,35 @@ import { IMAGES_PATH } from "../../config/config";
 import fs from "fs/promises";
 import { createFailure } from "../../utils/Failure";
 
-export async function saveImage(
-  data: string,
-  extension: string
-): Promise<string> {
-  //Create an UUID for the name of the file
-  let filename = v4() + extension;
-  let p = path.resolve(IMAGES_PATH, filename);
+class ImageFileAccess {
+  public async saveImage(
+    this: ImageFileAccess,
+    data: string,
+    extension: string
+  ): Promise<string> {
+    //Create an UUID for the name of the file
+    let filename = v4() + extension;
+    let p = path.resolve(IMAGES_PATH, filename);
 
-  try {
-    await fs.writeFile(p, data, { encoding: "binary" });
-  } catch (err) {
-    throw createFailure(err, __filename, saveImage.name);
+    try {
+      await fs.writeFile(p, data, { encoding: "binary" });
+    } catch (err) {
+      throw createFailure(err, __filename, this.saveImage.name);
+    }
+
+    return p;
   }
 
-  return p;
-}
-
-export async function deleteImage(path: string): Promise<null> {
-  try {
-    await fs.rm(path);
-  } catch (err) {
-    throw createFailure(err, __filename, deleteImage.name);
+  public async deleteImageFile(
+    this: ImageFileAccess,
+    path: string
+  ): Promise<void> {
+    try {
+      await fs.rm(path);
+    } catch (err) {
+      throw createFailure(err, __filename, this.deleteImageFile.name);
+    }
   }
-
-  return null;
 }
+
+export const imageFileAccess = new ImageFileAccess();

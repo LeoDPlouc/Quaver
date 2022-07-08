@@ -11,27 +11,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  getAlbumMbid,
-  getAlbumMetadata,
-  getAllAlbums,
-  getMbidlessAlbum,
-  getUpdatableAlbum,
-  updateAlbum,
-} from "../../service/albumService";
+import { albumService } from "../../service/albumService";
 import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
 
 async function grabMbids() {
-  let albums = await getMbidlessAlbum();
+  let albums = await albumService.getMbidlessAlbum();
 
   for (let i = 0; i < albums.length; i++) {
     try {
-      let mbids = await getAlbumMbid(albums[i]);
+      let mbids = await albumService.getAlbumMbid(albums[i]);
       if (!mbids.length) return;
 
       albums[i].mbids = mbids;
-      await updateAlbum(albums[i]);
+      await albumService.updateAlbum(albums[i]);
 
       logInfo(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
@@ -41,11 +34,11 @@ async function grabMbids() {
 }
 
 async function updateMetadata() {
-  let albums = await getUpdatableAlbum();
+  let albums = await albumService.getUpdatableAlbum();
 
   for (let i = 0; i < albums.length; i++) {
     try {
-      let metadata = await getAlbumMetadata(albums[i]);
+      let metadata = await albumService.getAlbumMetadata(albums[i]);
 
       if (metadata.title) albums[i].title = metadata.title;
       if (metadata.artist) albums[i].artist = metadata.artist;
@@ -53,7 +46,7 @@ async function updateMetadata() {
 
       albums[i].lastUpdated = Date.now();
 
-      await updateAlbum(albums[i]);
+      await albumService.updateAlbum(albums[i]);
       logInfo(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
       logError(

@@ -17,68 +17,82 @@ import { albumModel } from "./models/albumModel";
 import { artistModel } from "./models/artistModel";
 import { songModel } from "./models/songModel";
 
-export async function getAllArtistModels(): Promise<
-  (Artist & Document<any, any, Artist>)[]
-> {
-  try {
-    return await artistModel.find();
-  } catch (err) {
-    throw createFailure(err, __filename, getAllArtistModels.name);
+class ArtistDAO {
+  public async getAllArtistModels(
+    this: ArtistDAO
+  ): Promise<(Artist & Document<any, any, Artist>)[]> {
+    try {
+      return await artistModel.find();
+    } catch (err) {
+      throw createFailure(err, __filename, this.getAllArtistModels.name);
+    }
+  }
+
+  public async getArtistModel(
+    this: ArtistDAO,
+    id: string
+  ): Promise<Artist & Document<any, any, Artist>> {
+    try {
+      return await artistModel.findById(id);
+    } catch (err) {
+      throw createFailure(err, __filename, this.getArtistModel.name);
+    }
+  }
+
+  public async getArtistSongModels(
+    this: ArtistDAO,
+    id: string
+  ): Promise<(Song & Document<any, any, Song>)[]> {
+    try {
+      return await songModel.find({ artistId: id });
+    } catch (err) {
+      throw createFailure(err, __filename, this.getArtistSongModels.name);
+    }
+  }
+
+  public async getArtistAlbumModels(
+    this: ArtistDAO,
+    id: string
+  ): Promise<(Album & Document<any, any, Album>)[]> {
+    try {
+      return await albumModel.find({ artistId: id });
+    } catch (err) {
+      throw createFailure(err, __filename, this.getArtistAlbumModels.name);
+    }
+  }
+
+  public async createArtistModel(
+    this: ArtistDAO,
+    artist: Artist
+  ): Promise<string> {
+    try {
+      return (await artistModel.create(artist)).id;
+    } catch (err) {
+      throw createFailure(err, __filename, this.createArtistModel.name);
+    }
+  }
+
+  public async findArtistModelByName(
+    this: ArtistDAO,
+    name: string
+  ): Promise<(Artist & Document<any, any, Artist>)[]> {
+    try {
+      return await artistModel.find({ name: name });
+    } catch (err) {
+      throw createFailure(err, __filename, this.findArtistModelByName.name);
+    }
+  }
+
+  public async updateArtistModel(
+    this: ArtistDAO,
+    artist: Artist
+  ): Promise<void> {
+    try {
+      await artistModel.findByIdAndUpdate(artist.id, artist);
+    } catch (err) {
+      throw createFailure(err, __filename, this.updateArtistModel.name);
+    }
   }
 }
 
-export async function getArtistModel(
-  id: string
-): Promise<Artist & Document<any, any, Artist>> {
-  try {
-    return await artistModel.findById(id);
-  } catch (err) {
-    throw createFailure(err, __filename, getArtistModel.name);
-  }
-}
-
-export async function getArtistSongModels(
-  id: string
-): Promise<(Song & Document<any, any, Song>)[]> {
-  try {
-    return await songModel.find({ artistId: id });
-  } catch (err) {
-    throw createFailure(err, __filename, getArtistSongModels.name);
-  }
-}
-
-export async function getArtistAlbumModels(
-  id: string
-): Promise<(Album & Document<any, any, Album>)[]> {
-  try {
-    return await albumModel.find({ artistId: id });
-  } catch (err) {
-    throw createFailure(err, __filename, getArtistAlbumModels.name);
-  }
-}
-
-export async function createArtistModel(artist: Artist): Promise<string> {
-  try {
-    return (await artistModel.create(artist)).id;
-  } catch (err) {
-    throw createFailure(err, __filename, createArtistModel.name);
-  }
-}
-
-export async function findArtistModelByName(
-  name: string
-): Promise<(Artist & Document<any, any, Artist>)[]> {
-  try {
-    return await artistModel.find({ name: name });
-  } catch (err) {
-    throw createFailure(err, __filename, findArtistModelByName.name);
-  }
-}
-
-export async function updateArtistModel(artist: Artist): Promise<void> {
-  try {
-    await artistModel.findByIdAndUpdate(artist.id, artist);
-  } catch (err) {
-    throw createFailure(err, __filename, updateArtistModel.name);
-  }
-}
+export const artistDAO = new ArtistDAO();

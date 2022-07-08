@@ -24,3 +24,11 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=quaver
       - MONGO_INITDB_ROOT_PASSWORD=quaver
+
+  mongoNew:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=quaver
+      - MONGO_INITDB_ROOT_PASSWORD=quaver
