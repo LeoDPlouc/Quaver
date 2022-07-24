@@ -23,12 +23,7 @@ async function cleanAlbumlessImages() {
     var images = await imageService.getAllImages();
     var albums = await albumService.getAllAlbums();
   } catch (err) {
-    throw createFailure(
-      "DAO error",
-      __filename,
-      cleanAlbumlessImages.name,
-      err
-    );
+    throw createFailure("DAO error", __filename, cleanAlbumlessImages.name, err);
   }
 
   for (let i = 0; i < images.length; i++) {
@@ -37,9 +32,7 @@ async function cleanAlbumlessImages() {
         await imageService.deleteImageModel(images[i].id);
         logInfo(`Deleted image ${images[i].id}`, "Cover Cleaner");
       } catch (err) {
-        logError(
-          createFailure("DAO error", __filename, cleanAlbumlessImages.name, err)
-        );
+        logError("DAO error", __filename, cleanAlbumlessImages.name, err);
       }
     }
   }
@@ -50,14 +43,7 @@ async function cleanTinyLessFiles() {
     var images = await imageService.getAllImages();
     var files = await fileService.getAllFiles(IMAGES_PATH);
   } catch (err) {
-    logError(
-      createFailure(
-        "Cover cleaner error",
-        __filename,
-        cleanTinyLessFiles.name,
-        err
-      )
-    );
+    logError("Cover cleaner error", __filename, cleanTinyLessFiles.name, err);
   }
 
   for (let i = 0; i < images.length; i++) {
@@ -66,14 +52,7 @@ async function cleanTinyLessFiles() {
         imageService.deleteImageModel(images[i].id);
         logInfo(`Deleted cover ${files[i]}`, "Cover Cleaner");
       } catch (err) {
-        logError(
-          createFailure(
-            "Cover cleaner error",
-            __filename,
-            cleanTinyLessFiles.name,
-            err
-          )
-        );
+        logError("Cover cleaner error", __filename, cleanTinyLessFiles.name, err);
       }
     }
   }
@@ -90,9 +69,7 @@ async function cleanTinylessImages() {
     try {
       await imageService.deleteImageModel(images[i].id);
     } catch (err) {
-      logError(
-        createFailure("DAO error", __filename, cleanTinylessImages.name, err)
-      );
+      logError("DAO error", __filename, cleanTinylessImages.name, err);
     }
   }
 }
@@ -105,14 +82,7 @@ async function cleanImageLessFiles() {
       .filter((p) => p);
     var files = await fileService.getAllFiles(IMAGES_PATH);
   } catch (err) {
-    logError(
-      createFailure(
-        "Cover cleaner error",
-        __filename,
-        cleanImageLessFiles.name,
-        err
-      )
-    );
+    logError("Cover cleaner error", __filename, cleanImageLessFiles.name, err);
   }
 
   for (let i = 0; i < files.length; i++) {
@@ -121,14 +91,7 @@ async function cleanImageLessFiles() {
         await imageService.deleteImageFile(files[i]);
         logInfo(`Deleted cover ${files[i]}`, "Cover Cleaner");
       } catch (err) {
-        logError(
-          createFailure(
-            "Cover cleaner error",
-            __filename,
-            cleanImageLessFiles.name,
-            err
-          )
-        );
+        logError("Cover cleaner error", __filename, cleanImageLessFiles.name, err);
       }
     }
   }
@@ -139,12 +102,7 @@ async function cleanAlbumCoverId() {
     var images = await imageService.getAllImages();
     var albums = await albumService.getAllAlbums();
   } catch (err) {
-    throw createFailure(
-      "DAO error",
-      __filename,
-      cleanAlbumlessImages.name,
-      err
-    );
+    throw createFailure("DAO error", __filename, cleanAlbumlessImages.name, err);
   }
 
   try {
@@ -156,14 +114,7 @@ async function cleanAlbumCoverId() {
       }
     }
   } catch (err) {
-    logError(
-      createFailure(
-        "Cover cleaner error",
-        __filename,
-        cleanAlbumCoverId.name,
-        err
-      )
-    );
+    logError("Cover cleaner error", __filename, cleanAlbumCoverId.name, err);
   }
 }
 
@@ -177,12 +128,7 @@ async function cleanDeadFiles() {
 
   try {
     for (let i = 0; i < images.length; i++) {
-      let isDead = ![
-        images[i].large,
-        images[i].medium,
-        images[i].small,
-        images[i].verylarge,
-      ]
+      let isDead = ![images[i].large, images[i].medium, images[i].small, images[i].verylarge]
         .filter((i) => !!i)
         .map((i) => !!files.find((f) => f == i))
         .reduce((prev, cur) => prev && cur, true);
@@ -193,9 +139,7 @@ async function cleanDeadFiles() {
       }
     }
   } catch (err) {
-    logError(
-      createFailure("Cover cleaner error", __filename, cleanDeadFiles.name, err)
-    );
+    logError("Cover cleaner error", __filename, cleanDeadFiles.name, err);
   }
 }
 
@@ -210,8 +154,6 @@ export default async function doWork() {
     await cleanImageLessFiles();
     await cleanAlbumCoverId();
   } catch (err) {
-    logError(
-      createFailure("Cover cleaner error", __filename, doWork.name, err)
-    );
+    logError("Cover cleaner error", __filename, doWork.name, err);
   }
 }

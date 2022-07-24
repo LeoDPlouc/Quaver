@@ -125,6 +125,6 @@ export default async function doWork() {
 
     await collect();
   } catch (err) {
-    logError(err);
+    logError("Song collector error", __filename, doWork.name, err);
   }
 }

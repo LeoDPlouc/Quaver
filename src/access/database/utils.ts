@@ -13,13 +13,7 @@
 
 import mongoose from "mongoose";
 
-import {
-  MONGO_IP,
-  MONGO_PASSWORD,
-  MONGO_PORT,
-  MONGO_USER,
-} from "../../config/config";
-import { createFailure, Failure } from "../../utils/Failure";
+import { MONGO_IP, MONGO_PASSWORD, MONGO_PORT, MONGO_USER } from "../../config/config";
 import { logError, logInfo } from "../../utils/logger";
 
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`;
@@ -34,8 +28,7 @@ export async function connectToDb(source: String) {
     })
     .then(() => logInfo("Successfully connected to database", source))
     .catch((err) => {
-      let failure: Failure = createFailure(err, __filename, connectToDb.name);
-      logError(failure);
+      logError(err, __filename, connectToDb.name);
       //retry connection
       setTimeout(connectToDb, 5000);
     });

@@ -32,7 +32,7 @@ connectToDb("App").then(async () => {
   try {
     await Migrate();
   } catch (err) {
-    logError(err);
+    logError("Migration error", __filename, "main", err);
     process.exit(1);
   }
 
@@ -40,7 +40,5 @@ connectToDb("App").then(async () => {
   runTaskManager();
 
   //Open server
-  app.listen(APP_PORT, () =>
-    logInfo(`listening on port ${APP_PORT}`, "Migration")
-  );
+  app.listen(APP_PORT, () => logInfo(`listening on port ${APP_PORT}`, "Migration"));
 });

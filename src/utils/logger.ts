@@ -13,13 +13,10 @@
 
 import { Request } from "express";
 import { createLogger, format, transports } from "winston";
-import { Failure } from "./Failure";
+import { createFailure, Failure } from "./Failure";
 
 var logger = createLogger({
-  transports: [
-    new transports.Console(),
-    new transports.File({ dirname: "logs", filename: "quaver.log" }),
-  ],
+  transports: [new transports.Console(), new transports.File({ dirname: "logs", filename: "quaver.log" })],
   format: format.combine(
     format.colorize(),
     format.timestamp(),
@@ -29,7 +26,8 @@ var logger = createLogger({
   ),
 });
 
-export function logError(error: Failure) {
+export function logError(msg: string, file: string, func: string, sourceFailure?: Failure) {
+  let error = createFailure(msg, file, func, sourceFailure);
   logger.error(`${JSON.stringify(error)}`);
 }
 
