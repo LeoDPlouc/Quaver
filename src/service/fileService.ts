@@ -17,10 +17,7 @@ import { createFailure } from "../utils/Failure";
 import { logError } from "../utils/logger";
 
 class FileService {
-  public async getAllFiles(
-    this: FileService,
-    folder: string
-  ): Promise<string[]> {
+  public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
     let allPaths: string[] = [];
 
     try {
@@ -36,14 +33,7 @@ class FileService {
         try {
           (await this.getAllFiles(fullPath)).forEach((p) => allPaths.push(p));
         } catch (err) {
-          logError(
-            createFailure(
-              "File access eror",
-              __filename,
-              this.getAllFiles.name,
-              err
-            )
-          );
+          logError("File access eror", __filename, this.getAllFiles.name, err);
           continue;
         }
       }

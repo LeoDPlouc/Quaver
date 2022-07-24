@@ -23,7 +23,7 @@ export async function getAllArtistsCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getAllArtists();
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getAllArtistsCtrl.name);
     res.json({
       statusCode: 1,
       errorMessage: "Server error",
@@ -59,7 +59,7 @@ export async function getOneArtistCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getArtist(req.params.id);
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getOneArtistCtrl.name);
     res.json({
       status: "fail",
       statusCode: 1,
@@ -94,7 +94,7 @@ export async function getArtistSongsCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getArtistSongs(req.params.id);
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getArtistSongsCtrl.name);
     res.json({
       status: "fail",
       statusCode: 1,
@@ -130,7 +130,7 @@ export async function getArtistAlbumsCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getArtistAlbums(req.params.id);
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getArtistAlbumsCtrl.name);
     res.json({
       status: "fail",
       statusCode: 1,
