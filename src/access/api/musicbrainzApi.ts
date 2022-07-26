@@ -32,16 +32,13 @@ class MusicBrainzApiAccess {
       query += ` AND artist:${album.artist}`;
     }
 
-    try {
-      var result = await mbApi.search<IReleaseList>("release", { query });
-    } catch (err) {
-      throw createFailure(err, __filename, this.getMBId.name);
-    }
-    //Only keep ids of the release with score 100
-    var releases = result.releases.filter((release) => release.score == 100);
-    var ids = releases.map((release) => release.id);
-
-    return ids;
+    return await mbApi
+      .search<IReleaseList>("release", { query })
+      .then((result) => result.releases.filter((release) => release.score == 100))
+      .then((releases) => releases.map((release) => release.id))
+      .catch((err) => {
+        throw createFailure(err, __filename, this.getMBId.name);
+      });
   }
 
   public async getMetadataFromMB(this: MusicBrainzApiAccess, mbids: string[]): Promise<Album> {

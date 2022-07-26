@@ -19,26 +19,18 @@ import { createFailure } from "../utils/Failure";
 
 class ArtistService {
   public async getAllArtists(this: ArtistService): Promise<Artist[]> {
-    try {
-      var result = await artistDAO.getAllArtistModels();
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.getAllArtists.name,
-        err
-      );
-    }
-
-    return result.map((a) => mapArtist(a));
+    return await artistDAO
+      .getAllArtistModels()
+      .then((result) => result.map((a) => mapArtist(a)))
+      .catch((err) => {
+        throw createFailure("DAO error", __filename, this.getAllArtists.name, err);
+      });
   }
 
   public async getArtist(this: ArtistService, id: string): Promise<Artist> {
-    try {
-      var result = await artistDAO.getArtistModel(id);
-    } catch (err) {
+    let result = await artistDAO.getArtistModel(id).catch((err) => {
       throw createFailure("DAO error", __filename, this.getArtist.name, err);
-    }
+    });
 
     if (!result) {
       throw createFailure("Invalid Id", __filename, this.getArtist.name);
@@ -47,76 +39,46 @@ class ArtistService {
     return mapArtist(result);
   }
 
-  public async getArtistSongs(
-    this: ArtistService,
-    id: string
-  ): Promise<Song[]> {
-    try {
-      var result = await artistDAO.getArtistSongModels(id);
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.getArtistSongs.name,
-        err
-      );
-    }
-
-    return result.map((s) => mapSong(s));
+  public async getArtistSongs(this: ArtistService, id: string): Promise<Song[]> {
+    return await artistDAO
+      .getArtistSongModels(id)
+      .then((result) => result.map((s) => mapSong(s)))
+      .catch((err) => {
+        throw createFailure("DAO error", __filename, this.getArtistSongs.name, err);
+      });
   }
 
   public async getArtistAlbums(id: string): Promise<Album[]> {
-    try {
-      var result = await artistDAO.getArtistAlbumModels(id);
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.getArtistAlbums.name,
-        err
-      );
+    let result = await artistDAO.getArtistAlbumModels(id).catch((err) => {
+      throw createFailure("DAO error", __filename, this.getArtistAlbums.name, err);
+    });
+
+    if (!result) {
+      throw createFailure("Invalid Id", __filename, this.getArtistAlbums.name);
     }
 
     return result.map((a) => mapAlbum(a));
   }
 
-  public async createArtist(
-    this: ArtistService,
-    artist: Artist
-  ): Promise<string> {
-    try {
-      var result = await artistDAO.createArtistModel(artist);
-    } catch (err) {
+  public async createArtist(this: ArtistService, artist: Artist): Promise<string> {
+    return await artistDAO.createArtistModel(artist).catch((err) => {
       throw createFailure("DAO error", __filename, this.createArtist.name, err);
-    }
-
-    return result;
+    });
   }
 
-  public async findArtistByName(
-    this: ArtistService,
-    name: string
-  ): Promise<Artist[]> {
-    try {
-      var result = await artistDAO.findArtistModelByName(name);
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.findArtistByName.name,
-        err
-      );
-    }
-
-    return result.map((a) => mapArtist(a));
+  public async findArtistByName(this: ArtistService, name: string): Promise<Artist[]> {
+    return await artistDAO
+      .findArtistModelByName(name)
+      .then((result) => result.map((a) => mapArtist(a)))
+      .catch((err) => {
+        throw createFailure("DAO error", __filename, this.findArtistByName.name, err);
+      });
   }
 
   public async updateArtist(artist: Artist): Promise<void> {
-    try {
-      await artistDAO.updateArtistModel(artist);
-    } catch (err) {
+    return await artistDAO.updateArtistModel(artist).catch((err) => {
       throw createFailure("DAO error", __filename, this.updateArtist.name, err);
-    }
+    });
   }
 }
 

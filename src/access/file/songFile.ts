@@ -19,16 +19,12 @@ import Path from "path";
 import { createFailure } from "../../utils/Failure";
 
 class SongFileAccess {
-  public async getAcoustid(
-    this: SongFileAccess,
-    songPath: string
-  ): Promise<string> {
+  public async getAcoustid(this: SongFileAccess, songPath: string): Promise<string> {
     let fingerprint: FpcalcResult<string>;
 
     //If fpcalc isn't in PATH, use fpcalc with its path
     try {
-      if (FPCALC_PATH)
-        fingerprint = await fp(songPath, { command: FPCALC_PATH });
+      if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH });
       else fingerprint = await fp(songPath);
     } catch (err) {
       throw createFailure(err, __filename, this.getAcoustid.name);
@@ -37,15 +33,10 @@ class SongFileAccess {
     return fingerprint.fingerprint;
   }
 
-  public async getMetadataFromFile(
-    this: SongFileAccess,
-    songPath: string
-  ): Promise<Song> {
-    try {
-      var tag = await parseFile(songPath);
-    } catch (err) {
+  public async getMetadataFromFile(this: SongFileAccess, songPath: string): Promise<Song> {
+    var tag = await parseFile(songPath).catch((err) => {
       throw createFailure(err, __filename, this.getMetadataFromFile.name);
-    }
+    });
 
     let format = Path.extname(songPath);
 

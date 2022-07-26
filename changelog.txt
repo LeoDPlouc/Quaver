@@ -1,7 +1,14 @@
 CHANGELOG
 
 ====================================================
-0.5.1-beta
+0.6.1-beta
+
+BackEnd:
+- LogError accepts argument to create a new failure
+- Async calls refactored
+
+====================================================
+0.6.0-beta
 
 BackEnd:
 - Cover are now declined in different sizes when fetch

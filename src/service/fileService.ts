@@ -20,11 +20,9 @@ class FileService {
   public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
     let allPaths: string[] = [];
 
-    try {
-      var paths = await fs.readdir(folder, { withFileTypes: true });
-    } catch (err) {
+    var paths = await fs.readdir(folder, { withFileTypes: true }).catch((err) => {
       throw createFailure(err, __filename, this.getAllFiles.name);
-    }
+    });
 
     for (var i = 0; i < paths.length; i++) {
       var fullPath = path.join(folder, paths[i].name);

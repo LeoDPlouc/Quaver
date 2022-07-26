@@ -11,10 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  coverArtArchiveAccess,
-  imageFileData,
-} from "../access/api/coverArtArchive";
+import { coverArtArchiveAccess, imageFileData } from "../access/api/coverArtArchive";
 import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { albumDAO } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
@@ -23,21 +20,18 @@ import { createFailure } from "../utils/Failure";
 
 class AlbumService {
   public async getAllAlbums(this: AlbumService): Promise<Album[]> {
-    try {
-      var result = await albumDAO.getAllAlbumModels();
-    } catch (err) {
-      throw createFailure("DAO error", __filename, this.getAllAlbums.name, err);
-    }
-
-    return result.map((a) => mapAlbum(a));
+    return await albumDAO
+      .getAllAlbumModels()
+      .then((result) => result.map((a) => mapAlbum(a)))
+      .catch((err) => {
+        throw createFailure("DAO error", __filename, this.getAllAlbums.name, err);
+      });
   }
 
   public async getAlbum(this: AlbumService, id: string): Promise<Album> {
-    try {
-      var result = await albumDAO.getAlbumModel(id);
-    } catch (err) {
+    let result = await albumDAO.getAlbumModel(id).catch((err) => {
       throw createFailure("DAO error", __filename, this.getAlbum.name, err);
-    }
+    });
 
     if (!result) {
       throw createFailure("Invalid Id", __filename, this.getAlbum.name);
@@ -47,16 +41,9 @@ class AlbumService {
   }
 
   public async getAlbumSongs(this: AlbumService, id: string): Promise<Song[]> {
-    try {
-      var result = await albumDAO.getAlbumSongModel(id);
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.getAlbumSongs.name,
-        err
-      );
-    }
+    var result = await albumDAO.getAlbumSongModel(id).catch((err) => {
+      throw createFailure("DAO error", __filename, this.getAlbumSongs.name, err);
+    });
 
     if (!result) {
       throw createFailure("Invalid Id", __filename, this.getAlbumSongs.name);
@@ -66,97 +53,61 @@ class AlbumService {
   }
 
   public async createAlbum(this: AlbumService, album: Album): Promise<string> {
-    try {
-      var result = await albumDAO.createAlbumModel(album);
-    } catch (err) {
+    return await albumDAO.createAlbumModel(album).catch((err) => {
       throw createFailure("DAO error", __filename, this.createAlbum.name, err);
-    }
-
-    return result;
+    });
   }
 
-  public async findAlbumByName(
-    this: AlbumService,
-    albumTitle: string,
-    artistName?: string
-  ): Promise<Album[]> {
-    try {
-      var result = await albumDAO.findAlbumModelByName(albumTitle, artistName);
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.findAlbumByName.name,
-        err
-      );
-    }
-
-    return result.map((a) => mapAlbum(a));
+  public async findAlbumByName(this: AlbumService, albumTitle: string, artistName?: string): Promise<Album[]> {
+    return await albumDAO
+      .findAlbumModelByName(albumTitle, artistName)
+      .then((result) => result.map((a) => mapAlbum(a)))
+      .catch((err) => {
+        throw createFailure("DAO error", __filename, this.findAlbumByName.name, err);
+      });
   }
 
   public async updateAlbum(this: AlbumService, album: Album): Promise<void> {
-    try {
-      await albumDAO.updateAlbumModel(album);
-    } catch (err) {
+    await albumDAO.updateAlbumModel(album).catch((err) => {
       throw createFailure("DAO error", __filename, this.updateAlbum.name, err);
-    }
+    });
   }
 
   public async getMbidlessAlbum(this: AlbumService): Promise<Album[]> {
-    try {
-      var result = await albumDAO.getMbidlessAlbumModels();
-    } catch (err) {
-      throw createFailure("DAO error", __filename, this.getMbidlessAlbum.name);
-    }
-
-    return result.map((a) => mapAlbum(a));
+    return await albumDAO
+      .getMbidlessAlbumModels()
+      .then((result) => result.map((a) => mapAlbum(a)))
+      .catch((err) => {
+        throw createFailure("DAO error", __filename, this.getMbidlessAlbum.name);
+      });
   }
 
   public async getToCoverGrabAlbums(this: AlbumService): Promise<Album[]> {
-    try {
-      var result = await albumDAO.getToCoverGrabAlbumsModels();
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.getToCoverGrabAlbums.name,
-        err
-      );
-    }
-
-    return result.map((a) => mapAlbum(a));
+    return await albumDAO
+      .getToCoverGrabAlbumsModels()
+      .then((result) => result.map((a) => mapAlbum(a)))
+      .catch((err) => {
+        throw createFailure("DAO error", __filename, this.getToCoverGrabAlbums.name, err);
+      });
   }
 
-  public async getAlbumMbid(
-    this: AlbumService,
-    album: Album
-  ): Promise<string[]> {
-    try {
-      return musicBrainzApiAccess.getMBId(album);
-    } catch (err) {
-      throw createFailure("API error", __filename, this.getAlbumMbid.name);
-    }
+  public async getAlbumMbid(this: AlbumService, album: Album): Promise<string[]> {
+    return await musicBrainzApiAccess.getMBId(album).catch((err) => {
+      throw createFailure("API error", __filename, this.getAlbumMbid.name, err);
+    });
   }
 
-  public async getAlbumMetadata(
-    this: AlbumService,
-    album: Album
-  ): Promise<Album> {
-    return musicBrainzApiAccess.getMetadataFromMB(album.mbids);
+  public async getAlbumMetadata(this: AlbumService, album: Album): Promise<Album> {
+    return await musicBrainzApiAccess.getMetadataFromMB(album.mbids);
   }
 
   public async getUpdatableAlbum(this: AlbumService): Promise<Album[]> {
-    try {
-      return await albumDAO.getUpdatableAlbumModels();
-    } catch (err) {
-      throw createFailure("DAO error", __filename, this.getUpdatableAlbum.name);
-    }
+    return await albumDAO.getUpdatableAlbumModels().catch((err) => {
+      throw createFailure("DAO error", __filename, this.getUpdatableAlbum.name, err);
+    });
   }
 
-  public async getCover(
-    this: AlbumService,
-    album: Album
-  ): Promise<imageFileData> {
+  public async getCover(this: AlbumService, album: Album): Promise<imageFileData> {
     return await coverArtArchiveAccess.getAlbumCover(album.mbids);
   }
 }

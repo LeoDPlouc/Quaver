@@ -16,51 +16,37 @@ import { createFailure } from "../../utils/Failure";
 import { imageModel } from "./models/imageModel";
 
 class ImageDAO {
-  public async getAllImagesModels(
-    this: ImageDAO
-  ): Promise<(Image & Document<any, any, Image>)[]> {
-    try {
-      return await imageModel.find();
-    } catch (err) {
+  public async getAllImagesModels(this: ImageDAO): Promise<(Image & Document<any, any, Image>)[]> {
+    return await imageModel.find().catch((err) => {
       throw createFailure(err, __filename, this.getAllImagesModels.name);
-    }
+    });
   }
 
-  public async getImageModel(
-    this: ImageDAO,
-    id: string
-  ): Promise<Image & Document<any, any, Image>> {
-    try {
-      return await imageModel.findById(id);
-    } catch (err) {
+  public async getImageModel(this: ImageDAO, id: string): Promise<void | (Image & Document<any, any, Image>)> {
+    return await imageModel.findById(id).catch((err) => {
       createFailure(err, __filename, this.getImageModel.name);
-    }
+    });
   }
 
   public async createImageModel(this: ImageDAO, image: Image): Promise<string> {
-    try {
-      return (await imageModel.create(image)).id;
-    } catch (err) {
-      throw createFailure(err, __filename, this.createImageModel.name);
-    }
+    return await imageModel
+      .create(image)
+      .then((i) => i.id)
+      .catch((err) => {
+        throw createFailure(err, __filename, this.createImageModel.name);
+      });
   }
 
   public async deleteImageModel(this: ImageDAO, id: string): Promise<void> {
-    try {
-      await imageModel.findByIdAndDelete(id);
-    } catch (err) {
+    await imageModel.findByIdAndDelete(id).catch((err) => {
       throw createFailure(err, __filename, this.deleteImageModel.name);
-    }
+    });
   }
 
-  public async getTinyLessImageModel(
-    this: ImageDAO
-  ): Promise<(Image & Document<any, any, Image>)[]> {
-    try {
-      return await imageModel.find({ tiny: null });
-    } catch (err) {
+  public async getTinyLessImageModel(this: ImageDAO): Promise<(Image & Document<any, any, Image>)[]> {
+    return await imageModel.find({ tiny: null }).catch((err) => {
       throw createFailure(err, __filename, this.getTinyLessImageModel.name);
-    }
+    });
   }
 }
 

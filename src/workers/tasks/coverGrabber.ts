@@ -60,10 +60,8 @@ export default async function doWork() {
   let albums = await albumService.getToCoverGrabAlbums();
 
   for (let i = 0; i < albums.length; i++) {
-    try {
-      await updateAlbumCover(albums[i]);
-    } catch (err) {
+    await updateAlbumCover(albums[i]).catch((err) => {
       logError("Cover grabber error", __filename, doWork.name, err);
-    }
+    });
   }
 }
