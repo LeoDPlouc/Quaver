@@ -18,80 +18,49 @@ import { artistModel } from "./models/artistModel";
 import { songModel } from "./models/songModel";
 
 class ArtistDAO {
-  public async getAllArtistModels(
-    this: ArtistDAO
-  ): Promise<(Artist & Document<any, any, Artist>)[]> {
-    try {
-      return await artistModel.find();
-    } catch (err) {
+  public async getAllArtistModels(this: ArtistDAO): Promise<(Artist & Document<any, any, Artist>)[]> {
+    return await artistModel.find().catch((err) => {
       throw createFailure(err, __filename, this.getAllArtistModels.name);
-    }
+    });
   }
 
-  public async getArtistModel(
-    this: ArtistDAO,
-    id: string
-  ): Promise<Artist & Document<any, any, Artist>> {
-    try {
-      return await artistModel.findById(id);
-    } catch (err) {
+  public async getArtistModel(this: ArtistDAO, id: string): Promise<Artist & Document<any, any, Artist>> {
+    return await artistModel.findById(id).catch((err) => {
       throw createFailure(err, __filename, this.getArtistModel.name);
-    }
+    });
   }
 
-  public async getArtistSongModels(
-    this: ArtistDAO,
-    id: string
-  ): Promise<(Song & Document<any, any, Song>)[]> {
-    try {
-      return await songModel.find({ artistId: id });
-    } catch (err) {
+  public async getArtistSongModels(this: ArtistDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
+    return await songModel.find({ artistId: id }).catch((err) => {
       throw createFailure(err, __filename, this.getArtistSongModels.name);
-    }
+    });
   }
 
-  public async getArtistAlbumModels(
-    this: ArtistDAO,
-    id: string
-  ): Promise<(Album & Document<any, any, Album>)[]> {
-    try {
-      return await albumModel.find({ artistId: id });
-    } catch (err) {
+  public async getArtistAlbumModels(this: ArtistDAO, id: string): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel.find({ artistId: id }).catch((err) => {
       throw createFailure(err, __filename, this.getArtistAlbumModels.name);
-    }
+    });
   }
 
-  public async createArtistModel(
-    this: ArtistDAO,
-    artist: Artist
-  ): Promise<string> {
-    try {
-      return (await artistModel.create(artist)).id;
-    } catch (err) {
-      throw createFailure(err, __filename, this.createArtistModel.name);
-    }
+  public async createArtistModel(this: ArtistDAO, artist: Artist): Promise<string> {
+    return await artistModel
+      .create(artist)
+      .then((a) => a.id)
+      .catch((err) => {
+        throw createFailure(err, __filename, this.createArtistModel.name);
+      });
   }
 
-  public async findArtistModelByName(
-    this: ArtistDAO,
-    name: string
-  ): Promise<(Artist & Document<any, any, Artist>)[]> {
-    try {
-      return await artistModel.find({ name: name });
-    } catch (err) {
+  public async findArtistModelByName(this: ArtistDAO, name: string): Promise<(Artist & Document<any, any, Artist>)[]> {
+    return await artistModel.find({ name: name }).catch((err) => {
       throw createFailure(err, __filename, this.findArtistModelByName.name);
-    }
+    });
   }
 
-  public async updateArtistModel(
-    this: ArtistDAO,
-    artist: Artist
-  ): Promise<void> {
-    try {
-      await artistModel.findByIdAndUpdate(artist.id, artist);
-    } catch (err) {
+  public async updateArtistModel(this: ArtistDAO, artist: Artist): Promise<void> {
+    await artistModel.findByIdAndUpdate(artist.id, artist).catch((err) => {
       throw createFailure(err, __filename, this.updateArtistModel.name);
-    }
+    });
   }
 }
 

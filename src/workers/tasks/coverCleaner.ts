@@ -59,27 +59,24 @@ async function cleanTinyLessFiles() {
 }
 
 async function cleanTinylessImages() {
-  try {
-    var images = await imageService.getTinyLessImage();
-  } catch (err) {
+  var images = await imageService.getTinyLessImage().catch((err) => {
     throw createFailure("DAO err", __filename, cleanTinylessImages.name, err);
-  }
+  });
 
   for (let i = 0; i < images.length; i++) {
-    try {
-      await imageService.deleteImageModel(images[i].id);
-    } catch (err) {
+    await imageService.deleteImageModel(images[i].id).catch((err) => {
       logError("DAO error", __filename, cleanTinylessImages.name, err);
-    }
+    });
   }
 }
 
 async function cleanImageLessFiles() {
   try {
-    var coverFiles = (await imageService.getAllImages())
-      .map((i) => [i.large, i.medium, i.path, i.small, i.tiny, i.verylarge])
-      .reduce((tab1, tab2) => [...tab1, ...tab2], [])
-      .filter((p) => p);
+    var coverFiles = await imageService
+      .getAllImages()
+      .then((result) => result.map((i) => [i.large, i.medium, i.path, i.small, i.tiny, i.verylarge]))
+      .then((result) => result.reduce((tab1, tab2) => [...tab1, ...tab2], []))
+      .then((result) => result.filter((p) => p));
     var files = await fileService.getAllFiles(IMAGES_PATH);
   } catch (err) {
     logError("Cover cleaner error", __filename, cleanImageLessFiles.name, err);

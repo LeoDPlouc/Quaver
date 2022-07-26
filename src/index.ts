@@ -29,12 +29,10 @@ declare module "express-session" {
 //Connect to the db
 connectToDb("App").then(async () => {
   //Apply database migration
-  try {
-    await Migrate();
-  } catch (err) {
+  await Migrate().catch((err) => {
     logError("Migration error", __filename, "main", err);
     process.exit(1);
-  }
+  });
 
   //Start collection of the songs
   runTaskManager();
