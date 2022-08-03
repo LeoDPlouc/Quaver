@@ -11,7 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { coverArtArchiveAccess, imageFileData } from "../access/api/coverArtArchive";
+import { coverArtArchiveAccess } from "../access/api/coverArtArchive";
+import { imageFileData } from "../access/api/DTO/ImageFileData";
 import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { albumDAO } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
