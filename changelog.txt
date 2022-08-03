@@ -8,6 +8,7 @@ BackEnd:
 - Async calls refactored
 - Moved some hardcoded variables to a config file
 - Moved ImageFileData DTO to a file
+- Refactored callback
 
 ====================================================
 0.6.0-beta

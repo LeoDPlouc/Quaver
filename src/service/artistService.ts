@@ -21,7 +21,7 @@ class ArtistService {
   public async getAllArtists(this: ArtistService): Promise<Artist[]> {
     return await artistDAO
       .getAllArtistModels()
-      .then((result) => result.map((a) => mapArtist(a)))
+      .then((result) => result.map(mapArtist))
       .catch((err) => {
         throw createFailure("DAO error", __filename, this.getAllArtists.name, err);
       });
@@ -42,7 +42,7 @@ class ArtistService {
   public async getArtistSongs(this: ArtistService, id: string): Promise<Song[]> {
     return await artistDAO
       .getArtistSongModels(id)
-      .then((result) => result.map((s) => mapSong(s)))
+      .then((result) => result.map(mapSong))
       .catch((err) => {
         throw createFailure("DAO error", __filename, this.getArtistSongs.name, err);
       });
@@ -57,7 +57,7 @@ class ArtistService {
       throw createFailure("Invalid Id", __filename, this.getArtistAlbums.name);
     }
 
-    return result.map((a) => mapAlbum(a));
+    return result.map(mapAlbum);
   }
 
   public async createArtist(this: ArtistService, artist: Artist): Promise<string> {
@@ -69,7 +69,7 @@ class ArtistService {
   public async findArtistByName(this: ArtistService, name: string): Promise<Artist[]> {
     return await artistDAO
       .findArtistModelByName(name)
-      .then((result) => result.map((a) => mapArtist(a)))
+      .then((result) => result.map(mapArtist))
       .catch((err) => {
         throw createFailure("DAO error", __filename, this.findArtistByName.name, err);
       });

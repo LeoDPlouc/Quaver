@@ -33,7 +33,7 @@ export async function getAllAlbumsCtrl(req: Request, res: Response) {
   }
 
   //Search all albums in the db and clean the output
-  const albums = result.map((a) => mapAlbumDTO(a));
+  const albums = result.map(mapAlbumDTO);
 
   res.json({
     status: "success",
@@ -105,7 +105,7 @@ export async function getAlbumSongsCtrl(req: Request, res: Response) {
   }
 
   //Search songs by albumid in the db and clean the output
-  const songs = result.map((s) => mapSongDTO(s));
+  const songs = result.map(mapSongDTO);
 
   res.json({
     status: "success",

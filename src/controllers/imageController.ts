@@ -32,7 +32,7 @@ export async function getAllImagesInfoCtrl(req: Request, res: Response) {
   }
 
   //Search all images in the db and clean the output
-  const images = result.map((i) => mapImageDTO(i));
+  const images = result.map(mapImageDTO);
 
   res.json({
     status: "success",

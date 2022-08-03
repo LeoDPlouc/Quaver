@@ -20,7 +20,7 @@ class SongService {
   public async getAllSongs(this: SongService): Promise<Song[]> {
     return await songDAO
       .getAllSongModels()
-      .then((result) => result.map((s) => mapSong(s)))
+      .then((result) => result.map(mapSong))
       .catch((err) => {
         throw createFailure("DAO error", __filename, this.getAllSongs.name, err);
       });

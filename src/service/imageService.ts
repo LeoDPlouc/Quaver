@@ -30,7 +30,7 @@ class ImageService {
   public async getAllImages(this: ImageService): Promise<Image[]> {
     return await imageDAO
       .getAllImagesModels()
-      .then((result) => result.map((i) => mapImage(i)))
+      .then((result) => result.map(mapImage))
       .catch((err) => {
         throw createFailure("DAO error", __filename, this.getAllImages.name, err);
       });
