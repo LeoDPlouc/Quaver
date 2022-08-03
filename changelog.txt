@@ -6,6 +6,7 @@ CHANGELOG
 BackEnd:
 - LogError accepts argument to create a new failure
 - Async calls refactored
+- Moved some hardcoded variables to a config file
 
 ====================================================
 0.6.0-beta

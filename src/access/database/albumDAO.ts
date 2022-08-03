@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
+import { UPDATE_ALBUM_PERIOD, UPDATE_COVER_PERIOD } from "../../config/appConfig";
 import { createFailure } from "../../utils/Failure";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";
@@ -73,7 +74,7 @@ class AlbumDAO {
     return await albumModel
       .find({
         $or: [
-          { lastUpdated: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
+          { lastUpdated: { $lt: Date.now() - UPDATE_ALBUM_PERIOD } },
           { lastUpdated: { $exists: false } },
           { lastUpdated: null },
         ],
@@ -89,7 +90,7 @@ class AlbumDAO {
         $or: [
           { cover: { $eq: null } },
           { lastCoverUpdate: null },
-          { lastCoverUpdate: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
+          { lastCoverUpdate: { $lt: Date.now() - UPDATE_COVER_PERIOD } },
         ],
       })
       .catch((err) => {
