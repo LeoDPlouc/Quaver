@@ -11,12 +11,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { imageFileData } from "../access/api/coverArtArchive";
 import { mapImage } from "../mappers/imageMapper";
 import { createFailure } from "../utils/Failure";
 import Jimp from "jimp";
 import { imageDAO } from "../access/database/imageDAO";
 import { imageFileAccess } from "../access/file/imageFile";
+import { imageFileData } from "../access/api/DTO/ImageFileData";
 
 export interface resizedImage {
   tiny: imageFileData;
