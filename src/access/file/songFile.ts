@@ -38,14 +38,14 @@ class SongFileAccess {
       throw createFailure(err, __filename, this.getMetadataFromFile.name);
     });
 
-    let format = Path.extname(songPath);
+    let format = Path.extname(songPath); //Extract file extension
 
     return {
       title: tag.common.title,
       n: tag.common.track.no,
       artist: tag.common.albumartist,
       album: tag.common.album,
-      year: tag.common.year,
+      year: Number.isNaN(tag.common.year) ? undefined : tag.common.year,
       duration: tag.format.duration,
       like: 0,
       path: songPath,

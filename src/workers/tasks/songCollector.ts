@@ -27,12 +27,16 @@ let albums: Album[];
 
 async function collect() {
   try {
-    let paths = await fileService.getAllFiles(MUSIC_PATH);
+    var paths = await fileService.getAllFiles(MUSIC_PATH);
+  } catch (err) {
+    throw createFailure("File service error", __filename, collect.name, err);
+  }
 
-    for (let i = 0; i < paths.length; i++) {
+  for (let i = 0; i < paths.length; i++) {
+    try {
       if (!mm.lookup(path.extname(paths[i])).match("audio")) continue; //Only consider audio files
 
-      if (songPaths.find((p) => p == paths[i])) continue; //Pass  
+      if (songPaths.find((p) => p == paths[i])) continue; //Pass if song already exists
 
       let song = await songService.getMetadataFromFile(paths[i]);
 
@@ -70,9 +74,9 @@ async function collect() {
       song.artistId = artistId;
       song.albumId = albumId;
       await songService.createSong(song);
+    } catch (err) {
+      logError("Song collection error", __filename, collect.name, err);
     }
-  } catch (err) {
-    throw createFailure("Song collection error", __filename, collect.name, err);
   }
 }
 
