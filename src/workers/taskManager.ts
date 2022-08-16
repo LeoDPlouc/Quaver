@@ -17,6 +17,7 @@ import songCollector from "./tasks/songCollector";
 import metadataGrabber from "./tasks/metadataGrabber";
 import coverGrabber from "./tasks/coverGrabber";
 import coverCleaner from "./tasks/coverCleaner";
+import { TASK_MANAGER_PERIOD } from "../config/appConfig";
 
 function getWorker(path: string) {
   return new Worker(path, { env: { ...process.env, IS_PROC: "true" } });
@@ -42,7 +43,7 @@ if (process.env.IS_PROC) {
       await new Promise<never>((resolve) =>
         setTimeout(() => {
           resolve(null);
-        }, 60 * 1000)
+        }, TASK_MANAGER_PERIOD)
       );
     }
   })();

@@ -21,7 +21,7 @@ export async function getAllSongsInfoCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getAllSongs();
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getAllSongsInfoCtrl.name);
     res.json({
       status: "fail",
       statusCode: 1,
@@ -31,7 +31,7 @@ export async function getAllSongsInfoCtrl(req: Request, res: Response) {
   }
 
   //Search all songs in the db and clean the output
-  const songs = result.map((s) => mapSongDTO(s));
+  const songs = result.map(mapSongDTO);
 
   res.json({
     status: "success",
@@ -57,7 +57,7 @@ export async function getOneSongInfoCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getOneSongInfoCtrl.name);
     res.json({
       status: "fail",
       statusCode: 1,
@@ -92,7 +92,7 @@ export async function getSongStreamCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getSongStreamCtrl.name);
     res.json({
       status: "fail",
       statusCode: 1,
@@ -118,7 +118,7 @@ export async function updateLikeCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, updateLikeCtrl.name);
     res.json({
       status: "fail",
       statusCode: 1,

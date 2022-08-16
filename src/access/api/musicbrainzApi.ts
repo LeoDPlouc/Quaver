@@ -24,33 +24,24 @@ export const mbApi = new MusicBrainzApi({
 });
 
 class MusicBrainzApiAccess {
-  public async getMBId(
-    this: MusicBrainzApiAccess,
-    album: Album
-  ): Promise<string[]> {
+  public async getMBId(this: MusicBrainzApiAccess, album: Album): Promise<string[]> {
     //Build query with available info
-    let query = `release:${album.title as string}`;
+    let query = `release:${album.title as string}`;;
 
     if (album.artist) {
       query += ` AND artist:${album.artist}`;
     }
 
-    try {
-      var result = await mbApi.search<IReleaseList>("release", { query });
-    } catch (err) {
-      throw createFailure(err, __filename, this.getMBId.name);
-    }
-    //Only keep ids of the release with score 100
-    var releases = result.releases.filter((release) => release.score == 100);
-    var ids = releases.map((release) => release.id);
-
-    return ids;
+    return await mbApi
+      .search<IReleaseList>("release", { query })
+      .then((result) => result.releases.filter((release) => release.score == 100))
+      .then((releases) => releases.map((release) => release.id))
+      .catch((err) => {
+        throw createFailure(err, __filename, this.getMBId.name);
+      });
   }
 
-  public async getMetadataFromMB(
-    this: MusicBrainzApiAccess,
-    mbids: string[]
-  ): Promise<Album> {
+  public async getMetadataFromMB(this: MusicBrainzApiAccess, mbids: string[]): Promise<Album> {
     let album: Album = {};
 
     for (let i = 0; i < mbids.length; i++) {
@@ -61,7 +52,7 @@ class MusicBrainzApiAccess {
         if (!album.title) album.title = release.title;
         if (!album.year) album.year = new Date(release.date).getFullYear();
       } catch (err) {
-        logError(createFailure(err, __filename, this.getMetadataFromMB.name));
+        logError(err, __filename, this.getMetadataFromMB.name);
       }
     }
 

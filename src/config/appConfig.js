@@ -13,5 +13,8 @@
 
 module.exports = {
     DB_VERSION: 4,
-    APP_VERSION: "0.1.0-beta"
+    APP_VERSION: "0.6.1-beta",
+    UPDATE_ALBUM_PERIOD: 1000 * 60 * 60 * 24 * 30,
+    UPDATE_COVER_PERIOD: 1000 * 60 * 60 * 24 * 30 * 6,
+    TASK_MANAGER_PERIOD: 1000 * 60
 }

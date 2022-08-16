@@ -18,21 +18,18 @@ import { createFailure } from "../utils/Failure";
 
 class SongService {
   public async getAllSongs(this: SongService): Promise<Song[]> {
-    try {
-      var result = await songDAO.getAllSongModels();
-    } catch (err) {
-      throw createFailure("DAO error", __filename, this.getAllSongs.name, err);
-    }
-
-    return result.map((s) => mapSong(s));
+    return await songDAO
+      .getAllSongModels()
+      .then((result) => result.map(mapSong))
+      .catch((err) => {
+        throw createFailure("DAO error", __filename, this.getAllSongs.name, err);
+      });
   }
 
   public async getSong(this: SongService, id: string): Promise<Song> {
-    try {
-      var result = await songDAO.getSongModel(id);
-    } catch (err) {
+    let result = await songDAO.getSongModel(id).catch((err) => {
       throw createFailure("DAO error", __filename, this.getSong.name, err);
-    }
+    });
 
     if (!result) {
       throw createFailure("Invalid Id", __filename, this.getSong.name);
@@ -42,75 +39,39 @@ class SongService {
   }
 
   public async updateSong(this: SongService, song: Song): Promise<void> {
-    try {
-      var result = await songDAO.updateSongModel(song);
-    } catch (err) {
+    await songDAO.updateSongModel(song).catch((err) => {
       throw createFailure("DAO error", __filename, this.updateSong.name, err);
-    }
+    });
   }
 
   public async createSong(this: SongService, song: Song): Promise<string> {
-    try {
-      var result = await songDAO.createSongModel(song);
-    } catch (err) {
+    return await songDAO.createSongModel(song).catch((err) => {
       throw createFailure("DAO error", __filename, this.createSong.name, err);
-    }
-
-    return result;
+    });
   }
 
   public async findSongByPath(this: SongService, path: string): Promise<Song> {
-    try {
-      var result = await songDAO.findSongModelByPath(path);
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.findSongByPath.name,
-        err
-      );
-    }
+    let result = await songDAO.findSongModelByPath(path).catch((err) => {
+      throw createFailure("DAO error", __filename, this.findSongByPath.name, err);
+    });
 
-    if (!result) {
-      throw createFailure(
-        "No song at path " + path,
-        __filename,
-        this.findSongByPath.name
-      );
-    }
+      if (!result) {
+      throw createFailure("No song at path " + path, __filename, this.findSongByPath.name);
+      }
 
     return mapSong(result);
   }
 
   public async getAllSongPaths(this: SongService): Promise<string[]> {
-    try {
-      var result = await songDAO.getAllSongModelPaths();
-    } catch (err) {
-      throw createFailure(
-        "DAO error",
-        __filename,
-        this.getAllSongPaths.name,
-        err
-      );
-    }
-
-    return result;
+    return await songDAO.getAllSongModelPaths().catch((err) => {
+      throw createFailure("DAO error", __filename, this.getAllSongPaths.name, err);
+    });
   }
 
-  public async getMetadataFromFile(
-    this: SongService,
-    songPath: string
-  ): Promise<Song> {
-    try {
-      return await songFileAccess.getMetadataFromFile(songPath);
-    } catch (err) {
-      throw createFailure(
-        "File access error",
-        this.getMetadataFromFile.name,
-        __filename,
-        err
-      );
-    }
+  public async getMetadataFromFile(this: SongService, songPath: string): Promise<Song> {
+    return await songFileAccess.getMetadataFromFile(songPath).catch((err) => {
+      throw createFailure("File access error", this.getMetadataFromFile.name, __filename, err);
+    });
   }
 }
 

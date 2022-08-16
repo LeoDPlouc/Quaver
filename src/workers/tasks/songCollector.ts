@@ -30,11 +30,9 @@ async function collect() {
     let paths = await fileService.getAllFiles(MUSIC_PATH);
 
     for (let i = 0; i < paths.length; i++) {
-      //Only considere audio files
-      if (!mm.lookup(path.extname(paths[i])).match("audio")) return;
+      if (!mm.lookup(path.extname(paths[i])).match("audio")) continue; //Only consider audio files
 
-      //If the song doesn't already exist, extract its metadata and create a new song
-      if (songPaths.find((p) => p == paths[i])) return;
+      if (songPaths.find((p) => p == paths[i])) continue; //Pass  
 
       let song = await songService.getMetadataFromFile(paths[i]);
 
@@ -79,27 +77,21 @@ async function collect() {
 }
 
 async function updatePaths(): Promise<void> {
-  try {
-    songPaths = await songService.getAllSongPaths();
-  } catch (err) {
+  songPaths = await songService.getAllSongPaths().catch((err) => {
     throw createFailure("Path update error", __filename, updatePaths.name, err);
-  }
+  });
 }
 
 async function updateAlbums(): Promise<void> {
-  try {
-    albums = await albumService.getAllAlbums();
-  } catch (err) {
+  albums = await albumService.getAllAlbums().catch((err) => {
     throw createFailure("Service error", __filename, updateAlbums.name, err);
-  }
+  });
 }
 
 async function updateArtists(): Promise<void> {
-  try {
-    artists = await artistService.getAllArtists();
-  } catch (err) {
+  artists = await artistService.getAllArtists().catch((err) => {
     throw createFailure("Service error", __filename, updateArtists.name, err);
-  }
+  });
 }
 
 function findArtistByName(artist: string): Artist {
@@ -125,6 +117,6 @@ export default async function doWork() {
 
     await collect();
   } catch (err) {
-    logError(err);
+    logError("Song collector error", __filename, doWork.name, err);
   }
 }

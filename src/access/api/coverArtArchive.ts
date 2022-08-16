@@ -13,11 +13,7 @@
 
 import { APP_VERSION } from "../../config/appConfig";
 import coverart from "coverart";
-
-export interface imageFileData {
-  data: string;
-  extension: string;
-}
+import { imageFileData } from "./DTO/ImageFileData";
 
 //DEPRECIATED Ne plus exporter lors du nettoyage des dépréciés, déplacer dans la class
 export const caApi = new coverart({

@@ -24,14 +24,18 @@ async function updateAlbumCover(album: Album) {
     let resizes = await imageService.makeResizing(coverData);
 
     let tinyPath = await imageService.saveImageFile(resizes.tiny);
-    if (resizes.small)
+    if (resizes.small) {
       var smallPath = await imageService.saveImageFile(resizes.small);
-    if (resizes.medium)
+    }
+    if (resizes.medium) {
       var mediumPath = await imageService.saveImageFile(resizes.medium);
-    if (resizes.large)
+    }
+    if (resizes.large) {
       var largePath = await imageService.saveImageFile(resizes.large);
-    if (resizes.verylarge)
+    }
+    if (resizes.verylarge) {
       var verylargePath = await imageService.saveImageFile(resizes.verylarge);
+    }
 
     let id = await imageService.createImage({
       path: tinyPath,
@@ -56,10 +60,8 @@ export default async function doWork() {
   let albums = await albumService.getToCoverGrabAlbums();
 
   for (let i = 0; i < albums.length; i++) {
-    try {
-      await updateAlbumCover(albums[i]);
-    } catch (err) {
-      logError(err);
-    }
+    await updateAlbumCover(albums[i]).catch((err) => {
+      logError("Cover grabber error", __filename, doWork.name, err);
+    });
   }
 }

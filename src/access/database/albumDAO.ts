@@ -12,49 +12,37 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
+import { UPDATE_ALBUM_PERIOD, UPDATE_COVER_PERIOD } from "../../config/appConfig";
 import { createFailure } from "../../utils/Failure";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";
 
 class AlbumDAO {
-  public async getAllAlbumModels(
-    this: AlbumDAO
-  ): Promise<(Album & Document<any, any, Album>)[]> {
-    try {
-      return await albumModel.find();
-    } catch (err) {
+  public async getAllAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel.find().catch((err) => {
       throw createFailure(err, __filename, this.getAllAlbumModels.name);
-    }
+    });
   }
 
-  public async getAlbumModel(
-    this: AlbumDAO,
-    id: string
-  ): Promise<Album & Document<any, any, Album>> {
-    try {
-      return await albumModel.findById(id);
-    } catch (err) {
+  public async getAlbumModel(this: AlbumDAO, id: string): Promise<Album & Document<any, any, Album>> {
+    return await albumModel.findById(id).catch((err) => {
       throw createFailure(err, __filename, this.getAlbumModel.name);
-    }
+    });
   }
 
-  public async getAlbumSongModel(
-    this: AlbumDAO,
-    id: string
-  ): Promise<(Song & Document<any, any, Song>)[]> {
-    try {
-      return await songModel.find({ albumId: id });
-    } catch (err) {
+  public async getAlbumSongModel(this: AlbumDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
+    return await songModel.find({ albumId: id }).catch((err) => {
       throw createFailure(err, __filename, this.getAlbumSongModel.name);
-    }
+    });
   }
 
   public async createAlbumModel(this: AlbumDAO, album: Album): Promise<string> {
-    try {
-      return (await albumModel.create(album)).id;
-    } catch (err) {
-      throw createFailure(err, __filename, this.createAlbumModel.name);
-    }
+    return await albumModel
+      .create(album)
+      .then((a) => a.id)
+      .catch((err) => {
+        throw createFailure(err, __filename, this.createAlbumModel.name);
+      });
   }
 
   public async findAlbumModelByName(
@@ -65,65 +53,49 @@ class AlbumDAO {
     var query: Album = { title: albumTitle };
     if (artistName) query.artist = artistName;
 
-    try {
-      return await albumModel.find(query);
-    } catch (err) {
+    return await albumModel.find(query).catch((err) => {
       throw createFailure(err, __filename, this.findAlbumModelByName.name);
-    }
+    });
   }
 
   public async updateAlbumModel(this: AlbumDAO, album: Album): Promise<void> {
-    try {
-      await albumModel.findByIdAndUpdate(album.id, album);
-    } catch (err) {
+    await albumModel.findByIdAndUpdate(album.id, album).catch((err) => {
       throw createFailure(err, __filename, this.updateAlbumModel.name);
-    }
+    });
   }
 
-  public async getMbidlessAlbumModels(
-    this: AlbumDAO
-  ): Promise<(Album & Document<any, any, Album>)[]> {
-    try {
-      return await albumModel.find({ mbids: { $size: 0 } });
-    } catch (err) {
+  public async getMbidlessAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel.find({ mbids: { $size: 0 } }).catch((err) => {
       throw createFailure(err, __filename, this.getMbidlessAlbumModels.name);
-    }
+    });
   }
 
-  public async getUpdatableAlbumModels(
-    this: AlbumDAO
-  ): Promise<(Album & Document<any, any, Album>)[]> {
-    try {
-      return await albumModel.find({
+  public async getUpdatableAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel
+      .find({
         $or: [
-          { lastUpdated: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
+          { lastUpdated: { $lt: Date.now() - UPDATE_ALBUM_PERIOD } },
           { lastUpdated: { $exists: false } },
           { lastUpdated: null },
         ],
+      })
+      .catch((err) => {
+        throw createFailure(err, __filename, this.getUpdatableAlbumModels.name);
       });
-    } catch (err) {
-      throw createFailure(err, __filename, this.getUpdatableAlbumModels.name);
-    }
   }
 
-  public async getToCoverGrabAlbumsModels(
-    this: AlbumDAO
-  ): Promise<(Album & Document<any, any, Album>)[]> {
-    try {
-      return await albumModel.find({
+  public async getToCoverGrabAlbumsModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel
+      .find({
         $or: [
           { cover: { $eq: null } },
           { lastCoverUpdate: null },
-          { lastCoverUpdate: { $lt: Date.now() - 1000 * 60 * 60 * 24 * 7 } },
+          { lastCoverUpdate: { $lt: Date.now() - UPDATE_COVER_PERIOD } },
         ],
+      })
+      .catch((err) => {
+        throw createFailure(err, __filename, this.getToCoverGrabAlbumsModels.name);
       });
-    } catch (err) {
-      throw createFailure(
-        err,
-        __filename,
-        this.getToCoverGrabAlbumsModels.name
-      );
-    }
   }
 }
 

@@ -22,7 +22,7 @@ export async function getAllAlbumsCtrl(req: Request, res: Response) {
   try {
     var result = await albumService.getAllAlbums();
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getAllAlbumsCtrl.name);
 
     res.json({
       status: "fail",
@@ -33,7 +33,7 @@ export async function getAllAlbumsCtrl(req: Request, res: Response) {
   }
 
   //Search all albums in the db and clean the output
-  const albums = result.map((a) => mapAlbumDTO(a));
+  const albums = result.map(mapAlbumDTO);
 
   res.json({
     status: "success",
@@ -60,7 +60,7 @@ export async function getAlbumCtrl(req: Request, res: Response) {
   try {
     var result = await albumService.getAlbum(req.params.id);
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getAlbumCtrl.name);
 
     res.json({
       status: "fail",
@@ -95,7 +95,7 @@ export async function getAlbumSongsCtrl(req: Request, res: Response) {
   try {
     var result = await albumService.getAlbumSongs(req.params.id);
   } catch (err) {
-    logError(err);
+    logError("Controller error", __filename, getAlbumSongsCtrl.name);
     res.json({
       status: "fail",
       statusCode: 1,
@@ -105,7 +105,7 @@ export async function getAlbumSongsCtrl(req: Request, res: Response) {
   }
 
   //Search songs by albumid in the db and clean the output
-  const songs = result.map((s) => mapSongDTO(s));
+  const songs = result.map(mapSongDTO);
 
   res.json({
     status: "success",

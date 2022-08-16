@@ -12,7 +12,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { albumService } from "../../service/albumService";
-import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
 
 async function grabMbids() {
@@ -21,14 +20,14 @@ async function grabMbids() {
   for (let i = 0; i < albums.length; i++) {
     try {
       let mbids = await albumService.getAlbumMbid(albums[i]);
-      if (!mbids.length) return;
+      if (!mbids.length) continue; //Pass if no Mbid have been found
 
       albums[i].mbids = mbids;
       await albumService.updateAlbum(albums[i]);
 
       logInfo(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logError(createFailure("Task error", __filename, grabMbids.name, err));
+      logError("Task error", __filename, grabMbids.name, err);
     }
   }
 }
@@ -49,9 +48,7 @@ async function updateMetadata() {
       await albumService.updateAlbum(albums[i]);
       logInfo(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logError(
-        createFailure("Task error", __filename, updateMetadata.name, err)
-      );
+      logError("Task error", __filename, updateMetadata.name, err);
     }
   }
 }
