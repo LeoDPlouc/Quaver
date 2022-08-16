@@ -30,11 +30,9 @@ async function collect() {
     let paths = await fileService.getAllFiles(MUSIC_PATH);
 
     for (let i = 0; i < paths.length; i++) {
-      //Only considere audio files
-      if (!mm.lookup(path.extname(paths[i])).match("audio")) return;
+      if (!mm.lookup(path.extname(paths[i])).match("audio")) continue; //Only consider audio files
 
-      //If the song doesn't already exist, extract its metadata and create a new song
-      if (songPaths.find((p) => p == paths[i])) return;
+      if (songPaths.find((p) => p == paths[i])) continue; //Pass  
 
       let song = await songService.getMetadataFromFile(paths[i]);
 
