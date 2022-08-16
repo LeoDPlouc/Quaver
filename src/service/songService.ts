@@ -55,9 +55,9 @@ class SongService {
       throw createFailure("DAO error", __filename, this.findSongByPath.name, err);
     });
 
-      if (!result) {
+    if (!result) {
       throw createFailure("No song at path " + path, __filename, this.findSongByPath.name);
-      }
+    }
 
     return mapSong(result);
   }

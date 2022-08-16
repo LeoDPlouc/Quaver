@@ -26,7 +26,7 @@ export const mbApi = new MusicBrainzApi({
 class MusicBrainzApiAccess {
   public async getMBId(this: MusicBrainzApiAccess, album: Album): Promise<string[]> {
     //Build query with available info
-    let query = `release:${album.title as string}`;;
+    let query = `release:${album.title as string}`;
 
     if (album.artist) {
       query += ` AND artist:${album.artist}`;
