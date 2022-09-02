@@ -28,7 +28,7 @@ export async function connectToDb(source: String) {
     })
     .then(() => logInfo("Successfully connected to database", source))
     .catch((err) => {
-      logError(err, __filename, connectToDb.name);
+      logError(err, __filename, "connectToDb");
       //retry connection
       setTimeout(connectToDb, 5000);
     });

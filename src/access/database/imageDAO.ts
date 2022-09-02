@@ -18,13 +18,13 @@ import { imageModel } from "./models/imageModel";
 class ImageDAO {
   public async getAllImagesModels(this: ImageDAO): Promise<(Image & Document<any, any, Image>)[]> {
     return await imageModel.find().catch((err) => {
-      throw createFailure(err, __filename, this.getAllImagesModels.name);
+      throw createFailure(err, __filename, "getAllImagesModels");
     });
   }
 
   public async getImageModel(this: ImageDAO, id: string): Promise<void | (Image & Document<any, any, Image>)> {
     return await imageModel.findById(id).catch((err) => {
-      createFailure(err, __filename, this.getImageModel.name);
+      createFailure(err, __filename, "getImageModel");
     });
   }
 
@@ -33,19 +33,19 @@ class ImageDAO {
       .create(image)
       .then((i) => i.id)
       .catch((err) => {
-        throw createFailure(err, __filename, this.createImageModel.name);
+        throw createFailure(err, __filename, "createImageModel");
       });
   }
 
   public async deleteImageModel(this: ImageDAO, id: string): Promise<void> {
     await imageModel.findByIdAndDelete(id).catch((err) => {
-      throw createFailure(err, __filename, this.deleteImageModel.name);
+      throw createFailure(err, __filename, "deleteImageModel");
     });
   }
 
   public async getTinyLessImageModel(this: ImageDAO): Promise<(Image & Document<any, any, Image>)[]> {
     return await imageModel.find({ tiny: null }).catch((err) => {
-      throw createFailure(err, __filename, this.getTinyLessImageModel.name);
+      throw createFailure(err, __filename, "getTinyLessImageModel");
     });
   }
 }

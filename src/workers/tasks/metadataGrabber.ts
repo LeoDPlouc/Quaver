@@ -27,7 +27,7 @@ async function grabMbids() {
 
       logInfo(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logError("Task error", __filename, grabMbids.name, err);
+      logError("Task error", __filename, "grabMbids", err);
     }
   }
 }
@@ -48,7 +48,7 @@ async function updateMetadata() {
       await albumService.updateAlbum(albums[i]);
       logInfo(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logError("Task error", __filename, updateMetadata.name, err);
+      logError("Task error", __filename, "updateMetadata", err);
     }
   }
 }

@@ -18,19 +18,19 @@ import { songModel } from "./models/songModel";
 class SongDAO {
   public async getAllSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find().catch((err) => {
-      throw createFailure(err, __filename, this.getAllSongModels.name);
+      throw createFailure(err, __filename, "getAllSongModels");
     });
   }
 
   public async getSongModel(this: SongDAO, id: string): Promise<Song & Document<any, any, Song>> {
     return await songModel.findById(id).catch((err) => {
-      throw createFailure(err, __filename, this.getSongModel.name);
+      throw createFailure(err, __filename, "getSongModel");
     });
   }
 
   public async updateSongModel(this: SongDAO, song: Song): Promise<void> {
     await songModel.findByIdAndUpdate(song.id, song).catch((err) => {
-      throw createFailure(err, __filename, this.updateSongModel.name);
+      throw createFailure(err, __filename, "updateSongModel");
     });
   }
 
@@ -39,7 +39,7 @@ class SongDAO {
       .create(song)
       .then((s) => s.id)
       .catch((err) => {
-        throw createFailure(err, __filename, this.createSongModel.name);
+        throw createFailure(err, __filename, "createSongModel");
       });
   }
 
@@ -48,7 +48,7 @@ class SongDAO {
       .find({ path })
       .then((s) => s[0])
       .catch((err) => {
-        throw createFailure(err, __filename, this.findSongModelByPath.name);
+        throw createFailure(err, __filename, "findSongModelByPath");
       });
   }
 
@@ -57,7 +57,7 @@ class SongDAO {
       .find({}, { path: 1 })
       .then((s) => s.map((s) => s.path))
       .catch((err) => {
-        throw createFailure(err, __filename, this.getAllSongModelPaths.name);
+        throw createFailure(err, __filename, "getAllSongModelPaths");
       });
   }
 }

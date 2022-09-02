@@ -25,17 +25,17 @@ class AlbumService {
       .getAllAlbumModels()
       .then((result) => result.map(mapAlbum))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, this.getAllAlbums.name, err);
+        throw createFailure("DAO error", __filename, "getAllAlbums", err);
       });
   }
 
   public async getAlbum(this: AlbumService, id: string): Promise<Album> {
     let result = await albumDAO.getAlbumModel(id).catch((err) => {
-      throw createFailure("DAO error", __filename, this.getAlbum.name, err);
+      throw createFailure("DAO error", __filename, "getAlbum", err);
     });
 
     if (!result) {
-      throw createFailure("Invalid Id", __filename, this.getAlbum.name);
+      throw createFailure("Invalid Id", __filename, "getAlbum");
     }
 
     return mapAlbum(result);
@@ -43,11 +43,11 @@ class AlbumService {
 
   public async getAlbumSongs(this: AlbumService, id: string): Promise<Song[]> {
     var result = await albumDAO.getAlbumSongModel(id).catch((err) => {
-      throw createFailure("DAO error", __filename, this.getAlbumSongs.name, err);
+      throw createFailure("DAO error", __filename, "getAlbumSongs", err);
     });
 
     if (!result) {
-      throw createFailure("Invalid Id", __filename, this.getAlbumSongs.name);
+      throw createFailure("Invalid Id", __filename, "getAlbumSongs");
     }
 
     return result.map(mapSong);
@@ -55,7 +55,7 @@ class AlbumService {
 
   public async createAlbum(this: AlbumService, album: Album): Promise<string> {
     return await albumDAO.createAlbumModel(album).catch((err) => {
-      throw createFailure("DAO error", __filename, this.createAlbum.name, err);
+      throw createFailure("DAO error", __filename, "createAlbum", err);
     });
   }
 
@@ -64,13 +64,13 @@ class AlbumService {
       .findAlbumModelByName(albumTitle, artistName)
       .then((result) => result.map(mapAlbum))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, this.findAlbumByName.name, err);
+        throw createFailure("DAO error", __filename, "findAlbumByName", err);
       });
   }
 
   public async updateAlbum(this: AlbumService, album: Album): Promise<void> {
     await albumDAO.updateAlbumModel(album).catch((err) => {
-      throw createFailure("DAO error", __filename, this.updateAlbum.name, err);
+      throw createFailure("DAO error", __filename, "updateAlbum", err);
     });
   }
 
@@ -79,7 +79,7 @@ class AlbumService {
       .getMbidlessAlbumModels()
       .then((result) => result.map(mapAlbum))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, this.getMbidlessAlbum.name, err);
+        throw createFailure("DAO error", __filename, "getMbidlessAlbum", err);
       });
   }
 
@@ -88,13 +88,13 @@ class AlbumService {
       .getToCoverGrabAlbumsModels()
       .then((result) => result.map(mapAlbum))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, this.getToCoverGrabAlbums.name, err);
+        throw createFailure("DAO error", __filename, "getToCoverGrabAlbums", err);
       });
   }
 
   public async getAlbumMbid(this: AlbumService, album: Album): Promise<string[]> {
     return await musicBrainzApiAccess.getMBId(album).catch((err) => {
-      throw createFailure("API error", __filename, this.getAlbumMbid.name, err);
+      throw createFailure("API error", __filename, "getAlbumMbid", err);
     });
   }
 
@@ -104,7 +104,7 @@ class AlbumService {
 
   public async getUpdatableAlbum(this: AlbumService): Promise<Album[]> {
     return await albumDAO.getUpdatableAlbumModels().catch((err) => {
-      throw createFailure("DAO error", __filename, this.getUpdatableAlbum.name, err);
+      throw createFailure("DAO error", __filename, "getUpdatableAlbum", err);
     });
   }
 

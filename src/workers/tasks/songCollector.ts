@@ -29,7 +29,7 @@ async function collect() {
   try {
     var paths = await fileService.getAllFiles(MUSIC_PATH);
   } catch (err) {
-    throw createFailure("File service error", __filename, collect.name, err);
+    throw createFailure("File service error", __filename, "collect", err);
   }
 
   for (let i = 0; i < paths.length; i++) {
@@ -75,26 +75,26 @@ async function collect() {
       song.albumId = albumId;
       await songService.createSong(song);
     } catch (err) {
-      logError("Song collection error", __filename, collect.name, err);
+      logError("Song collection error", __filename, "collect", err);
     }
   }
 }
 
 async function updatePaths(): Promise<void> {
   songPaths = await songService.getAllSongPaths().catch((err) => {
-    throw createFailure("Path update error", __filename, updatePaths.name, err);
+    throw createFailure("Path update error", __filename, "updatePaths", err);
   });
 }
 
 async function updateAlbums(): Promise<void> {
   albums = await albumService.getAllAlbums().catch((err) => {
-    throw createFailure("Service error", __filename, updateAlbums.name, err);
+    throw createFailure("Service error", __filename, "updateAlbums", err);
   });
 }
 
 async function updateArtists(): Promise<void> {
   artists = await artistService.getAllArtists().catch((err) => {
-    throw createFailure("Service error", __filename, updateArtists.name, err);
+    throw createFailure("Service error", __filename, "updateArtists", err);
   });
 }
 
@@ -121,6 +121,6 @@ export default async function doWork() {
 
     await collect();
   } catch (err) {
-    logError("Song collector error", __filename, doWork.name, err);
+    logError("Song collector error", __filename, "doWork", err);
   }
 }

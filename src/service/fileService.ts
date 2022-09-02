@@ -21,7 +21,7 @@ class FileService {
     let allPaths: string[] = [];
 
     var paths = await fs.readdir(folder, { withFileTypes: true }).catch((err) => {
-      throw createFailure(err, __filename, this.getAllFiles.name);
+      throw createFailure(err, __filename, "getAllFiles");
     });
 
     for (var i = 0; i < paths.length; i++) {
@@ -31,7 +31,7 @@ class FileService {
         try {
           (await this.getAllFiles(fullPath)).forEach((p) => allPaths.push(p));
         } catch (err) {
-          logError("File access eror", __filename, this.getAllFiles.name, err);
+          logError("File access eror", __filename, "getAllFiles", err);
           continue;
         }
       }

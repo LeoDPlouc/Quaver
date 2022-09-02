@@ -32,17 +32,17 @@ class ImageService {
       .getAllImagesModels()
       .then((result) => result.map(mapImage))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, this.getAllImages.name, err);
+        throw createFailure("DAO error", __filename, "getAllImages", err);
       });
   }
 
   public async getImage(this: ImageService, id: string): Promise<Image> {
     let result = await imageDAO.getImageModel(id).catch((err) => {
-      throw createFailure("DAO error", __filename, this.getImage.name, err);
+      throw createFailure("DAO error", __filename, "getImage", err);
     });
 
     if (!result) {
-      throw createFailure("Invalid Id", __filename, this.getImage.name);
+      throw createFailure("Invalid Id", __filename, "getImage");
     }
 
     return mapImage(result);
@@ -54,13 +54,13 @@ class ImageService {
     }
 
     return await imageFileAccess.saveImage(fileData.data, fileData.extension).catch((err) => {
-      throw createFailure("File acces error", __filename, this.saveImageFile.name, err);
+      throw createFailure("File acces error", __filename, "saveImageFile", err);
     });
   }
 
   public async createImage(this: ImageService, image: Image): Promise<string> {
     return await imageDAO.createImageModel(image).catch((err) => {
-      throw createFailure("DAO error", __filename, this.createImage.name, err);
+      throw createFailure("DAO error", __filename, "createImage", err);
     });
   }
 
@@ -108,19 +108,19 @@ class ImageService {
 
       return resizes;
     } catch (err) {
-      throw createFailure("Resize error", __filename, this.makeResizing.name, err);
+      throw createFailure("Resize error", __filename, "makeResizing", err);
     }
   }
 
   public async deleteImageModel(this: ImageService, id: string): Promise<void> {
     await imageDAO.deleteImageModel(id).catch((err) => {
-      throw createFailure("DAO error", __filename, this.deleteImageModel.name, err);
+      throw createFailure("DAO error", __filename, "deleteImageModel", err);
     });
   }
 
   public async deleteImageFile(this: ImageService, path: string): Promise<void> {
     await imageFileAccess.deleteImageFile(path).catch((err) => {
-      throw createFailure("File access error", __filename, this.deleteImageFile.name, err);
+      throw createFailure("File access error", __filename, "deleteImageFile", err);
     });
   }
 
@@ -133,7 +133,7 @@ class ImageService {
       await imageFileAccess.deleteImageFile(image?.large);
       await imageFileAccess.deleteImageFile(image?.verylarge);
     } catch (err) {
-      throw createFailure("File access error", __filename, this.deleteAllImageFiles.name, err);
+      throw createFailure("File access error", __filename, "deleteAllImageFiles", err);
     }
   }
 
@@ -142,7 +142,7 @@ class ImageService {
       .getTinyLessImageModel()
       .then((result) => result.map(mapImage))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, this.getTinyLessImage.name, err);
+        throw createFailure("DAO error", __filename, "getTinyLessImage", err);
       });
   }
 
@@ -153,7 +153,7 @@ class ImageService {
       .getBufferAsync(Jimp.MIME_JPEG)
       .then((result) => result.toString("binary"))
       .catch((err) => {
-        throw createFailure(err, __filename, this.resizeImage.name);
+        throw createFailure(err, __filename, "resizeImage");
       });
   }
 }

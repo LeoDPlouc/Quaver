@@ -37,7 +37,7 @@ class MusicBrainzApiAccess {
       .then((result) => result.releases.filter((release) => release.score == 100))
       .then((releases) => releases.map((release) => release.id))
       .catch((err) => {
-        throw createFailure(err, __filename, this.getMBId.name);
+        throw createFailure(err, __filename, "getMBId");
       });
   }
 
@@ -52,7 +52,7 @@ class MusicBrainzApiAccess {
         if (!album.title) album.title = release.title;
         if (!album.year) album.year = new Date(release.date).getFullYear();
       } catch (err) {
-        logError(err, __filename, this.getMetadataFromMB.name);
+        logError(err, __filename, "getMetadataFromMB");
       }
     }
 

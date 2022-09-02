@@ -51,7 +51,7 @@ async function updateAlbumCover(album: Album) {
     albumService.updateAlbum(album);
     logInfo(`Updated cover of album ${album.id}`, "Cover Grabber");
   } catch (err) {
-    throw createFailure("Task failure", __filename, updateAlbumCover.name, err);
+    throw createFailure("Task failure", __filename, "updateAlbumCover", err);
   }
 }
 
@@ -61,7 +61,7 @@ export default async function doWork() {
 
   for (let i = 0; i < albums.length; i++) {
     await updateAlbumCover(albums[i]).catch((err) => {
-      logError("Cover grabber error", __filename, doWork.name, err);
+      logError("Cover grabber error", __filename, "doWork", err);
     });
   }
 }
