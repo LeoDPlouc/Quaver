@@ -27,7 +27,7 @@ class SongFileAccess {
       if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH });
       else fingerprint = await fp(songPath);
     } catch (err) {
-      throw createFailure(err, __filename, this.getAcoustid.name);
+      throw createFailure(err, __filename, "getAcoustid");
     }
 
     return fingerprint.fingerprint;
@@ -35,7 +35,7 @@ class SongFileAccess {
 
   public async getMetadataFromFile(this: SongFileAccess, songPath: string): Promise<Song> {
     var tag = await parseFile(songPath).catch((err) => {
-      throw createFailure(err, __filename, this.getMetadataFromFile.name);
+      throw createFailure(err, __filename, "getMetadataFromFile");
     });
 
     let format = Path.extname(songPath); //Extract file extension

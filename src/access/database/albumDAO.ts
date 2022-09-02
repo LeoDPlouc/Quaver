@@ -20,19 +20,19 @@ import { songModel } from "./models/songModel";
 class AlbumDAO {
   public async getAllAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find().catch((err) => {
-      throw createFailure(err, __filename, this.getAllAlbumModels.name);
+      throw createFailure(err, __filename, "getAllAlbumModels");
     });
   }
 
   public async getAlbumModel(this: AlbumDAO, id: string): Promise<Album & Document<any, any, Album>> {
     return await albumModel.findById(id).catch((err) => {
-      throw createFailure(err, __filename, this.getAlbumModel.name);
+      throw createFailure(err, __filename, "getAlbumModel");
     });
   }
 
   public async getAlbumSongModel(this: AlbumDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find({ albumId: id }).catch((err) => {
-      throw createFailure(err, __filename, this.getAlbumSongModel.name);
+      throw createFailure(err, __filename, "getAlbumSongModel");
     });
   }
 
@@ -41,7 +41,7 @@ class AlbumDAO {
       .create(album)
       .then((a) => a.id)
       .catch((err) => {
-        throw createFailure(err, __filename, this.createAlbumModel.name);
+        throw createFailure(err, __filename, "createAlbumModel");
       });
   }
 
@@ -54,19 +54,19 @@ class AlbumDAO {
     if (artistName) query.artist = artistName;
 
     return await albumModel.find(query).catch((err) => {
-      throw createFailure(err, __filename, this.findAlbumModelByName.name);
+      throw createFailure(err, __filename, "findAlbumModelByName");
     });
   }
 
   public async updateAlbumModel(this: AlbumDAO, album: Album): Promise<void> {
     await albumModel.findByIdAndUpdate(album.id, album).catch((err) => {
-      throw createFailure(err, __filename, this.updateAlbumModel.name);
+      throw createFailure(err, __filename, "updateAlbumModel");
     });
   }
 
   public async getMbidlessAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find({ mbids: { $size: 0 } }).catch((err) => {
-      throw createFailure(err, __filename, this.getMbidlessAlbumModels.name);
+      throw createFailure(err, __filename, "getMbidlessAlbumModels");
     });
   }
 
@@ -80,7 +80,7 @@ class AlbumDAO {
         ],
       })
       .catch((err) => {
-        throw createFailure(err, __filename, this.getUpdatableAlbumModels.name);
+        throw createFailure(err, __filename, "getUpdatableAlbumModels");
       });
   }
 
@@ -94,7 +94,7 @@ class AlbumDAO {
         ],
       })
       .catch((err) => {
-        throw createFailure(err, __filename, this.getToCoverGrabAlbumsModels.name);
+        throw createFailure(err, __filename, "getToCoverGrabAlbumsModels");
       });
   }
 }

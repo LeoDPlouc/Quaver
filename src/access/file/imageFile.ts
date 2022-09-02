@@ -24,7 +24,7 @@ class ImageFileAccess {
     let p = path.resolve(IMAGES_PATH, filename);
 
     await fs.writeFile(p, data, { encoding: "binary" }).catch((err) => {
-      throw createFailure(err, __filename, this.saveImage.name);
+      throw createFailure(err, __filename, "saveImage");
     });
 
     return p;
@@ -32,7 +32,7 @@ class ImageFileAccess {
 
   public async deleteImageFile(this: ImageFileAccess, path: string): Promise<void> {
     await fs.rm(path).catch((err) => {
-      throw createFailure(err, __filename, this.deleteImageFile.name);
+      throw createFailure(err, __filename, "deleteImageFile");
     });
   }
 }

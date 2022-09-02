@@ -22,7 +22,7 @@ export async function getAllImagesInfoCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getAllImages();
   } catch (err) {
-    logError("Controller error", __filename, getAllImagesInfoCtrl.name);
+    logError("Controller error", __filename, "getAllImagesInfoCtrl");
     res.json({
       status: "fail",
       statusCode: 1,
@@ -58,7 +58,7 @@ export async function getOneImageInfoCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, getOneImageInfoCtrl.name);
+    logError("Controller error", __filename, "getOneImageInfoCtrl");
     res.json({
       status: "fail",
       statusCode: 1,
@@ -92,7 +92,7 @@ export async function getImageFileCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, getImageFileCtrl.name);
+    logError("Controller error", __filename, "getImageFileCtrl");
     res.json({
       status: "fail",
       statusCode: 1,
@@ -124,7 +124,7 @@ export async function getImageFileWithSizeCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, getImageFileWithSizeCtrl.name);
+    logError("Controller error", __filename, "getImageFileWithSizeCtrl");
     res.json({
       status: "fail",
       statusCode: 1,
