@@ -11,8 +11,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import path from "path";
-import mm from "mime-types";
 import { MUSIC_PATH } from "../../config/config";
 import { createFailure } from "../../utils/Failure";
 import { logError, logInfo } from "../../utils/logger";
@@ -34,7 +32,7 @@ async function collect() {
 
   for (let i = 0; i < paths.length; i++) {
     try {
-      if (!mm.lookup(path.extname(paths[i])).match("audio")) continue; //Only consider audio files
+      if (fileService.isMusicFile(paths[i])) continue; //Only consider audio files
 
       if (songPaths.find((p) => p == paths[i])) continue; //Pass if song already exists
 
