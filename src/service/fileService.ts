@@ -15,7 +15,7 @@ import fs from "fs/promises";
 import path from "path";
 import mm from "mime-types";
 import { createFailure } from "../utils/Failure";
-import { logError } from "../utils/logger";
+import { logger } from "../utils/logger";
 
 class FileService {
   public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
@@ -32,7 +32,7 @@ class FileService {
         try {
           (await this.getAllFiles(fullPath)).forEach((p) => allPaths.push(p));
         } catch (err) {
-          logError("File access eror", __filename, "getAllFiles", err);
+          // logError("File access eror", __filename, "getAllFiles", err);  DEBUGGER LOG LVL 1
           continue;
         }
       }

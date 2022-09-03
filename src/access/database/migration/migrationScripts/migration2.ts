@@ -14,7 +14,7 @@
 import { IMigration } from "../migration";
 import { albumModel } from "../../models/albumModel";
 import { imageModel } from "../../models/imageModel";
-import { logInfo } from "../../../../utils/logger";
+import { logger } from "../../../../utils/logger";
 import { createFailure } from "../../../../utils/Failure";
 import { musicBrainzApiAccess } from "../../../api/musicbrainzApi";
 import { imageFileAccess } from "../../../file/imageFile";
@@ -32,7 +32,7 @@ export const migration2: IMigration = {
       for (let i = 0; i < albums.length; i++) {
         let a = albums[i];
 
-        logInfo(`Migration 2 -> 3 album ${a.id}`, "Migration");
+        logger.info(`Migration 2 -> 3 album ${a.id}`, "Migration");
 
         let mbids = await musicBrainzApiAccess.getMBId(a);
         if (!mbids) {
@@ -71,7 +71,7 @@ export const migration2: IMigration = {
         let a = albums[i];
 
         if (a.cover) {
-          logInfo(`Migration 2 -> 1 album ${a.id}`, "Migration");
+          logger.info(`Migration 2 -> 1 album ${a.id}`, "Migration");
 
           try {
             var cover = await imageModel.findById(a.cover);

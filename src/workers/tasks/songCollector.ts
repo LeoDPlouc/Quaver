@@ -13,7 +13,7 @@
 
 import { MUSIC_PATH } from "../../config/config";
 import { createFailure } from "../../utils/Failure";
-import { logError, logInfo } from "../../utils/logger";
+import { logger } from "../../utils/logger";
 import { albumService } from "../../service/albumService";
 import { songService } from "../../service/songService";
 import { artistService } from "../../service/artistService";
@@ -38,7 +38,7 @@ async function collect() {
 
       let song = await songService.getMetadataFromFile(paths[i]);
 
-      logInfo(`Found new song ${song.path}`, "Song Collector");
+      logger.info(`Found new song ${song.path}`, "Song Collector");
 
       //Fetch the song's album
       let album = findAlbumByName(song.album, song.artist);
@@ -48,7 +48,7 @@ async function collect() {
 
         albumId = await albumService.createAlbum(album);
 
-        logInfo(`Found new album ${album.title}`, "Song Collector");
+        logger.info(`Found new album ${album.title}`, "Song Collector");
 
         await updateAlbums();
       }
@@ -61,7 +61,7 @@ async function collect() {
 
         artistId = await artistService.createArtist(artist);
 
-        logInfo(`Found new artist ${artist.name}`, "Song Collector");
+        logger.info(`Found new artist ${artist.name}`, "Song Collector");
 
         await updateArtists();
       }
@@ -73,7 +73,7 @@ async function collect() {
       song.albumId = albumId;
       await songService.createSong(song);
     } catch (err) {
-      logError("Song collection error", __filename, "collect", err);
+      logger.error("Song collection error", __filename, "collect", err);
     }
   }
 }
@@ -109,7 +109,7 @@ function findAlbumByName(album: string, artist: string) {
 }
 
 export default async function doWork() {
-  logInfo("Song collection Started", "Song Collector");
+  logger.info("Song collection Started", "Song Collector");
 
   //Collection run in background and is relaunched every 30 sec
   try {
@@ -119,6 +119,6 @@ export default async function doWork() {
 
     await collect();
   } catch (err) {
-    logError("Song collector error", __filename, "doWork", err);
+    logger.error("Song collector error", __filename, "doWork", err);
   }
 }

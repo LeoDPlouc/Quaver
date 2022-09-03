@@ -15,13 +15,13 @@ import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { mapSongDTO } from "../mappers/songMapper";
 import { songService } from "../service/songService";
-import { logError } from "../utils/logger";
+import { logger } from "../utils/logger";
 
 export async function getAllSongsInfoCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getAllSongs();
   } catch (err) {
-    logError("Controller error", __filename, "getAllSongsInfoCtrl");
+    logger.error("Controller error", __filename, "getAllSongsInfoCtrl");
     res.json({
       status: "fail",
       statusCode: 1,
@@ -57,7 +57,7 @@ export async function getOneSongInfoCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, "getOneSongInfoCtrl");
+    logger.error("Controller error", __filename, "getOneSongInfoCtrl");
     res.json({
       status: "fail",
       statusCode: 1,
@@ -92,7 +92,7 @@ export async function getSongStreamCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, "getSongStreamCtrl");
+    logger.error("Controller error", __filename, "getSongStreamCtrl");
     res.json({
       status: "fail",
       statusCode: 1,
@@ -118,7 +118,7 @@ export async function updateLikeCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, "updateLikeCtrl");
+    logger.error("Controller error", __filename, "updateLikeCtrl");
     res.json({
       status: "fail",
       statusCode: 1,

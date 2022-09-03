@@ -16,7 +16,7 @@ import { albumService } from "../../service/albumService";
 import { fileService } from "../../service/fileService";
 import { imageService } from "../../service/imageService";
 import { createFailure } from "../../utils/Failure";
-import { logError, logInfo } from "../../utils/logger";
+import { logger } from "../../utils/logger";
 
 async function cleanAlbumlessImages() {
   try {
@@ -30,9 +30,9 @@ async function cleanAlbumlessImages() {
     if (!albums.find((a) => a.cover == images[i].id)) {
       try {
         await imageService.deleteImageModel(images[i].id);
-        logInfo(`Deleted image ${images[i].id}`, "Cover Cleaner");
+        logger.info(`Deleted image ${images[i].id}`, "Cover Cleaner");
       } catch (err) {
-        logError("DAO error", __filename, "cleanAlbumlessImages", err);
+        logger.error("DAO error", __filename, "cleanAlbumlessImages", err);
       }
     }
   }
@@ -43,16 +43,16 @@ async function cleanTinyLessFiles() {
     var images = await imageService.getAllImages();
     var files = await fileService.getAllFiles(IMAGES_PATH);
   } catch (err) {
-    logError("Cover cleaner error", __filename, "cleanTinyLessFiles", err);
+    logger.error("Cover cleaner error", __filename, "cleanTinyLessFiles", err);
   }
 
   for (let i = 0; i < images.length; i++) {
     if (!files.find((f) => f == images[i].tiny)) {
       try {
         imageService.deleteImageModel(images[i].id);
-        logInfo(`Deleted cover ${files[i]}`, "Cover Cleaner");
+        logger.info(`Deleted cover ${files[i]}`, "Cover Cleaner");
       } catch (err) {
-        logError("Cover cleaner error", __filename, "cleanTinyLessFiles", err);
+        logger.error("Cover cleaner error", __filename, "cleanTinyLessFiles", err);
       }
     }
   }
@@ -65,7 +65,7 @@ async function cleanTinylessImages() {
 
   for (let i = 0; i < images.length; i++) {
     await imageService.deleteImageModel(images[i].id).catch((err) => {
-      logError("DAO error", __filename, "cleanTinylessImages", err);
+      logger.error("DAO error", __filename, "cleanTinylessImages", err);
     });
   }
 }
@@ -79,16 +79,16 @@ async function cleanImageLessFiles() {
       .then((result) => result.filter((p) => p));
     var files = await fileService.getAllFiles(IMAGES_PATH);
   } catch (err) {
-    logError("Cover cleaner error", __filename, "cleanImageLessFiles", err);
+    logger.error("Cover cleaner error", __filename, "cleanImageLessFiles", err);
   }
 
   for (let i = 0; i < files.length; i++) {
     if (!coverFiles.find((p) => p == files[i])) {
       try {
         await imageService.deleteImageFile(files[i]);
-        logInfo(`Deleted cover ${files[i]}`, "Cover Cleaner");
+        logger.info(`Deleted cover ${files[i]}`, "Cover Cleaner");
       } catch (err) {
-        logError("Cover cleaner error", __filename, "cleanImageLessFiles", err);
+        logger.error("Cover cleaner error", __filename, "cleanImageLessFiles", err);
       }
     }
   }
@@ -107,11 +107,11 @@ async function cleanAlbumCoverId() {
       if (albums[i].cover && !images.find((im) => im.id == albums[i].cover)) {
         albums[i].cover = null;
         await albumService.updateAlbum(albums[i]);
-        logInfo(`Clean cover id for ${albums[i].id}`, "Cover Cleaner");
+        logger.info(`Clean cover id for ${albums[i].id}`, "Cover Cleaner");
       }
     }
   } catch (err) {
-    logError("Cover cleaner error", __filename, "cleanAlbumCoverId", err);
+    logger.error("Cover cleaner error", __filename, "cleanAlbumCoverId", err);
   }
 }
 
@@ -132,16 +132,16 @@ async function cleanDeadFiles() {
 
       if (isDead) {
         imageService.deleteImageModel(images[i].id);
-        logInfo(`Deleted image ${images[i].id}`, "Cover Cleaner");
+        logger.info(`Deleted image ${images[i].id}`, "Cover Cleaner");
       }
     }
   } catch (err) {
-    logError("Cover cleaner error", __filename, "cleanDeadFiles", err);
+    logger.error("Cover cleaner error", __filename, "cleanDeadFiles", err);
   }
 }
 
 export default async function doWork() {
-  logInfo("Cover cleaner started", "Cover Cleaner");
+  logger.info("Cover cleaner started", "Cover Cleaner");
 
   try {
     await cleanAlbumlessImages();
@@ -151,6 +151,6 @@ export default async function doWork() {
     await cleanImageLessFiles();
     await cleanAlbumCoverId();
   } catch (err) {
-    logError("Cover cleaner error", __filename, "doWork", err);
+    logger.error("Cover cleaner error", __filename, "doWork", err);
   }
 }

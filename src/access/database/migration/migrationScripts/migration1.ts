@@ -15,7 +15,7 @@ import { IMigration } from "../migration";
 import { getAlbumCoverLegacy } from "../legacy/legacyCode";
 import { albumModel } from "../../models/albumModel";
 import { createFailure } from "../../../../utils/Failure";
-import { logError, logInfo } from "../../../../utils/logger";
+import { logger } from "../../../../utils/logger";
 
 export const migration1: IMigration = {
   //Download album covers
@@ -30,7 +30,7 @@ export const migration1: IMigration = {
       for (let i = 0; i < albums.length; i++) {
         let a = albums[i];
 
-        logInfo(`Migration 1 -> 2 album ${a.id}`, "Migration");
+        logger.info(`Migration 1 -> 2 album ${a.id}`, "Migration");
 
         let cover = await getAlbumCoverLegacy(a);
         if (!cover) {
@@ -68,7 +68,7 @@ export const migration1: IMigration = {
         let a = albums[i];
 
         if (!a.mbid) {
-          logInfo(`Migration 1 -> 0 album ${a.id}`, "Migration");
+          logger.info(`Migration 1 -> 0 album ${a.id}`, "Migration");
 
           a.mbid = undefined;
 

@@ -15,7 +15,7 @@ import { Request } from "express";
 import { createLogger, format, transports } from "winston";
 import { createFailure, Failure } from "./Failure";
 
-var logger = createLogger({
+let loggerStd = createLogger({
   transports: [new transports.Console(), new transports.File({ dirname: "logs", filename: "quaver.log" })],
   format: format.combine(
     format.colorize(),
@@ -26,15 +26,19 @@ var logger = createLogger({
   ),
 });
 
-export function logError(msg: string, file: string, func: string, sourceFailure?: Failure) {
-  let error = createFailure(msg, file, func, sourceFailure);
-  logger.error(`${JSON.stringify(error)}`);
+class Logger {
+  public error(this: Logger, msg: string, file: string, func: string, sourceFailure?: Failure) {
+    let error = createFailure(msg, file, func, sourceFailure);
+    loggerStd.error(`${JSON.stringify(error)}`);
+  }
+
+  public info(this: Logger, info: String, source: String) {
+    loggerStd.info(`${source} : ${info}`);
+  }
+
+  public logRequest(this: Logger, req: Request) {
+    loggerStd.info(`${req.ip} ${req.url}`);
+  }
 }
 
-export function logInfo(info: String, source: String) {
-  logger.info(`${source} :  ${info}`);
-}
-
-export function logRequest(req: Request) {
-  logger.info(`${req.ip} ${req.url}`);
-}
+export const logger = new Logger()

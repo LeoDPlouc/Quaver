@@ -14,7 +14,7 @@
 import { albumService } from "../../service/albumService";
 import { imageService } from "../../service/imageService";
 import { createFailure } from "../../utils/Failure";
-import { logError, logInfo } from "../../utils/logger";
+import { logger } from "../../utils/logger";
 
 async function updateAlbumCover(album: Album) {
   try {
@@ -49,19 +49,19 @@ async function updateAlbumCover(album: Album) {
     album.cover = id;
     album.lastCoverUpdate = Date.now();
     albumService.updateAlbum(album);
-    logInfo(`Updated cover of album ${album.id}`, "Cover Grabber");
+    logger.info(`Updated cover of album ${album.id}`, "Cover Grabber");
   } catch (err) {
     throw createFailure("Task failure", __filename, "updateAlbumCover", err);
   }
 }
 
 export default async function doWork() {
-  logInfo("Cover grabber started", "Cover Grabber");
+  logger.info("Cover grabber started", "Cover Grabber");
   let albums = await albumService.getToCoverGrabAlbums();
 
   for (let i = 0; i < albums.length; i++) {
     await updateAlbumCover(albums[i]).catch((err) => {
-      logError("Cover grabber error", __filename, "doWork", err);
+      logger.error("Cover grabber error", __filename, "doWork", err);
     });
   }
 }
