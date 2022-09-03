@@ -32,7 +32,7 @@ class FileService {
         try {
           (await this.getAllFiles(fullPath)).forEach((p) => allPaths.push(p));
         } catch (err) {
-          // logError("File access eror", __filename, "getAllFiles", err);  DEBUGGER LOG LVL 1
+          logger.debugError(1, "File access eror", __filename, "getAllFiles", err);
           continue;
         }
       }

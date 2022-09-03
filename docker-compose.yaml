@@ -14,6 +14,7 @@ services:
       - QUAVER_DB_USER=quaver
       - QUAVER_DB_PASSWORD=quaver
       - QUAVER_SESSION_SECRET=quaver
+      - QUAVER_DEBUG_LEVEL=0
     depends_on:
       - mongo
 

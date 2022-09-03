@@ -12,7 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import mongoose from "mongoose";
-import { APP_PORT } from "./config/config";
+import { APP_PORT, DEBUG_LVL, } from "./config/config";
 import { runTaskManager } from "./workers/taskManager";
 import { Migrate } from "./access/database/migration/migration";
 import { logger } from "./utils/logger";
@@ -26,6 +26,8 @@ declare module "express-session" {
   }
 }
 
+logger.debug(1, `Debug level: ${DEBUG_LVL}`, "App")
+
 //Connect to the db
 connectToDb("App").then(async () => {
   //Apply database migration
@@ -38,5 +40,5 @@ connectToDb("App").then(async () => {
   runTaskManager();
 
   //Open server
-  app.listen(APP_PORT, () => logger.info(`listening on port ${APP_PORT}`, "Main"));
+  app.listen(APP_PORT, () => logger.info(`listening on port ${APP_PORT}`, "App"));
 });
