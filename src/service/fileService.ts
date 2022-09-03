@@ -13,6 +13,7 @@
 
 import fs from "fs/promises";
 import path from "path";
+import mm from "mime-types";
 import { createFailure } from "../utils/Failure";
 import { logError } from "../utils/logger";
 
@@ -42,6 +43,14 @@ class FileService {
     }
 
     return allPaths;
+  }
+
+  public async isMusicFile(this: FileService, file: string) {
+    try {
+      return !mm.lookup(path.extname(file)).match("audio")
+    } catch (err) {
+      throw createFailure("mime-types error", __filename, "isMusicFile", err)
+    }
   }
 }
 
