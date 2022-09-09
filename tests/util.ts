@@ -19,7 +19,7 @@ import { songModel } from "../src/access/database/models/songModel"
 import { imageModel } from "../src/access/database/models/imageModel"
 
 export async function createDatabase() {
-    await connectToDb()
+    await connectToDb("Test")
 
     var artist = await new artistModel({ name: "Nirvana" }).save()
     var album = await new albumModel({ artist: "Nirvana", artistId: artist.id, title: "Nevermind", year: 1991 }).save()
