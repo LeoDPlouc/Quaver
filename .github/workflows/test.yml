@@ -32,4 +32,4 @@ jobs:
     - name: Build
       run: npm install && npm run build --if-present
     - name: Tests
-      run: mkdir ./images && QUAVER_IMAGES_PATH=./images npm run test
+      run: mkdir ./data && QUAVER_DATA_PATH=./data npm run test
