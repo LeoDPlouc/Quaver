@@ -17,7 +17,7 @@ import { mbApi } from "../../../api/musicbrainzApi";
 import { caApi } from "../../../api/coverArtArchive";
 import { imageModel } from "../../models/imageModel";
 import { createFailure } from "../../../../utils/Failure";
-import { logInfo } from "../../../../utils/logger";
+import { logger } from "../../../../utils/logger";
 import { imageFileAccess } from "../../../file/imageFile";
 
 export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
@@ -58,7 +58,7 @@ export async function getAlbumCoverLegacy(
   }
 
   if (image) {
-    logInfo(`Found new cover for ${album.id}`, "Migration");
+    logger.info(`Found new cover for ${album.id}`, "Migration");
     //Save the image cover on the hard drive
 
     try {
@@ -107,7 +107,7 @@ export async function getAlbumCoverLegacy2(
   }
 
   if (cover) {
-    logInfo(`Found new cover for ${album.id}`, "Migration");
+    logger.info(`Found new cover for ${album.id}`, "Migration");
     //Save the image cover on the hard drive
 
     try {

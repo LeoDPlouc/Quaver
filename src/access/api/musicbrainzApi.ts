@@ -14,7 +14,7 @@
 import { IReleaseList, MusicBrainzApi } from "musicbrainz-api";
 import { APP_VERSION } from "../../config/appConfig";
 import { createFailure } from "../../utils/Failure";
-import { logError } from "../../utils/logger";
+import { logger } from "../../utils/logger";
 
 //DEPRCIATED Ne plus exporter lors du nettoyage des dépréciés, mettre dans la class
 export const mbApi = new MusicBrainzApi({
@@ -52,7 +52,7 @@ class MusicBrainzApiAccess {
         if (!album.title) album.title = release.title;
         if (!album.year) album.year = new Date(release.date).getFullYear();
       } catch (err) {
-        logError(err, __filename, "getMetadataFromMB");
+        logger.error(err, __filename, "getMetadataFromMB");
       }
     }
 

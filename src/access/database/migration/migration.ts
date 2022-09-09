@@ -13,8 +13,8 @@
 
 import { Document } from "mongoose";
 import { DB_VERSION } from "../../../config/appConfig";
-import { createFailure, Failure } from "../../../utils/Failure";
-import { logError, logInfo } from "../../../utils/logger";
+import { createFailure } from "../../../utils/Failure";
+import { logger } from "../../../utils/logger";
 import { dbInfoModel } from "../models/dbInfoModel";
 import { migration0 } from "./migrationScripts/migration0";
 import { migration1 } from "./migrationScripts/migration1";
@@ -55,8 +55,8 @@ export async function Migrate(): Promise<void> {
     let db_ver = info.version;
     let app_ver = DB_VERSION;
 
-    logInfo(`Database schema version : ${db_ver}`, "Migration");
-    logInfo(`Application schema version : ${app_ver}`, "Migration");
+    logger.info(`Database schema version : ${db_ver}`, "Migration");
+    logger.info(`Application schema version : ${app_ver}`, "Migration");
 
     //Compare db version with app version and apply migration
     if (db_ver > app_ver) {

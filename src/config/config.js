@@ -16,13 +16,14 @@
 
 module.exports = {
     MONGO_IP: process.env.QUAVER_DB_IP || "mongo",
-    MONGO_PORT: process.env.QUAVER_DB_PORT || 27017,
+    MONGO_PORT: Number(process.env.QUAVER_DB_PORT) || 27017,
     MONGO_USER: process.env.QUAVER_DB_USER,
     MONGO_PASSWORD: process.env.QUAVER_DB_PASSWORD,
     SESSION_SECRET: process.env.QUAVER_SESSION_SECRET,
-    APP_PORT: process.env.QUAVER_PORT || 8080,
+    APP_PORT: Number(process.env.QUAVER_PORT) || 8080,
     MUSIC_PATH: process.env.QUAVER_MUSIC_PATH || "/music",
     FPCALC_PATH: process.env.QUAVER_FPCALC_PATH,
-    HEADLESS: process.env.QUAVER_HEADLESS || false,
-    IMAGES_PATH: process.env.QUAVER_IMAGES_PATH || "/images"
+    HEADLESS: Boolean(process.env.QUAVER_HEADLESS) || false,
+    DATA_PATH: process.env.QUAVER_DATA_PATH || "/data",
+    DEBUG_LVL: Number(process.env.QUAVER_DEBUG_LEVEL) || 0
 }

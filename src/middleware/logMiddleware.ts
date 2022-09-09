@@ -12,9 +12,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Request, Response, NextFunction } from "express"
-import { logRequest } from "../utils/logger"
+import { logger } from "../utils/logger"
 
 export default function logRequestMiddleware(req: Request, res: Response, next: NextFunction) {
-    logRequest(req)
+    logger.logRequest(req)
     next()
 }

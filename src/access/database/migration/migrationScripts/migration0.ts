@@ -14,7 +14,7 @@
 import { IMigration } from "../migration";
 import { getAlbumMBIdLegacy } from "../legacy/legacyCode";
 import { albumModel } from "../../models/albumModel";
-import { logInfo } from "../../../../utils/logger";
+import { logger } from "../../../../utils/logger";
 import { createFailure } from "../../../../utils/Failure";
 
 export const migration0: IMigration = {
@@ -31,7 +31,7 @@ export const migration0: IMigration = {
         let a = albums[i];
 
         if (!a.mbid) {
-          logInfo(`Migration 0 -> 1 album ${a.id}`, "Migration");
+          logger.info(`Migration 0 -> 1 album ${a.id}`, "Migration");
 
           let mbid = await getAlbumMBIdLegacy(a);
           if (!mbid) {

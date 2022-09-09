@@ -13,15 +13,15 @@
 
 import { v4 } from "uuid";
 import path from "path";
-import { IMAGES_PATH } from "../../config/config";
 import fs from "fs/promises";
 import { createFailure } from "../../utils/Failure";
+import { fileService } from "../../service/fileService";
 
 class ImageFileAccess {
   public async saveImage(this: ImageFileAccess, data: string, extension: string): Promise<string> {
     //Create an UUID for the name of the file
     let filename = v4() + extension;
-    let p = path.resolve(IMAGES_PATH, filename);
+    let p = path.resolve(fileService.getImagesPath(), filename);
 
     await fs.writeFile(p, data, { encoding: "binary" }).catch((err) => {
       throw createFailure(err, __filename, "saveImage");
