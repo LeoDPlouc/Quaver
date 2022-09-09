@@ -11,7 +11,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IMAGES_PATH } from "../../config/config";
 import { albumService } from "../../service/albumService";
 import { fileService } from "../../service/fileService";
 import { imageService } from "../../service/imageService";
@@ -41,7 +40,7 @@ async function cleanAlbumlessImages() {
 async function cleanTinyLessFiles() {
   try {
     var images = await imageService.getAllImages();
-    var files = await fileService.getAllFiles(IMAGES_PATH);
+    var files = await fileService.getAllFiles(fileService.getImagesPath());
   } catch (err) {
     logger.error("Cover cleaner error", __filename, "cleanTinyLessFiles", err);
   }
@@ -77,7 +76,7 @@ async function cleanImageLessFiles() {
       .then((result) => result.map((i) => [i.large, i.medium, i.path, i.small, i.tiny, i.verylarge]))
       .then((result) => result.reduce((tab1, tab2) => [...tab1, ...tab2], []))
       .then((result) => result.filter((p) => p));
-    var files = await fileService.getAllFiles(IMAGES_PATH);
+    var files = await fileService.getAllFiles(fileService.getImagesPath());
   } catch (err) {
     logger.error("Cover cleaner error", __filename, "cleanImageLessFiles", err);
   }
@@ -118,7 +117,7 @@ async function cleanAlbumCoverId() {
 async function cleanDeadFiles() {
   try {
     var images = await imageService.getAllImages();
-    var files = await fileService.getAllFiles(IMAGES_PATH);
+    var files = await fileService.getAllFiles(fileService.getImagesPath());
   } catch (err) {
     throw createFailure("DAO err", __filename, "cleanTinylessImages", err);
   }

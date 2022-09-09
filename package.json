@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "startdev": "QUAVER_DB_IP=127.0.0.1 QUAVER_DB_USER=quaver QUAVER_DB_PASSWORD=quaver QUAVER_SESSION_SECRET=quaver QUAVER_MUSIC_PATH=./music QUAVER_IMAGES_PATH=./images QUAVER_DEBUG_LEVEL=4 node dist/index.js",
+    "startdev": "QUAVER_DB_IP=127.0.0.1 QUAVER_DB_USER=quaver QUAVER_DB_PASSWORD=quaver QUAVER_SESSION_SECRET=quaver QUAVER_MUSIC_PATH=./music QUAVER_DATA_PATH=./data QUAVER_DEBUG_LEVEL=4 node dist/index.js",
     "build": "./scripts/build.sh",
     "publish": "./scripts/publish.sh",
     "test": "QUAVER_DB_IP=127.0.0.1 QUAVER_DB_USER=quaver QUAVER_DB_PASSWORD=quaver QUAVER_SESSION_SECRET=quaver QUAVER_MUSIC_PATH=./music QUAVER_IMAGES_PATH=./images QUAVER_DEBUG_LEVEL=4 jest --detectOpenHandles --runInBand"

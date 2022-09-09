@@ -24,6 +24,6 @@ module.exports = {
     MUSIC_PATH: process.env.QUAVER_MUSIC_PATH || "/music",
     FPCALC_PATH: process.env.QUAVER_FPCALC_PATH,
     HEADLESS: Boolean(process.env.QUAVER_HEADLESS) || false,
-    IMAGES_PATH: process.env.QUAVER_IMAGES_PATH || "/images",
+    DATA_PATH: process.env.QUAVER_DATA_PATH || "/data",
     DEBUG_LVL: Number(process.env.QUAVER_DEBUG_LEVEL) || 0
 }

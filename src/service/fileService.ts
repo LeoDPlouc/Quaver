@@ -16,6 +16,7 @@ import path from "path";
 import mm from "mime-types";
 import { createFailure } from "../utils/Failure";
 import { logger } from "../utils/logger";
+import { DATA_PATH } from "../config/config";
 
 class FileService {
   public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
@@ -50,6 +51,30 @@ class FileService {
       return !mm.lookup(path.extname(file)).match("audio")
     } catch (err) {
       throw createFailure("mime-types error", __filename, "isMusicFile", err)
+    }
+  }
+
+  public getImagesPath(this: FileService) {
+    try {
+      let imageDir = path.join(DATA_PATH, "images")
+      if (!fs.access(imageDir).then(_ => true).catch(_ => false)) {
+        fs.mkdir(imageDir)
+      }
+      return imageDir
+    } catch (err) {
+      throw createFailure("File system error", __filename, "getImagesPath", err)
+    }
+  }
+
+  public getLogsPath(this: FileService) {
+    try {
+      let logsDir = path.join(DATA_PATH, "logs")
+      if (!fs.access(logsDir).then(_ => true).catch(_ => false)) {
+        fs.mkdir(logsDir)
+      }
+      return logsDir
+    } catch (err) {
+      throw createFailure("File system error", __filename, "getImagesPath", err)
     }
   }
 }

@@ -14,6 +14,7 @@
 import { Request } from "express";
 import { createLogger, format, level, transports } from "winston";
 import { DEBUG_LVL } from "../config/config";
+import { fileService } from "../service/fileService";
 import { createFailure, Failure } from "./Failure";
 
 let loggerStd = createLogger({
@@ -39,7 +40,7 @@ let loggerDebug = createLogger({
 });
 
 let loggerFile = createLogger({
-  transports: [new transports.File({ dirname: "logs", filename: "quaver.log", maxsize: 1_000_000 })],
+  transports: [new transports.File({ dirname: fileService.getLogsPath(), filename: "quaver.log", maxsize: 1_000_000 })],
   format: format.combine(
     format.timestamp(),
     format.printf(({ timestamp, level, message }) => {

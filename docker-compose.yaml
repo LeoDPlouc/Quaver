@@ -7,7 +7,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./images/:/images
+      - ./data/:/data
       - ./music/:/music
       - ./dist/src/:/app/src
     environment:
