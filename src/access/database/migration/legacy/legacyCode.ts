@@ -16,9 +16,9 @@ import { Document } from "mongoose";
 import { mbApi } from "../../../api/musicbrainzApi";
 import { caApi } from "../../../api/coverArtArchive";
 import { imageModel } from "../../models/imageModel";
-import { createFailure } from "../../../../utils/Failure";
 import { logger } from "../../../../utils/logger";
 import { imageFileAccess } from "../../../file/imageFile";
+import { MigrationException } from "../exceptions/MigrationException";
 
 export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
   let query = `release:${album.title as string}`;
@@ -31,7 +31,7 @@ export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
   try {
     var result = await mbApi.search<IReleaseList>("release", { query });
   } catch (err) {
-    throw createFailure(err, __filename, getAlbumMBIdLegacy.name);
+    throw new MigrationException(__filename, "getAlbumMBIdLegacy", err);
   }
 
   if (!result.releases.length) {
@@ -40,9 +40,7 @@ export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
   return result.releases[0].id;
 }
 
-export async function getAlbumCoverLegacy(
-  album: Album & Document<any, any, Album>
-): Promise<Image & Document<any, any, Image>> {
+export async function getAlbumCoverLegacy(album: Album & Document<any, any, Album>): Promise<Image & Document<any, any, Image>> {
   //Fetch Cover art
   let p = new Promise<any>((resolve, reject) => {
     caApi.release(album.mbid, { piece: "front" }, (err, data) => {
@@ -54,7 +52,7 @@ export async function getAlbumCoverLegacy(
   try {
     var { image, extension } = await p;
   } catch (err) {
-    throw createFailure(err, __filename, getAlbumCoverLegacy.name);
+    throw new MigrationException(__filename, "getAlbumCoverLegacy", err);
   }
 
   if (image) {
@@ -64,7 +62,7 @@ export async function getAlbumCoverLegacy(
     try {
       var path = await imageFileAccess.saveImage(image, extension);
     } catch (err) {
-      throw createFailure(err, __filename, getAlbumCoverLegacy.name);
+      throw new MigrationException(__filename, "getAlbumCoverLegacy", err);
     }
 
     var newCover = new imageModel({ path });
@@ -72,7 +70,7 @@ export async function getAlbumCoverLegacy(
     try {
       await newCover.save();
     } catch (err) {
-      throw createFailure(err, __filename, getAlbumCoverLegacy.name);
+      throw new MigrationException(__filename, "getAlbumCoverLegacy", err);
     }
 
     return newCover;
@@ -80,9 +78,7 @@ export async function getAlbumCoverLegacy(
   return null;
 }
 
-export async function getAlbumCoverLegacy2(
-  album: Album & Document<any, any, Album>
-): Promise<Image & Document<any, any, Image>> {
+export async function getAlbumCoverLegacy2(album: Album & Document<any, any, Album>): Promise<Image & Document<any, any, Image>> {
   let cover;
   let ext;
 
@@ -113,7 +109,7 @@ export async function getAlbumCoverLegacy2(
     try {
       var path = await imageFileAccess.saveImage(cover, ext);
     } catch (err) {
-      throw createFailure(err, __filename, getAlbumCoverLegacy2.name);
+      throw new MigrationException(__filename, "getAlbumCoverLegacy2", err);
     }
 
     var newCover = new imageModel({ path });
@@ -121,7 +117,7 @@ export async function getAlbumCoverLegacy2(
     try {
       await newCover.save();
     } catch (err) {
-      throw createFailure(err, __filename, getAlbumCoverLegacy2.name);
+      throw new MigrationException(__filename, "getAlbumCoverLegacy2", err);
     }
 
     return newCover;

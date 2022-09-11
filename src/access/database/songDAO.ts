@@ -12,25 +12,25 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { createFailure } from "../../utils/Failure";
+import { DAOException } from "./exceptions/DAOException";
 import { songModel } from "./models/songModel";
 
 class SongDAO {
   public async getAllSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find().catch((err) => {
-      throw createFailure(err, __filename, "getAllSongModels");
+      throw new DAOException(__filename, "getAllSongModels", err);
     });
   }
 
   public async getSongModel(this: SongDAO, id: string): Promise<Song & Document<any, any, Song>> {
     return await songModel.findById(id).catch((err) => {
-      throw createFailure(err, __filename, "getSongModel");
+      throw new DAOException(__filename, "getSongModel", err);
     });
   }
 
   public async updateSongModel(this: SongDAO, song: Song): Promise<void> {
     await songModel.findByIdAndUpdate(song.id, song).catch((err) => {
-      throw createFailure(err, __filename, "updateSongModel");
+      throw new DAOException(__filename, "updateSongModel", err);
     });
   }
 
@@ -39,7 +39,7 @@ class SongDAO {
       .create(song)
       .then((s) => s.id)
       .catch((err) => {
-        throw createFailure(err, __filename, "createSongModel");
+        throw new DAOException(__filename, "createSongModel", err);
       });
   }
 
@@ -48,7 +48,7 @@ class SongDAO {
       .find({ path })
       .then((s) => s[0])
       .catch((err) => {
-        throw createFailure(err, __filename, "findSongModelByPath");
+        throw new DAOException(__filename, "findSongModelByPath", err);
       });
   }
 
@@ -57,7 +57,7 @@ class SongDAO {
       .find({}, { path: 1 })
       .then((s) => s.map((s) => s.path))
       .catch((err) => {
-        throw createFailure(err, __filename, "getAllSongModelPaths");
+        throw new DAOException(__filename, "getAllSongModelPaths", err);
       });
   }
 }

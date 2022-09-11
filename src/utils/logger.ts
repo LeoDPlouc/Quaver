@@ -15,7 +15,7 @@ import { Request } from "express";
 import { createLogger, format, level, transports } from "winston";
 import { DEBUG_LVL } from "../config/config";
 import { fileService } from "../service/fileService";
-import { createFailure, Failure } from "./Failure";
+import { Exception } from "./Exception";
 
 let loggerStd = createLogger({
   transports: [new transports.Console()],
@@ -50,10 +50,9 @@ let loggerFile = createLogger({
 });
 
 class Logger {
-  public error(this: Logger, msg: string, file: string, func: string, sourceFailure?: Failure) {
-    let error = createFailure(msg, file, func, sourceFailure);
-    loggerStd.error(`${JSON.stringify(error)}`);
-    loggerFile.error(`${JSON.stringify(error)}`);
+  public error(this: Logger, exception: Exception) {
+    loggerStd.error(`${JSON.stringify(exception)}`);
+    loggerFile.error(`${JSON.stringify(exception)}`);
   }
 
   public info(this: Logger, info: String, source: String) {
@@ -72,10 +71,9 @@ class Logger {
     }
   }
 
-  public debugError(this: Logger, debugLvl: number, msg: string, file: string, func: string, sourceFailure?: Failure) {
-    let error = createFailure(msg, file, func, sourceFailure);
+  public debugError(this: Logger, debugLvl: number, exception: Exception) {
     if (debugLvl <= DEBUG_LVL && DEBUG_LVL > 0 && debugLvl > 0) {
-      loggerDebug.debug(`ERROR: ${JSON.stringify(error)}`);
+      loggerDebug.debug(`ERROR: ${JSON.stringify(exception)}`);
     }
   }
 }

@@ -13,8 +13,8 @@
 
 import { albumService } from "../../service/albumService";
 import { imageService } from "../../service/imageService";
-import { createFailure } from "../../utils/Failure";
 import { logger } from "../../utils/logger";
+import { TaskException } from "./exceptions/taskException";
 
 async function updateAlbumCover(album: Album) {
   try {
@@ -51,7 +51,7 @@ async function updateAlbumCover(album: Album) {
     albumService.updateAlbum(album);
     logger.info(`Updated cover of album ${album.id}`, "Cover Grabber");
   } catch (err) {
-    throw createFailure("Task failure", __filename, "updateAlbumCover", err);
+    throw new TaskException(__filename, "updateAlbumCover", err);
   }
 }
 
@@ -61,7 +61,7 @@ export default async function doWork() {
 
   for (let i = 0; i < albums.length; i++) {
     await updateAlbumCover(albums[i]).catch((err) => {
-      logger.error("Cover grabber error", __filename, "doWork", err);
+      logger.error(new TaskException(__filename, "doWork", err));
     });
   }
 }

@@ -12,12 +12,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { MUSIC_PATH } from "../../config/config";
-import { createFailure } from "../../utils/Failure";
 import { logger } from "../../utils/logger";
 import { albumService } from "../../service/albumService";
 import { songService } from "../../service/songService";
 import { artistService } from "../../service/artistService";
 import { fileService } from "../../service/fileService";
+import { TaskException } from "./exceptions/taskException";
 
 let songPaths: string[];
 let artists: Artist[];
@@ -27,7 +27,7 @@ async function collect() {
   try {
     var paths = await fileService.getAllFiles(MUSIC_PATH);
   } catch (err) {
-    throw createFailure("File service error", __filename, "collect", err);
+    throw new TaskException(__filename, "collect", err);
   }
 
   for (let i = 0; i < paths.length; i++) {
@@ -73,26 +73,26 @@ async function collect() {
       song.albumId = albumId;
       await songService.createSong(song);
     } catch (err) {
-      logger.error("Song collection error", __filename, "collect", err);
+      logger.error(new TaskException(__filename, "collect", err));
     }
   }
 }
 
 async function updatePaths(): Promise<void> {
   songPaths = await songService.getAllSongPaths().catch((err) => {
-    throw createFailure("Path update error", __filename, "updatePaths", err);
+    throw new TaskException(__filename, "updatePaths", err);
   });
 }
 
 async function updateAlbums(): Promise<void> {
   albums = await albumService.getAllAlbums().catch((err) => {
-    throw createFailure("Service error", __filename, "updateAlbums", err);
+    throw new TaskException(__filename, "updateAlbums", err);
   });
 }
 
 async function updateArtists(): Promise<void> {
   artists = await artistService.getAllArtists().catch((err) => {
-    throw createFailure("Service error", __filename, "updateArtists", err);
+    throw new TaskException(__filename, "updateArtists", err);
   });
 }
 
@@ -119,6 +119,6 @@ export default async function doWork() {
 
     await collect();
   } catch (err) {
-    logger.error("Song collector error", __filename, "doWork", err);
+    logger.error(new TaskException(__filename, "doWork", err));
   }
 }

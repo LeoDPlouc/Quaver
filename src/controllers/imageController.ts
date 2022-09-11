@@ -17,12 +17,13 @@ import { mapImageDTO } from "../mappers/imageMapper";
 import { logger } from "../utils/logger";
 import { ImageSize } from "../models/imageSize";
 import { imageService } from "../service/imageService";
+import { ControllerException } from "./exceptions/controllerException";
 
 export async function getAllImagesInfoCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getAllImages();
   } catch (err) {
-    logger.error("Controller error", __filename, "getAllImagesInfoCtrl");
+    logger.error(new ControllerException(__filename, "getAllImagesInfoCtrl", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -58,7 +59,7 @@ export async function getOneImageInfoCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logger.error("Controller error", __filename, "getOneImageInfoCtrl");
+    logger.error(new ControllerException(__filename, "getOneImageInfoCtrl", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -92,7 +93,7 @@ export async function getImageFileCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logger.error("Controller error", __filename, "getImageFileCtrl");
+    logger.error(new ControllerException(__filename, "getImageFileCtrl", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -124,7 +125,7 @@ export async function getImageFileWithSizeCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logger.error("Controller error", __filename, "getImageFileWithSizeCtrl");
+    logger.error(new ControllerException(__filename, "getImageFileWithSizeCtrl", err));
     res.json({
       status: "fail",
       statusCode: 1,

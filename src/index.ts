@@ -18,6 +18,7 @@ import { Migrate } from "./access/database/migration/migration";
 import { logger } from "./utils/logger";
 import app from "./app";
 import { connectToDb } from "./access/database/utils";
+import { AppException } from "./utils/exceptions/appException";
 
 //Declare the objects stored in session
 declare module "express-session" {
@@ -32,7 +33,7 @@ logger.debug(1, `Debug level: ${DEBUG_LVL}`, "App")
 connectToDb("App").then(async () => {
   //Apply database migration
   await Migrate().catch((err) => {
-    logger.error("Migration error", __filename, "main", err);
+    logger.error(new AppException(__filename, "main", err));
     process.exit(1);
   });
 

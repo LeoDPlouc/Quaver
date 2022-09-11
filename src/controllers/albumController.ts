@@ -17,12 +17,13 @@ import { mapAlbumDTO } from "../mappers/albumMapper";
 import { mapSongDTO } from "../mappers/songMapper";
 import { albumService } from "../service/albumService";
 import { logger } from "../utils/logger";
+import { ControllerException } from "./exceptions/controllerException";
 
 export async function getAllAlbumsCtrl(req: Request, res: Response) {
   try {
     var result = await albumService.getAllAlbums();
   } catch (err) {
-    logger.error("Controller error", __filename, "getAllAlbumsCtrl");
+    logger.error(new ControllerException(__filename, "getAllAlbumsCtrl", err));
 
     res.json({
       status: "fail",
@@ -60,7 +61,7 @@ export async function getAlbumCtrl(req: Request, res: Response) {
   try {
     var result = await albumService.getAlbum(req.params.id);
   } catch (err) {
-    logger.error("Controller error", __filename, "getAlbumCtrl");
+    logger.error(new ControllerException(__filename, "getAlbumCtrl", err));
 
     res.json({
       status: "fail",
@@ -95,7 +96,7 @@ export async function getAlbumSongsCtrl(req: Request, res: Response) {
   try {
     var result = await albumService.getAlbumSongs(req.params.id);
   } catch (err) {
-    logger.error("Controller error", __filename, "getAlbumSongsCtrl");
+    logger.error(new ControllerException(__filename, "getAlbumSongsCtrl", err));
     res.json({
       status: "fail",
       statusCode: 1,

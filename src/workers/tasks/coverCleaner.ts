@@ -14,15 +14,15 @@
 import { albumService } from "../../service/albumService";
 import { fileService } from "../../service/fileService";
 import { imageService } from "../../service/imageService";
-import { createFailure } from "../../utils/Failure";
 import { logger } from "../../utils/logger";
+import { TaskException } from "./exceptions/taskException";
 
 async function cleanAlbumlessImages() {
   try {
     var images = await imageService.getAllImages();
     var albums = await albumService.getAllAlbums();
   } catch (err) {
-    throw createFailure("DAO error", __filename, "cleanAlbumlessImages", err);
+    throw new TaskException(__filename, "cleanAlbumlessImages", err);
   }
 
   for (let i = 0; i < images.length; i++) {
@@ -31,7 +31,7 @@ async function cleanAlbumlessImages() {
         await imageService.deleteImageModel(images[i].id);
         logger.info(`Deleted image ${images[i].id}`, "Cover Cleaner");
       } catch (err) {
-        logger.error("DAO error", __filename, "cleanAlbumlessImages", err);
+        logger.error(new TaskException(__filename, "cleanAlbumlessImages", err));
       }
     }
   }
@@ -42,7 +42,7 @@ async function cleanTinyLessFiles() {
     var images = await imageService.getAllImages();
     var files = await fileService.getAllFiles(fileService.getImagesPath());
   } catch (err) {
-    logger.error("Cover cleaner error", __filename, "cleanTinyLessFiles", err);
+    logger.error(new TaskException(__filename, "cleanTinyLessFiles", err));
   }
 
   for (let i = 0; i < images.length; i++) {
@@ -51,7 +51,7 @@ async function cleanTinyLessFiles() {
         imageService.deleteImageModel(images[i].id);
         logger.info(`Deleted cover ${files[i]}`, "Cover Cleaner");
       } catch (err) {
-        logger.error("Cover cleaner error", __filename, "cleanTinyLessFiles", err);
+        logger.error(new TaskException(__filename, "cleanTinyLessFiles", err));
       }
     }
   }
@@ -59,12 +59,12 @@ async function cleanTinyLessFiles() {
 
 async function cleanTinylessImages() {
   var images = await imageService.getTinyLessImage().catch((err) => {
-    throw createFailure("DAO err", __filename, "cleanTinylessImages", err);
+    throw new TaskException(__filename, "cleanTinylessImages", err);
   });
 
   for (let i = 0; i < images.length; i++) {
     await imageService.deleteImageModel(images[i].id).catch((err) => {
-      logger.error("DAO error", __filename, "cleanTinylessImages", err);
+      logger.error(new TaskException(__filename, "cleanTinylessImages", err));
     });
   }
 }
@@ -78,7 +78,7 @@ async function cleanImageLessFiles() {
       .then((result) => result.filter((p) => p));
     var files = await fileService.getAllFiles(fileService.getImagesPath());
   } catch (err) {
-    logger.error("Cover cleaner error", __filename, "cleanImageLessFiles", err);
+    logger.error(new TaskException(__filename, "cleanImageLessFiles", err));
   }
 
   for (let i = 0; i < files.length; i++) {
@@ -87,7 +87,7 @@ async function cleanImageLessFiles() {
         await imageService.deleteImageFile(files[i]);
         logger.info(`Deleted cover ${files[i]}`, "Cover Cleaner");
       } catch (err) {
-        logger.error("Cover cleaner error", __filename, "cleanImageLessFiles", err);
+        logger.error(new TaskException(__filename, "cleanImageLessFiles", err));
       }
     }
   }
@@ -98,7 +98,7 @@ async function cleanAlbumCoverId() {
     var images = await imageService.getAllImages();
     var albums = await albumService.getAllAlbums();
   } catch (err) {
-    throw createFailure("DAO error", __filename, "cleanAlbumlessImages", err);
+    throw new TaskException(__filename, "cleanAlbumlessImages", err);
   }
 
   try {
@@ -110,7 +110,7 @@ async function cleanAlbumCoverId() {
       }
     }
   } catch (err) {
-    logger.error("Cover cleaner error", __filename, "cleanAlbumCoverId", err);
+    logger.error(new TaskException(__filename, "cleanAlbumCoverId", err));
   }
 }
 
@@ -119,7 +119,7 @@ async function cleanDeadFiles() {
     var images = await imageService.getAllImages();
     var files = await fileService.getAllFiles(fileService.getImagesPath());
   } catch (err) {
-    throw createFailure("DAO err", __filename, "cleanTinylessImages", err);
+    throw new TaskException(__filename, "cleanTinylessImages", err);
   }
 
   try {
@@ -135,7 +135,7 @@ async function cleanDeadFiles() {
       }
     }
   } catch (err) {
-    logger.error("Cover cleaner error", __filename, "cleanDeadFiles", err);
+    logger.error(new TaskException(__filename, "cleanDeadFiles", err));
   }
 }
 
@@ -150,6 +150,6 @@ export default async function doWork() {
     await cleanImageLessFiles();
     await cleanAlbumCoverId();
   } catch (err) {
-    logger.error("Cover cleaner error", __filename, "doWork", err);
+    logger.error(new TaskException(__filename, "doWork", err));
   }
 }

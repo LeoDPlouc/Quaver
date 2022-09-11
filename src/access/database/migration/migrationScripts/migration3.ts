@@ -15,7 +15,7 @@ import { albumModel } from "../../models/albumModel";
 import { IMigration } from "../migration";
 import { getAlbumCoverLegacy2 } from "../legacy/legacyCode";
 import { logger } from "../../../../utils/logger";
-import { createFailure } from "../../../../utils/Failure";
+import { MigrationException } from "../exceptions/MigrationException";
 
 export const migration3: IMigration = {
   //Download album covers
@@ -24,7 +24,7 @@ export const migration3: IMigration = {
       try {
         var albums = await albumModel.find();
       } catch (err) {
-        throw createFailure(err, __filename, migration3.up.name);
+        throw new MigrationException(__filename, "migration3.up", err);
       }
 
       for (let i = 0; i < albums.length; i++) {
@@ -45,12 +45,7 @@ export const migration3: IMigration = {
         }
       }
     } catch (err) {
-      throw createFailure(
-        "Migration error",
-        __filename,
-        migration3.up.name,
-        err
-      );
+      throw new MigrationException(__filename, "migration3.up", err);
     }
   },
 
@@ -60,7 +55,7 @@ export const migration3: IMigration = {
       try {
         var albums = await albumModel.find();
       } catch (err) {
-        throw createFailure(err, __filename, migration3.down.name);
+        throw new MigrationException(__filename, "migration3.down", err);
       }
 
       for (let i = 0; i < albums.length; i++) {
@@ -75,17 +70,12 @@ export const migration3: IMigration = {
           try {
             await a.save();
           } catch (err) {
-            throw createFailure(err, __filename, migration3.down.name);
+            throw new MigrationException(__filename, "migration3.down", err);
           }
         }
       }
     } catch (err) {
-      throw createFailure(
-        "Migration error",
-        __filename,
-        migration3.down.name,
-        err
-      );
+      throw new MigrationException(__filename, "migration3.down", err);
     }
   },
 };

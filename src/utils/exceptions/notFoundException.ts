@@ -11,19 +11,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MigrationException } from "../exceptions/MigrationException";
-import { IMigration } from "../migration";
-import { migration2 } from "./migration2";
+import { Exception } from "../Exception";
 
-export const migration4: IMigration = {
-  async up(): Promise<void> { },
+export class NotFoundException extends Exception {
+    message: string
 
-  //Remove MB ID list and keep only one
-  async down(): Promise<void> {
-    try {
-      return migration2.down();
-    } catch (err) {
-      throw new MigrationException(__filename, "migration4.down", err);
+    public getType(): string {
+        return "Not Found Exception"
     }
-  },
-};
+
+    constructor(file: string, func: string, message: string) {
+        super(file, func)
+        this.message = message
+    }
+}

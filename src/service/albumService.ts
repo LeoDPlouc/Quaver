@@ -17,7 +17,8 @@ import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { albumDAO } from "../access/database/albumDAO";
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapSong } from "../mappers/songMapper";
-import { createFailure } from "../utils/Failure";
+import { NotFoundException } from "../utils/exceptions/notFoundException";
+import { ServiceException } from "./exceptions/serviceException";
 
 class AlbumService {
   public async getAllAlbums(this: AlbumService): Promise<Album[]> {
@@ -25,17 +26,17 @@ class AlbumService {
       .getAllAlbumModels()
       .then((result) => result.map(mapAlbum))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, "getAllAlbums", err);
+        throw new ServiceException(__filename, "getAllAlbums", err);
       });
   }
 
   public async getAlbum(this: AlbumService, id: string): Promise<Album> {
     let result = await albumDAO.getAlbumModel(id).catch((err) => {
-      throw createFailure("DAO error", __filename, "getAlbum", err);
+      throw new ServiceException(__filename, "getAlbum", err);
     });
 
     if (!result) {
-      throw createFailure("Invalid Id", __filename, "getAlbum");
+      throw new NotFoundException(__filename, "getAlbum", "Album not found");
     }
 
     return mapAlbum(result);
@@ -43,11 +44,11 @@ class AlbumService {
 
   public async getAlbumSongs(this: AlbumService, id: string): Promise<Song[]> {
     var result = await albumDAO.getAlbumSongModel(id).catch((err) => {
-      throw createFailure("DAO error", __filename, "getAlbumSongs", err);
+      throw new ServiceException(__filename, "getAlbumSongs", err);
     });
 
     if (!result) {
-      throw createFailure("Invalid Id", __filename, "getAlbumSongs");
+      throw new NotFoundException(__filename, "getAlbumSongs", "Album not found");
     }
 
     return result.map(mapSong);
@@ -55,7 +56,7 @@ class AlbumService {
 
   public async createAlbum(this: AlbumService, album: Album): Promise<string> {
     return await albumDAO.createAlbumModel(album).catch((err) => {
-      throw createFailure("DAO error", __filename, "createAlbum", err);
+      throw new ServiceException(__filename, "createAlbum", err);
     });
   }
 
@@ -64,13 +65,13 @@ class AlbumService {
       .findAlbumModelByName(albumTitle, artistName)
       .then((result) => result.map(mapAlbum))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, "findAlbumByName", err);
+        throw new ServiceException(__filename, "findAlbumByName", err);
       });
   }
 
   public async updateAlbum(this: AlbumService, album: Album): Promise<void> {
     await albumDAO.updateAlbumModel(album).catch((err) => {
-      throw createFailure("DAO error", __filename, "updateAlbum", err);
+      throw new ServiceException(__filename, "updateAlbum", err);
     });
   }
 
@@ -79,7 +80,7 @@ class AlbumService {
       .getMbidlessAlbumModels()
       .then((result) => result.map(mapAlbum))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, "getMbidlessAlbum", err);
+        throw new ServiceException(__filename, "getMbidlessAlbum", err);
       });
   }
 
@@ -88,13 +89,13 @@ class AlbumService {
       .getToCoverGrabAlbumsModels()
       .then((result) => result.map(mapAlbum))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, "getToCoverGrabAlbums", err);
+        throw new ServiceException(__filename, "getToCoverGrabAlbums", err);
       });
   }
 
   public async getAlbumMbid(this: AlbumService, album: Album): Promise<string[]> {
     return await musicBrainzApiAccess.getMBId(album).catch((err) => {
-      throw createFailure("API error", __filename, "getAlbumMbid", err);
+      throw new ServiceException(__filename, "getAlbumMbid", err);
     });
   }
 
@@ -104,7 +105,7 @@ class AlbumService {
 
   public async getUpdatableAlbum(this: AlbumService): Promise<Album[]> {
     return await albumDAO.getUpdatableAlbumModels().catch((err) => {
-      throw createFailure("DAO error", __filename, "getUpdatableAlbum", err);
+      throw new ServiceException(__filename, "getUpdatableAlbum", err);
     });
   }
 
