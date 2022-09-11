@@ -11,19 +11,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MigrationException } from "../exceptions/MigrationException";
-import { IMigration } from "../migration";
-import { migration2 } from "./migration2";
+export abstract class Exception {
+  file: string;
+  func: string;
+  sourceError?: Exception | any;
 
-export const migration4: IMigration = {
-  async up(): Promise<void> { },
+  public abstract getType(): string
 
-  //Remove MB ID list and keep only one
-  async down(): Promise<void> {
-    try {
-      return migration2.down();
-    } catch (err) {
-      throw new MigrationException(__filename, "migration4.down", err);
-    }
-  },
-};
+  constructor(file: string, func: string, sourceError?: Exception | any) {
+    this.file = file
+    this.func = func
+    this.sourceError = sourceError
+  }
+}

@@ -14,8 +14,8 @@
 import { IMigration } from "../migration";
 import { getAlbumCoverLegacy } from "../legacy/legacyCode";
 import { albumModel } from "../../models/albumModel";
-import { createFailure } from "../../../../utils/Failure";
 import { logger } from "../../../../utils/logger";
+import { MigrationException } from "../exceptions/MigrationException";
 
 export const migration1: IMigration = {
   //Download album covers
@@ -24,7 +24,7 @@ export const migration1: IMigration = {
       try {
         var albums = await albumModel.find();
       } catch (err) {
-        throw createFailure(err, __filename, migration1.up.name);
+        throw new MigrationException(__filename, "migration1.up", err);
       }
 
       for (let i = 0; i < albums.length; i++) {
@@ -40,18 +40,18 @@ export const migration1: IMigration = {
         try {
           await cover.save();
         } catch (err) {
-          throw createFailure(err, __filename, migration1.up.name);
+          throw new MigrationException(__filename, "migration1.up", err);
         }
 
         a.cover = cover.id;
         try {
           await a.save();
         } catch (err) {
-          throw createFailure(err, __filename, migration1.up.name);
+          throw new MigrationException(__filename, "migration1.up", err);
         }
       }
     } catch (err) {
-      throw createFailure(err, __filename, migration1.up.name);
+      throw new MigrationException(__filename, "migration1.up", err);
     }
   },
 
@@ -61,7 +61,7 @@ export const migration1: IMigration = {
       try {
         var albums = await albumModel.find();
       } catch (err) {
-        throw createFailure(err, __filename, migration1.down.name);
+        throw new MigrationException(__filename, "migration1.down", err);
       }
 
       for (let i = 0; i < albums.length; i++) {
@@ -75,12 +75,12 @@ export const migration1: IMigration = {
           try {
             await a.save();
           } catch (err) {
-            throw createFailure(err, __filename, migration1.down.name);
+            throw new MigrationException(__filename, "migration1.down", err);
           }
         }
       }
     } catch (err) {
-      throw createFailure(err, __filename, migration1.down.name);
+      throw new MigrationException(__filename, "migration1.down", err);
     }
   },
 };

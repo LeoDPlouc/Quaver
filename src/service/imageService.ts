@@ -12,11 +12,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { mapImage } from "../mappers/imageMapper";
-import { createFailure } from "../utils/Failure";
 import Jimp from "jimp";
 import { imageDAO } from "../access/database/imageDAO";
 import { imageFileAccess } from "../access/file/imageFile";
 import { imageFileData } from "../access/api/DTO/ImageFileData";
+import { ServiceException } from "./exceptions/serviceException";
+import { NotFoundException } from "../utils/exceptions/notFoundException";
+import { ImageProcessingException } from "./exceptions/imageProcessingException";
 
 export interface resizedImage {
   tiny: imageFileData;
@@ -32,17 +34,17 @@ class ImageService {
       .getAllImagesModels()
       .then((result) => result.map(mapImage))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, "getAllImages", err);
+        throw new ServiceException(__filename, "getAllImages", err);
       });
   }
 
   public async getImage(this: ImageService, id: string): Promise<Image> {
     let result = await imageDAO.getImageModel(id).catch((err) => {
-      throw createFailure("DAO error", __filename, "getImage", err);
+      throw new ServiceException(__filename, "getImage", err);
     });
 
     if (!result) {
-      throw createFailure("Invalid Id", __filename, "getImage");
+      throw new NotFoundException(__filename, "getImage", "Image not found");
     }
 
     return mapImage(result);
@@ -54,13 +56,13 @@ class ImageService {
     }
 
     return await imageFileAccess.saveImage(fileData.data, fileData.extension).catch((err) => {
-      throw createFailure("File acces error", __filename, "saveImageFile", err);
+      throw new ServiceException(__filename, "saveImageFile", err);
     });
   }
 
   public async createImage(this: ImageService, image: Image): Promise<string> {
     return await imageDAO.createImageModel(image).catch((err) => {
-      throw createFailure("DAO error", __filename, "createImage", err);
+      throw new ServiceException(__filename, "createImage", err);
     });
   }
 
@@ -108,19 +110,19 @@ class ImageService {
 
       return resizes;
     } catch (err) {
-      throw createFailure("Resize error", __filename, "makeResizing", err);
+      throw new ServiceException(__filename, "makeResizing", err);
     }
   }
 
   public async deleteImageModel(this: ImageService, id: string): Promise<void> {
     await imageDAO.deleteImageModel(id).catch((err) => {
-      throw createFailure("DAO error", __filename, "deleteImageModel", err);
+      throw new ServiceException(__filename, "deleteImageModel", err);
     });
   }
 
   public async deleteImageFile(this: ImageService, path: string): Promise<void> {
     await imageFileAccess.deleteImageFile(path).catch((err) => {
-      throw createFailure("File access error", __filename, "deleteImageFile", err);
+      throw new ServiceException(__filename, "deleteImageFile", err);
     });
   }
 
@@ -133,7 +135,7 @@ class ImageService {
       await imageFileAccess.deleteImageFile(image?.large);
       await imageFileAccess.deleteImageFile(image?.verylarge);
     } catch (err) {
-      throw createFailure("File access error", __filename, "deleteAllImageFiles", err);
+      throw new ServiceException(__filename, "deleteAllImageFiles", err);
     }
   }
 
@@ -142,7 +144,7 @@ class ImageService {
       .getTinyLessImageModel()
       .then((result) => result.map(mapImage))
       .catch((err) => {
-        throw createFailure("DAO error", __filename, "getTinyLessImage", err);
+        throw new ServiceException(__filename, "getTinyLessImage", err);
       });
   }
 
@@ -153,7 +155,7 @@ class ImageService {
       .getBufferAsync(Jimp.MIME_JPEG)
       .then((result) => result.toString("binary"))
       .catch((err) => {
-        throw createFailure(err, __filename, "resizeImage");
+        throw new ImageProcessingException(__filename, "resizeImage", err);
       });
   }
 }

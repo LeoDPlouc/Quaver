@@ -12,7 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { createFailure } from "../../utils/Failure";
+import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
 import { artistModel } from "./models/artistModel";
 import { songModel } from "./models/songModel";
@@ -20,25 +20,25 @@ import { songModel } from "./models/songModel";
 class ArtistDAO {
   public async getAllArtistModels(this: ArtistDAO): Promise<(Artist & Document<any, any, Artist>)[]> {
     return await artistModel.find().catch((err) => {
-      throw createFailure(err, __filename, "getAllArtistModels");
+      throw new DAOException(__filename, "getAllArtistModels", err);
     });
   }
 
   public async getArtistModel(this: ArtistDAO, id: string): Promise<Artist & Document<any, any, Artist>> {
     return await artistModel.findById(id).catch((err) => {
-      throw createFailure(err, __filename, "getArtistModel");
+      throw new DAOException(__filename, "getArtistModel", err);
     });
   }
 
   public async getArtistSongModels(this: ArtistDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find({ artistId: id }).catch((err) => {
-      throw createFailure(err, __filename, "getArtistSongModels");
+      throw new DAOException(__filename, "getArtistSongModels", err);
     });
   }
 
   public async getArtistAlbumModels(this: ArtistDAO, id: string): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find({ artistId: id }).catch((err) => {
-      throw createFailure(err, __filename, "getArtistAlbumModels");
+      throw new DAOException(__filename, "getArtistAlbumModels", err);
     });
   }
 
@@ -47,19 +47,19 @@ class ArtistDAO {
       .create(artist)
       .then((a) => a.id)
       .catch((err) => {
-        throw createFailure(err, __filename, "createArtistModel");
+        throw new DAOException(__filename, "createArtistModel", err);
       });
   }
 
   public async findArtistModelByName(this: ArtistDAO, name: string): Promise<(Artist & Document<any, any, Artist>)[]> {
     return await artistModel.find({ name: name }).catch((err) => {
-      throw createFailure(err, __filename, "findArtistModelByName");
+      throw new DAOException(__filename, "findArtistModelByName", err);
     });
   }
 
   public async updateArtistModel(this: ArtistDAO, artist: Artist): Promise<void> {
     await artistModel.findByIdAndUpdate(artist.id, artist).catch((err) => {
-      throw createFailure(err, __filename, "updateArtistModel");
+      throw new DAOException(__filename, "updateArtistModel", err);
     });
   }
 }

@@ -13,26 +13,26 @@
 
 import { Document } from "mongoose";
 import { UPDATE_ALBUM_PERIOD, UPDATE_COVER_PERIOD } from "../../config/appConfig";
-import { createFailure } from "../../utils/Failure";
+import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";
 
 class AlbumDAO {
   public async getAllAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find().catch((err) => {
-      throw createFailure(err, __filename, "getAllAlbumModels");
+      throw new DAOException(__filename, "getAllAlbumModels", err);
     });
   }
 
   public async getAlbumModel(this: AlbumDAO, id: string): Promise<Album & Document<any, any, Album>> {
     return await albumModel.findById(id).catch((err) => {
-      throw createFailure(err, __filename, "getAlbumModel");
+      throw new DAOException(__filename, "getAlbumModel", err);
     });
   }
 
   public async getAlbumSongModel(this: AlbumDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find({ albumId: id }).catch((err) => {
-      throw createFailure(err, __filename, "getAlbumSongModel");
+      throw new DAOException(__filename, "getAlbumSongModel", err);
     });
   }
 
@@ -41,32 +41,28 @@ class AlbumDAO {
       .create(album)
       .then((a) => a.id)
       .catch((err) => {
-        throw createFailure(err, __filename, "createAlbumModel");
+        throw new DAOException(__filename, "createAlbumModel", err);
       });
   }
 
-  public async findAlbumModelByName(
-    this: AlbumDAO,
-    albumTitle: string,
-    artistName?: string
-  ): Promise<(Album & Document<any, any, Album>)[]> {
+  public async findAlbumModelByName(this: AlbumDAO, albumTitle: string, artistName?: string): Promise<(Album & Document<any, any, Album>)[]> {
     var query: Album = { title: albumTitle };
     if (artistName) query.artist = artistName;
 
     return await albumModel.find(query).catch((err) => {
-      throw createFailure(err, __filename, "findAlbumModelByName");
+      throw new DAOException(__filename, "findAlbumModelByName", err);
     });
   }
 
   public async updateAlbumModel(this: AlbumDAO, album: Album): Promise<void> {
     await albumModel.findByIdAndUpdate(album.id, album).catch((err) => {
-      throw createFailure(err, __filename, "updateAlbumModel");
+      throw new DAOException(__filename, "updateAlbumModel", err);
     });
   }
 
   public async getMbidlessAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find({ mbids: { $size: 0 } }).catch((err) => {
-      throw createFailure(err, __filename, "getMbidlessAlbumModels");
+      throw new DAOException(__filename, "getMbidlessAlbumModels", err);
     });
   }
 
@@ -80,7 +76,7 @@ class AlbumDAO {
         ],
       })
       .catch((err) => {
-        throw createFailure(err, __filename, "getUpdatableAlbumModels");
+        throw new DAOException(__filename, "getUpdatableAlbumModels", err);
       });
   }
 
@@ -94,7 +90,7 @@ class AlbumDAO {
         ],
       })
       .catch((err) => {
-        throw createFailure(err, __filename, "getToCoverGrabAlbumsModels");
+        throw new DAOException(__filename, "getToCoverGrabAlbumsModels", err);
       });
   }
 }

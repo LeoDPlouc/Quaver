@@ -14,16 +14,18 @@
 import fs from "fs/promises";
 import path from "path";
 import mm from "mime-types";
-import { createFailure } from "../utils/Failure";
 import { logger } from "../utils/logger";
 import { DATA_PATH } from "../config/config";
+import { FileSystemException } from "../utils/exceptions/fileSystemException";
+import { ServiceException } from "./exceptions/serviceException";
+import { MimeLookupException } from "./exceptions/MimeLookupException";
 
 class FileService {
   public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
     let allPaths: string[] = [];
 
     var paths = await fs.readdir(folder, { withFileTypes: true }).catch((err) => {
-      throw createFailure(err, __filename, "getAllFiles");
+      throw new FileSystemException(__filename, "getAllFiles", err);
     });
 
     for (var i = 0; i < paths.length; i++) {
@@ -33,7 +35,7 @@ class FileService {
         try {
           (await this.getAllFiles(fullPath)).forEach((p) => allPaths.push(p));
         } catch (err) {
-          logger.debugError(1, "File access eror", __filename, "getAllFiles", err);
+          logger.debugError(1, new ServiceException(__filename, "getAllFiles", err));
           continue;
         }
       }
@@ -50,7 +52,7 @@ class FileService {
     try {
       return !mm.lookup(path.extname(file)).match("audio")
     } catch (err) {
-      throw createFailure("mime-types error", __filename, "isMusicFile", err)
+      throw new MimeLookupException(__filename, "isMusicFile", err)
     }
   }
 
@@ -62,7 +64,7 @@ class FileService {
       }
       return imageDir
     } catch (err) {
-      throw createFailure("File system error", __filename, "getImagesPath", err)
+      throw new FileSystemException(__filename, "getImagesPath", err)
     }
   }
 
@@ -74,7 +76,7 @@ class FileService {
       }
       return logsDir
     } catch (err) {
-      throw createFailure("File system error", __filename, "getImagesPath", err)
+      throw new FileSystemException(__filename, "getImagesPath", err)
     }
   }
 }

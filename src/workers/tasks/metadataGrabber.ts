@@ -13,6 +13,7 @@
 
 import { albumService } from "../../service/albumService";
 import { logger } from "../../utils/logger";
+import { TaskException } from "./exceptions/taskException";
 
 async function grabMbids() {
   let albums = await albumService.getMbidlessAlbum();
@@ -27,7 +28,7 @@ async function grabMbids() {
 
       logger.info(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logger.error("Task error", __filename, "grabMbids", err);
+      logger.error(new TaskException(__filename, "grabMbids", err));
     }
   }
 }
@@ -48,7 +49,7 @@ async function updateMetadata() {
       await albumService.updateAlbum(albums[i]);
       logger.info(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logger.error("Task error", __filename, "updateMetadata", err);
+      logger.error(new TaskException(__filename, "updateMetadata", err));
     }
   }
 }

@@ -15,7 +15,7 @@ import { IMigration } from "../migration";
 import { getAlbumMBIdLegacy } from "../legacy/legacyCode";
 import { albumModel } from "../../models/albumModel";
 import { logger } from "../../../../utils/logger";
-import { createFailure } from "../../../../utils/Failure";
+import { MigrationException } from "../exceptions/MigrationException";
 
 export const migration0: IMigration = {
   //Add MB ID to albums
@@ -24,7 +24,7 @@ export const migration0: IMigration = {
       try {
         var albums = await albumModel.find();
       } catch (err) {
-        throw createFailure(err, __filename, migration0.up.name);
+        throw new MigrationException(__filename, "migration0.up", err);
       }
 
       for (let i = 0; i < albums.length; i++) {
@@ -42,13 +42,13 @@ export const migration0: IMigration = {
           try {
             await a.save();
           } catch (err) {
-            createFailure(err, __filename, migration0.up.name);
+            logger.error(new MigrationException(__filename, "migration0.up", err));
           }
         }
       }
     } catch (err) {
-      throw createFailure("Migration error", __filename, migration0.up.name);
+      throw new MigrationException(__filename, "migration0.up", err);
     }
   },
-  async down(): Promise<void> {},
+  async down(): Promise<void> { },
 };
