@@ -48,9 +48,9 @@ class FileService {
     return allPaths;
   }
 
-  public async isMusicFile(this: FileService, file: string) {
+  public isMusicFile(this: FileService, file: string): boolean {
     try {
-      return !mm.lookup(path.extname(file)).match("audio")
+      return !!mm.lookup(path.extname(file)).match("audio")
     } catch (err) {
       throw new MimeLookupException(__filename, "isMusicFile", err)
     }

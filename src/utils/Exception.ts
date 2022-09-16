@@ -11,16 +11,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { logger } from "./logger";
+
 export abstract class Exception {
   file: string;
   func: string;
-  sourceError?: Exception | any;
+  sourceError?: Exception | string;
 
   public abstract getType(): string
 
-  constructor(file: string, func: string, sourceError?: Exception | any) {
+  constructor(file: string, func: string, sourceError?: Exception | string) {
     this.file = file
     this.func = func
     this.sourceError = sourceError
+  }
+
+  public toString(): string {
+    let display = `${this.getType()} in file ${this.file}: ${this.func}`
+
+    if (this.sourceError) {
+      if (this.sourceError instanceof Exception) {
+        display += ` caused by\n${(<Exception>this.sourceError).toString()}`
+      } else {
+        display += `\nSource error: ${String(this.sourceError)}`
+      }
+    }
+
+    return display
   }
 }

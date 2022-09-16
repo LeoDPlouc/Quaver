@@ -32,7 +32,7 @@ async function collect() {
 
   for (let i = 0; i < paths.length; i++) {
     try {
-      if (fileService.isMusicFile(paths[i])) continue; //Only consider audio files
+      if (!fileService.isMusicFile(paths[i])) continue; //Only consider audio files
 
       if (songPaths.find((p) => p == paths[i])) continue; //Pass if song already exists
 

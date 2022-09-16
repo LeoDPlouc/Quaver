@@ -24,4 +24,8 @@ export class NotFoundException extends Exception {
         super(file, func)
         this.message = message
     }
+
+    public toString(): string {
+        return `Exception ${this.getType()} in file ${this.file}: ${this.func} - ${this.message}`
+    }
 }

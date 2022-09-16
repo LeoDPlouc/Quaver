@@ -51,13 +51,13 @@ let loggerFile = createLogger({
 
 class Logger {
   public error(this: Logger, exception: Exception) {
-    loggerStd.error(`${JSON.stringify(exception)}`);
-    loggerFile.error(`${JSON.stringify(exception)}`);
+    loggerStd.error(`${exception.toString()}`);
+    loggerFile.error(`${exception.toString()}`);
   }
 
   public info(this: Logger, info: String, source: String) {
-    loggerStd.info(`${source} : ${info}`);
-    loggerFile.info(`${source} : ${info}`);
+    loggerStd.info(`[${source}] : ${info}`);
+    loggerFile.info(`[${source}] : ${info}`);
   }
 
   public logRequest(this: Logger, req: Request) {
@@ -67,13 +67,13 @@ class Logger {
 
   public debug(this: Logger, debugLvl: number, info: String, source: String) {
     if (debugLvl <= DEBUG_LVL && DEBUG_LVL > 0 && debugLvl > 0) {
-      loggerDebug.debug(`${source} : ${info}`);
+      loggerDebug.debug(`[${source}] ${info}`);
     }
   }
 
   public debugError(this: Logger, debugLvl: number, exception: Exception) {
     if (debugLvl <= DEBUG_LVL && DEBUG_LVL > 0 && debugLvl > 0) {
-      loggerDebug.debug(`ERROR: ${JSON.stringify(exception)}`);
+      loggerDebug.debug(`[ERROR] ${exception.toString()}`);
     }
   }
 }
