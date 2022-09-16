@@ -1,5 +1,39 @@
 CHANGELOG
 ====================================================
+0.6.3-beta
+
+Added:
+- Debug logging
+- Exception types
+- Exception display
+
+Changed:
+- Refactorisation of fileService and songCollector
+- Refactorisation of the logger system, now the logger have multiple logger in the backend wich are optimised to log in file, log errors etc
+- Changed the directory where quaver stores files like logs and images
+- Changed failure system to exception system
+- Changed logger display
+
+Deprecated:
+- API url "image/:id/file
+- Image interface path field
+- Image interface tiny field's optionality
+- Image controller for file fallback to path file
+- Musicbrainz api export
+- CoverArtArchive api export
+- Migrations
+- Status and statusCode in api reponses
+
+Removed:
+- Removed express-session dependence
+- Removed tests for migration
+
+Fixed:
+- During exception creation the function name could not be fetched, function's name are now hardcoded
+- Fixed a bug in github actions
+- isMusicFile was considerer async but was not
+
+====================================================
 0.6.2-beta
 
 BackEnd:

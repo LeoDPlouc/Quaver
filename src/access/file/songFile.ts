@@ -17,6 +17,7 @@ import fp from "fpcalc-async";
 import { parseFile } from "music-metadata";
 import Path from "path";
 import { FileSystemException } from "../../utils/exceptions/fileSystemException";
+import { logger } from "../../utils/logger";
 
 class SongFileAccess {
   public async getAcoustid(this: SongFileAccess, songPath: string): Promise<string> {
@@ -35,7 +36,7 @@ class SongFileAccess {
 
   public async getMetadataFromFile(this: SongFileAccess, songPath: string): Promise<Song> {
     var tag = await parseFile(songPath).catch((err) => {
-      throw new FileSystemException(__filename, "getMetadataFromFile", err);
+      throw new FileSystemException(__filename, "getMetadataFromFile", String(err));
     });
 
     let format = Path.extname(songPath); //Extract file extension

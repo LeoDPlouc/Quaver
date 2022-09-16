@@ -51,7 +51,7 @@ services:
       - 8080:8080
     volumes:
       - $MUSIC_PATH:/music
-      - $IMAGES_PATH:/images
+      - $IMAGES_PATH:/data/images
     environment:
       - QUAVER_DB_USER=$MONGO_USERNAME
       - QUAVER_DB_PASSWORD=$MONGO_PASSWORD
