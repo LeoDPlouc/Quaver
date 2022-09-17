@@ -12,7 +12,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { albumService } from "../../service/albumService";
-import { logError, logInfo } from "../../utils/logger";
+import { logger } from "../../utils/logger";
+import { TaskException } from "./exceptions/taskException";
 
 async function grabMbids() {
   let albums = await albumService.getMbidlessAlbum();
@@ -25,9 +26,9 @@ async function grabMbids() {
       albums[i].mbids = mbids;
       await albumService.updateAlbum(albums[i]);
 
-      logInfo(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
+      logger.info(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logError("Task error", __filename, grabMbids.name, err);
+      logger.error(new TaskException(__filename, "grabMbids", err));
     }
   }
 }
@@ -46,15 +47,15 @@ async function updateMetadata() {
       albums[i].lastUpdated = Date.now();
 
       await albumService.updateAlbum(albums[i]);
-      logInfo(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
+      logger.info(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logError("Task error", __filename, updateMetadata.name, err);
+      logger.error(new TaskException(__filename, "updateMetadata", err));
     }
   }
 }
 
 export default async function doWork() {
-  logInfo("Metadata grabber started", "Metadata Grabber");
+  logger.info("Metadata grabber started", "Metadata Grabber");
   await grabMbids();
   await updateMetadata();
 }

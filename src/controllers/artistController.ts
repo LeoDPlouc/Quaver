@@ -16,14 +16,15 @@ import { validationResult } from "express-validator";
 import { mapArtistDTO } from "../mappers/artistMapper";
 import { mapSongDTO } from "../mappers/songMapper";
 import { mapAlbumDTO } from "../mappers/albumMapper";
-import { logError } from "../utils/logger";
+import { logger } from "../utils/logger";
 import { artistService } from "../service/artistService";
+import { ControllerException } from "./exceptions/controllerException";
 
 export async function getAllArtistsCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getAllArtists();
   } catch (err) {
-    logError("Controller error", __filename, getAllArtistsCtrl.name);
+    logger.error(new ControllerException(__filename, "getAllArtistsCtrl", err));
     res.json({
       statusCode: 1,
       errorMessage: "Server error",
@@ -59,7 +60,7 @@ export async function getOneArtistCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getArtist(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, getOneArtistCtrl.name);
+    logger.error(new ControllerException(__filename, "getOneArtistCtrl", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -94,7 +95,7 @@ export async function getArtistSongsCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getArtistSongs(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, getArtistSongsCtrl.name);
+    logger.error(new ControllerException(__filename, "getArtistSongsCtrl", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -130,7 +131,7 @@ export async function getArtistAlbumsCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getArtistAlbums(req.params.id);
   } catch (err) {
-    logError("Controller error", __filename, getArtistAlbumsCtrl.name);
+    logger.error(new ControllerException(__filename, "getArtistAlbumsCtrl", err));
     res.json({
       status: "fail",
       statusCode: 1,

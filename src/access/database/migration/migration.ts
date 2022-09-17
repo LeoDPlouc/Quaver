@@ -13,9 +13,9 @@
 
 import { Document } from "mongoose";
 import { DB_VERSION } from "../../../config/appConfig";
-import { createFailure, Failure } from "../../../utils/Failure";
-import { logError, logInfo } from "../../../utils/logger";
+import { logger } from "../../../utils/logger";
 import { dbInfoModel } from "../models/dbInfoModel";
+import { MigrationException } from "./exceptions/MigrationException";
 import { migration0 } from "./migrationScripts/migration0";
 import { migration1 } from "./migrationScripts/migration1";
 import { migration2 } from "./migrationScripts/migration2";
@@ -43,7 +43,7 @@ async function FetchDbInfo(): Promise<Document<any, any, DbInfo> & DbInfo> {
       } else return infos[0];
     });
   } catch (err) {
-    throw createFailure(err, __filename, FetchDbInfo.name);
+    throw new MigrationException(__filename, "FetchDbInfo", err);
   }
 }
 
@@ -55,8 +55,8 @@ export async function Migrate(): Promise<void> {
     let db_ver = info.version;
     let app_ver = DB_VERSION;
 
-    logInfo(`Database schema version : ${db_ver}`, "Migration");
-    logInfo(`Application schema version : ${app_ver}`, "Migration");
+    logger.info(`Database schema version : ${db_ver}`, "Migration");
+    logger.info(`Application schema version : ${app_ver}`, "Migration");
 
     //Compare db version with app version and apply migration
     if (db_ver > app_ver) {
@@ -75,9 +75,9 @@ export async function Migrate(): Promise<void> {
     try {
       await info.save();
     } catch (err) {
-      throw createFailure(err, __filename, Migrate.name);
+      throw new MigrationException(__filename, "Migrate", err);
     }
   } catch (err) {
-    throw createFailure("Migration error", __filename, Migrate.name, err);
+    throw new MigrationException(__filename, "Migrate", err);
   }
 }

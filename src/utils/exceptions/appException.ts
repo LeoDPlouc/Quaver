@@ -11,10 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Request, Response, NextFunction } from "express"
-import { logger } from "../utils/logger"
+import { Exception } from "../Exception";
 
-export default function logRequestMiddleware(req: Request, res: Response, next: NextFunction) {
-    logger.logRequest(req)
-    next()
+export class AppException extends Exception {
+    public getType(): string {
+        return "App Exception"
+    }
 }

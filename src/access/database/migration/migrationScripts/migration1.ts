@@ -14,8 +14,8 @@
 import { IMigration } from "../migration";
 import { getAlbumCoverLegacy } from "../legacy/legacyCode";
 import { albumModel } from "../../models/albumModel";
-import { createFailure } from "../../../../utils/Failure";
-import { logError, logInfo } from "../../../../utils/logger";
+import { logger } from "../../../../utils/logger";
+import { MigrationException } from "../exceptions/MigrationException";
 
 export const migration1: IMigration = {
   //Download album covers
@@ -24,13 +24,13 @@ export const migration1: IMigration = {
       try {
         var albums = await albumModel.find();
       } catch (err) {
-        throw createFailure(err, __filename, migration1.up.name);
+        throw new MigrationException(__filename, "migration1.up", err);
       }
 
       for (let i = 0; i < albums.length; i++) {
         let a = albums[i];
 
-        logInfo(`Migration 1 -> 2 album ${a.id}`, "Migration");
+        logger.info(`Migration 1 -> 2 album ${a.id}`, "Migration");
 
         let cover = await getAlbumCoverLegacy(a);
         if (!cover) {
@@ -40,18 +40,18 @@ export const migration1: IMigration = {
         try {
           await cover.save();
         } catch (err) {
-          throw createFailure(err, __filename, migration1.up.name);
+          throw new MigrationException(__filename, "migration1.up", err);
         }
 
         a.cover = cover.id;
         try {
           await a.save();
         } catch (err) {
-          throw createFailure(err, __filename, migration1.up.name);
+          throw new MigrationException(__filename, "migration1.up", err);
         }
       }
     } catch (err) {
-      throw createFailure(err, __filename, migration1.up.name);
+      throw new MigrationException(__filename, "migration1.up", err);
     }
   },
 
@@ -61,26 +61,26 @@ export const migration1: IMigration = {
       try {
         var albums = await albumModel.find();
       } catch (err) {
-        throw createFailure(err, __filename, migration1.down.name);
+        throw new MigrationException(__filename, "migration1.down", err);
       }
 
       for (let i = 0; i < albums.length; i++) {
         let a = albums[i];
 
         if (!a.mbid) {
-          logInfo(`Migration 1 -> 0 album ${a.id}`, "Migration");
+          logger.info(`Migration 1 -> 0 album ${a.id}`, "Migration");
 
           a.mbid = undefined;
 
           try {
             await a.save();
           } catch (err) {
-            throw createFailure(err, __filename, migration1.down.name);
+            throw new MigrationException(__filename, "migration1.down", err);
           }
         }
       }
     } catch (err) {
-      throw createFailure(err, __filename, migration1.down.name);
+      throw new MigrationException(__filename, "migration1.down", err);
     }
   },
 };

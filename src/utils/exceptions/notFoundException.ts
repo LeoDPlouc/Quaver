@@ -11,10 +11,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Request, Response, NextFunction } from "express"
-import { logger } from "../utils/logger"
+import { Exception } from "../Exception";
 
-export default function logRequestMiddleware(req: Request, res: Response, next: NextFunction) {
-    logger.logRequest(req)
-    next()
+export class NotFoundException extends Exception {
+    message: string
+
+    public getType(): string {
+        return "Not Found Exception"
+    }
+
+    constructor(file: string, func: string, message: string) {
+        super(file, func)
+        this.message = message
+    }
+
+    public toString(): string {
+        return `Exception ${this.getType()} in file ${this.file}: ${this.func} - ${this.message}`
+    }
 }

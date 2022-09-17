@@ -13,10 +13,10 @@
 
 import { IReleaseList, MusicBrainzApi } from "musicbrainz-api";
 import { APP_VERSION } from "../../config/appConfig";
-import { createFailure } from "../../utils/Failure";
-import { logError } from "../../utils/logger";
+import { logger } from "../../utils/logger";
+import { MusicBrainzException } from "./exceptions/MusicBrainzException";
 
-//DEPRCIATED Ne plus exporter lors du nettoyage des dépréciés, mettre dans la class
+//DEPRECATED Ne plus exporter lors du nettoyage des dépréciés, mettre dans la class
 export const mbApi = new MusicBrainzApi({
   appName: "Quaver",
   appVersion: APP_VERSION,
@@ -37,7 +37,7 @@ class MusicBrainzApiAccess {
       .then((result) => result.releases.filter((release) => release.score == 100))
       .then((releases) => releases.map((release) => release.id))
       .catch((err) => {
-        throw createFailure(err, __filename, this.getMBId.name);
+        throw new MusicBrainzException(__filename, "getMBId", err);
       });
   }
 
@@ -52,7 +52,7 @@ class MusicBrainzApiAccess {
         if (!album.title) album.title = release.title;
         if (!album.year) album.year = new Date(release.date).getFullYear();
       } catch (err) {
-        logError(err, __filename, this.getMetadataFromMB.name);
+        logger.error(new MusicBrainzException(__filename, "getMetadataFromMB", err));
       }
     }
 

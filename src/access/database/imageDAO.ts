@@ -12,19 +12,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { createFailure } from "../../utils/Failure";
+import { DAOException } from "./exceptions/DAOException";
 import { imageModel } from "./models/imageModel";
 
 class ImageDAO {
   public async getAllImagesModels(this: ImageDAO): Promise<(Image & Document<any, any, Image>)[]> {
     return await imageModel.find().catch((err) => {
-      throw createFailure(err, __filename, this.getAllImagesModels.name);
+      throw new DAOException(__filename, "getAllImagesModels", err);
     });
   }
 
   public async getImageModel(this: ImageDAO, id: string): Promise<void | (Image & Document<any, any, Image>)> {
     return await imageModel.findById(id).catch((err) => {
-      createFailure(err, __filename, this.getImageModel.name);
+      throw new DAOException(__filename, "getImageModel", err);
     });
   }
 
@@ -33,19 +33,19 @@ class ImageDAO {
       .create(image)
       .then((i) => i.id)
       .catch((err) => {
-        throw createFailure(err, __filename, this.createImageModel.name);
+        throw new DAOException(__filename, "createImageModel", err);
       });
   }
 
   public async deleteImageModel(this: ImageDAO, id: string): Promise<void> {
     await imageModel.findByIdAndDelete(id).catch((err) => {
-      throw createFailure(err, __filename, this.deleteImageModel.name);
+      throw new DAOException(__filename, "deleteImageModel", err);
     });
   }
 
   public async getTinyLessImageModel(this: ImageDAO): Promise<(Image & Document<any, any, Image>)[]> {
     return await imageModel.find({ tiny: null }).catch((err) => {
-      throw createFailure(err, __filename, this.getTinyLessImageModel.name);
+      throw new DAOException(__filename, "getTinyLessImageModel", err);
     });
   }
 }

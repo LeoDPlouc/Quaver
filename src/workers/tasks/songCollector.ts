@@ -11,15 +11,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import path from "path";
-import mm from "mime-types";
 import { MUSIC_PATH } from "../../config/config";
-import { createFailure } from "../../utils/Failure";
-import { logError, logInfo } from "../../utils/logger";
+import { logger } from "../../utils/logger";
 import { albumService } from "../../service/albumService";
 import { songService } from "../../service/songService";
 import { artistService } from "../../service/artistService";
 import { fileService } from "../../service/fileService";
+import { TaskException } from "./exceptions/taskException";
 
 let songPaths: string[];
 let artists: Artist[];
@@ -29,18 +27,18 @@ async function collect() {
   try {
     var paths = await fileService.getAllFiles(MUSIC_PATH);
   } catch (err) {
-    throw createFailure("File service error", __filename, collect.name, err);
+    throw new TaskException(__filename, "collect", err);
   }
 
   for (let i = 0; i < paths.length; i++) {
     try {
-      if (!mm.lookup(path.extname(paths[i])).match("audio")) continue; //Only consider audio files
+      if (!fileService.isMusicFile(paths[i])) continue; //Only consider audio files
 
       if (songPaths.find((p) => p == paths[i])) continue; //Pass if song already exists
 
       let song = await songService.getMetadataFromFile(paths[i]);
 
-      logInfo(`Found new song ${song.path}`, "Song Collector");
+      logger.info(`Found new song ${song.path}`, "Song Collector");
 
       //Fetch the song's album
       let album = findAlbumByName(song.album, song.artist);
@@ -50,7 +48,7 @@ async function collect() {
 
         albumId = await albumService.createAlbum(album);
 
-        logInfo(`Found new album ${album.title}`, "Song Collector");
+        logger.info(`Found new album ${album.title}`, "Song Collector");
 
         await updateAlbums();
       }
@@ -63,7 +61,7 @@ async function collect() {
 
         artistId = await artistService.createArtist(artist);
 
-        logInfo(`Found new artist ${artist.name}`, "Song Collector");
+        logger.info(`Found new artist ${artist.name}`, "Song Collector");
 
         await updateArtists();
       }
@@ -75,26 +73,26 @@ async function collect() {
       song.albumId = albumId;
       await songService.createSong(song);
     } catch (err) {
-      logError("Song collection error", __filename, collect.name, err);
+      logger.error(new TaskException(__filename, "collect", err));
     }
   }
 }
 
 async function updatePaths(): Promise<void> {
   songPaths = await songService.getAllSongPaths().catch((err) => {
-    throw createFailure("Path update error", __filename, updatePaths.name, err);
+    throw new TaskException(__filename, "updatePaths", err);
   });
 }
 
 async function updateAlbums(): Promise<void> {
   albums = await albumService.getAllAlbums().catch((err) => {
-    throw createFailure("Service error", __filename, updateAlbums.name, err);
+    throw new TaskException(__filename, "updateAlbums", err);
   });
 }
 
 async function updateArtists(): Promise<void> {
   artists = await artistService.getAllArtists().catch((err) => {
-    throw createFailure("Service error", __filename, updateArtists.name, err);
+    throw new TaskException(__filename, "updateArtists", err);
   });
 }
 
@@ -111,7 +109,7 @@ function findAlbumByName(album: string, artist: string) {
 }
 
 export default async function doWork() {
-  logInfo("Song collection Started", "Song Collector");
+  logger.info("Song collection Started", "Song Collector");
 
   //Collection run in background and is relaunched every 30 sec
   try {
@@ -121,6 +119,6 @@ export default async function doWork() {
 
     await collect();
   } catch (err) {
-    logError("Song collector error", __filename, doWork.name, err);
+    logger.error(new TaskException(__filename, "doWork", err));
   }
 }

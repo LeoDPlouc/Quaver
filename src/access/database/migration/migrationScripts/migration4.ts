@@ -11,24 +11,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { createFailure } from "../../../../utils/Failure";
+import { MigrationException } from "../exceptions/MigrationException";
 import { IMigration } from "../migration";
 import { migration2 } from "./migration2";
 
 export const migration4: IMigration = {
-  async up(): Promise<void> {},
+  async up(): Promise<void> { },
 
   //Remove MB ID list and keep only one
   async down(): Promise<void> {
     try {
       return migration2.down();
     } catch (err) {
-      throw createFailure(
-        "Migration error",
-        __filename,
-        migration4.down.name,
-        err
-      );
+      throw new MigrationException(__filename, "migration4.down", err);
     }
   },
 };

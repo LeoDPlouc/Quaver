@@ -13,18 +13,18 @@
 
 import { v4 } from "uuid";
 import path from "path";
-import { IMAGES_PATH } from "../../config/config";
 import fs from "fs/promises";
-import { createFailure } from "../../utils/Failure";
+import { fileService } from "../../service/fileService";
+import { FileSystemException } from "../../utils/exceptions/fileSystemException";
 
 class ImageFileAccess {
   public async saveImage(this: ImageFileAccess, data: string, extension: string): Promise<string> {
     //Create an UUID for the name of the file
     let filename = v4() + extension;
-    let p = path.resolve(IMAGES_PATH, filename);
+    let p = path.resolve(fileService.getImagesPath(), filename);
 
     await fs.writeFile(p, data, { encoding: "binary" }).catch((err) => {
-      throw createFailure(err, __filename, this.saveImage.name);
+      throw new FileSystemException(__filename, "saveImage", err);
     });
 
     return p;
@@ -32,7 +32,7 @@ class ImageFileAccess {
 
   public async deleteImageFile(this: ImageFileAccess, path: string): Promise<void> {
     await fs.rm(path).catch((err) => {
-      throw createFailure(err, __filename, this.deleteImageFile.name);
+      throw new FileSystemException(__filename, "deleteImageFile", err);
     });
   }
 }

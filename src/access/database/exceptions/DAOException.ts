@@ -11,18 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { cleanDatabase, createDatabase, getOneAlbum } from "../util"
-import { migration0 } from "../../src/access/database/migration/migrationScripts/migration0"
+import { Exception } from "../../../utils/Exception";
 
-describe("Migration 0 up", () => {
-    beforeAll(createDatabase)
-    afterAll(cleanDatabase)
-
-    it("Migration 0 up", async () => {
-        await migration0.up()
-
-        var album = await getOneAlbum()
-
-        expect(album.mbid).toBeDefined()
-    }, 1000000)
-})
+export class DAOException extends Exception{
+    public getType(): string {
+        return "DAO Exception"
+    }
+}

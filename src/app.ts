@@ -12,8 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import express from "express"
-import session from "express-session"
-import { HEADLESS, SESSION_SECRET } from "./config/config"
+import { HEADLESS } from "./config/config"
 import logMiddleware from "./middleware/logMiddleware"
 import songRouter from "./routes/songRoute"
 import userRouter from "./routes/userRoute"
@@ -23,16 +22,6 @@ import appRouter from "./routes/appRoute"
 import imageRouter from "./routes/imageRoute"
 
 const app = express()
-
-//Init session
-app.use(session({
-    secret: SESSION_SECRET,
-    cookie: {
-        secure: false,
-        httpOnly: true,
-        maxAge: 2600000000
-    }
-}))
 
 //Parse request's body to json
 app.use(express.json())

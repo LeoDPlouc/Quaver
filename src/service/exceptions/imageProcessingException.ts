@@ -11,20 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { cleanDatabase, createDatabase, getOneAlbum } from "../util"
-import { migration4 } from "../../src/access/database/migration/migrationScripts/migration4"
-import { migration3 } from "../../src/access/database/migration/migrationScripts/migration3"
+import { Exception } from "../../utils/Exception";
 
-describe("Migration 4 down", () => {
-    beforeAll(createDatabase)
-    afterAll(cleanDatabase)
-
-    it("Migration 4 down", async () => {
-        await migration4.down()
-        await migration3.down()
-
-        var album = await getOneAlbum()
-
-        expect(album.mbids.length).toBe(0)
-    }, 1000000)
-})
+export class ImageProcessingException extends Exception {
+    public getType(): string {
+        return "Image Processing Exception"
+    }
+}

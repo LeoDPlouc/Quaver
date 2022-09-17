@@ -13,15 +13,19 @@
 
 import fs from "fs/promises";
 import path from "path";
-import { createFailure } from "../utils/Failure";
-import { logError } from "../utils/logger";
+import mm from "mime-types";
+import { logger } from "../utils/logger";
+import { DATA_PATH } from "../config/config";
+import { FileSystemException } from "../utils/exceptions/fileSystemException";
+import { ServiceException } from "./exceptions/serviceException";
+import { MimeLookupException } from "./exceptions/MimeLookupException";
 
 class FileService {
   public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
     let allPaths: string[] = [];
 
     var paths = await fs.readdir(folder, { withFileTypes: true }).catch((err) => {
-      throw createFailure(err, __filename, this.getAllFiles.name);
+      throw new FileSystemException(__filename, "getAllFiles", err);
     });
 
     for (var i = 0; i < paths.length; i++) {
@@ -31,7 +35,7 @@ class FileService {
         try {
           (await this.getAllFiles(fullPath)).forEach((p) => allPaths.push(p));
         } catch (err) {
-          logError("File access eror", __filename, this.getAllFiles.name, err);
+          logger.debugError(1, new ServiceException(__filename, "getAllFiles", err));
           continue;
         }
       }
@@ -42,6 +46,38 @@ class FileService {
     }
 
     return allPaths;
+  }
+
+  public isMusicFile(this: FileService, file: string): boolean {
+    try {
+      return !!mm.lookup(path.extname(file)).match("audio")
+    } catch (err) {
+      throw new MimeLookupException(__filename, "isMusicFile", err)
+    }
+  }
+
+  public getImagesPath(this: FileService) {
+    try {
+      let imageDir = path.join(DATA_PATH, "images")
+      if (!fs.access(imageDir).then(_ => true).catch(_ => false)) {
+        fs.mkdir(imageDir)
+      }
+      return imageDir
+    } catch (err) {
+      throw new FileSystemException(__filename, "getImagesPath", err)
+    }
+  }
+
+  public getLogsPath(this: FileService) {
+    try {
+      let logsDir = path.join(DATA_PATH, "logs")
+      if (!fs.access(logsDir).then(_ => true).catch(_ => false)) {
+        fs.mkdir(logsDir)
+      }
+      return logsDir
+    } catch (err) {
+      throw new FileSystemException(__filename, "getImagesPath", err)
+    }
   }
 }
 

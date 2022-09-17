@@ -11,22 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { cleanDatabase, createDatabase, getOneAlbum } from "../util"
-import { migration4 } from "../../src/access/database/migration/migrationScripts/migration4"
-import { migration3 } from "../../src/access/database/migration/migrationScripts/migration3"
-import { migration2 } from "../../src/access/database/migration/migrationScripts/migration2"
+import { Exception } from "../../../utils/Exception";
 
-describe("Migration 4 down", () => {
-    beforeAll(createDatabase)
-    afterAll(cleanDatabase)
-
-    it("Migration 4 down", async () => {
-        await migration4.down()
-        await migration3.down()
-        await migration2.down()
-
-        var album = await getOneAlbum()
-
-        expect(album.cover).toBeUndefined()
-    }, 1000000)
-})
+export class DatabaseException extends Exception {
+    public getType(): string {
+        return "Database Exception"
+    }
+}

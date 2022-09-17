@@ -11,23 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { cleanDatabase, createDatabase, getOneAlbum } from "../util"
-import { migration2 } from "../../src/access/database/migration/migrationScripts/migration2"
-import { migration0 } from "../../src/access/database/migration/migrationScripts/migration0"
-import { migration1 } from "../../src/access/database/migration/migrationScripts/migration1"
+import { Exception } from "../Exception";
 
-describe("Migration 2 up", () => {
-    beforeAll(createDatabase)
-    afterAll(cleanDatabase)
 
-    it("Migration 2 up", async () => {
-        await migration0.up()
-        await migration1.up()
-        await migration2.up()
-
-        var album = await getOneAlbum()
-
-        expect(album.mbid).toBeUndefined()
-        expect(album.mbids).toBeDefined()
-    }, 1000000)
-})
+export class FileSystemException extends Exception {
+    public getType(): string {
+        return "File System Exception"
+    }
+}
