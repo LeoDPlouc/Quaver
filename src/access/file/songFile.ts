@@ -34,7 +34,7 @@ class SongFileAccess {
     return fingerprint.fingerprint;
   }
 
-  public async getMetadataFromFile(this: SongFileAccess, songPath: string): Promise<Song> {
+  public async getMetadataFromFile(this: SongFileAccess, songPath: string): Promise<SongData> {
     var tag = await parseFile(songPath).catch((err) => {
       throw new FileSystemException(__filename, "getMetadataFromFile", String(err));
     });
@@ -43,14 +43,10 @@ class SongFileAccess {
 
     return {
       title: tag.common.title,
-      n: tag.common.track.no,
       artist: tag.common.albumartist,
       album: tag.common.album,
       year: Number.isNaN(tag.common.year) ? undefined : tag.common.year,
-      duration: tag.format.duration,
-      like: 0,
-      path: songPath,
-      format: format,
+      duration: tag.format.duration
     };
   }
 }

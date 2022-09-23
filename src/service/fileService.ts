@@ -81,7 +81,7 @@ class FileService {
     }
   }
 
-  public async getMetadataFromFile(this: FileService, songPath: string): Promise<Song> {
+  public async getMetadataFromFile(this: FileService, songPath: string): Promise<SongData> {
     return await songFileAccess.getMetadataFromFile(songPath).catch((err) => {
       throw new ServiceException(__filename, "getMetadataFromFile", err);
     });

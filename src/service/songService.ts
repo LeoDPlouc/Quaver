@@ -11,6 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { songDAO } from "../access/database/songDAO";
 import { songFileAccess } from "../access/file/songFile";
 import { mapSong } from "../mappers/songMapper";
@@ -67,6 +68,12 @@ class SongService {
     return await songDAO.getAllSongModelPaths().catch((err) => {
       throw new ServiceException(__filename, "getAllSongPaths", err);
     });
+  }
+
+  public async getSongMbids(this: SongService, song: SongData): Promise<string[]> {
+    return await musicBrainzApiAccess.getSongMBId(song).catch(err => {
+      throw new ServiceException(__filename, "getSongMbids", err)
+    })
   }
 }
 
