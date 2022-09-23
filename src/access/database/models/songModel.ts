@@ -24,7 +24,8 @@ const songSchema = new Schema<Song>({
         type: Number
     },
     like: {
-        type: Number
+        type: Number,
+        default: 0
     },
     artist: {
         type: String
@@ -50,6 +51,15 @@ const songSchema = new Schema<Song>({
     },
     format: {
         type: String
+    },
+    lastUpdated: {
+        type: Number,
+    },
+    lastCoverUpdate: {
+        type: Number,
+    },
+    mbids: {
+        type: [String]
     }
 })
 export const songModel = model<Song>("Song", songSchema)

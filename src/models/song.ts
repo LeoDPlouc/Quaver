@@ -24,5 +24,6 @@ interface Song {
     path: string,
     acoustid?: string,
     year?: number,
-    format?: string
+    format?: string,
+    mbids?: string[]
 }
