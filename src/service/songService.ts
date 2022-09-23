@@ -68,12 +68,6 @@ class SongService {
       throw new ServiceException(__filename, "getAllSongPaths", err);
     });
   }
-
-  public async getMetadataFromFile(this: SongService, songPath: string): Promise<Song> {
-    return await songFileAccess.getMetadataFromFile(songPath).catch((err) => {
-      throw new ServiceException(__filename, "getMetadataFromFile", err);
-    });
-  }
 }
 
 export const songService = new SongService();

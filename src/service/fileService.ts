@@ -19,6 +19,7 @@ import { DATA_PATH } from "../config/config";
 import { FileSystemException } from "../utils/exceptions/fileSystemException";
 import { ServiceException } from "./exceptions/serviceException";
 import { MimeLookupException } from "./exceptions/MimeLookupException";
+import { songFileAccess } from "../access/file/songFile";
 
 class FileService {
   public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
@@ -78,6 +79,12 @@ class FileService {
     } catch (err) {
       throw new FileSystemException(__filename, "getImagesPath", err)
     }
+  }
+
+  public async getMetadataFromFile(this: FileService, songPath: string): Promise<Song> {
+    return await songFileAccess.getMetadataFromFile(songPath).catch((err) => {
+      throw new ServiceException(__filename, "getMetadataFromFile", err);
+    });
   }
 }
 
