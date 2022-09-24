@@ -12,7 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
-import { UPDATE_ALBUM_PERIOD, UPDATE_COVER_PERIOD } from "../../config/appConfig";
+import { UPDATE_COVER_PERIOD, UPDATE_METADATA_PERIOD } from "../../config/appConfig";
 import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";
@@ -60,17 +60,11 @@ class AlbumDAO {
     });
   }
 
-  public async getMbidlessAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
-    return await albumModel.find({ mbids: { $size: 0 } }).catch((err) => {
-      throw new DAOException(__filename, "getMbidlessAlbumModels", err);
-    });
-  }
-
   public async getUpdatableAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel
       .find({
         $or: [
-          { lastUpdated: { $lt: Date.now() - UPDATE_ALBUM_PERIOD } },
+          { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
           { lastUpdated: { $exists: false } },
           { lastUpdated: null },
         ],

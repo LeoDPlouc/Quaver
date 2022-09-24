@@ -11,10 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module.exports = {
-    DB_VERSION: 4,
-    APP_VERSION: "0.6.3-beta",
-    UPDATE_METADATA_PERIOD: 1000 * 60 * 60 * 24 * 365,
-    UPDATE_COVER_PERIOD: 1000 * 60 * 60 * 24 * 30 * 150,
-    TASK_MANAGER_PERIOD: 1000 * 60
+interface SongData {
+    title?: string,
+    artist?: string,
+    album?: string,
+    year?: number,
+    duration?: number
 }

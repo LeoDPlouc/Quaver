@@ -11,10 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IReleaseList, MusicBrainzApi } from "musicbrainz-api";
+import { ILinkedEntitiesRecording, IRecording, IReleaseList, ISearchResult, MusicBrainzApi } from "musicbrainz-api";
 import { APP_VERSION } from "../../config/appConfig";
 import { logger } from "../../utils/logger";
-import { MusicBrainzException } from "./exceptions/MusicBrainzException";
+import { MusicBrainzException } from "./exceptions/MusicBrainzException"; // DEPRECATED 
+import { MusicBrainzApi as mba } from "musicbrainz-ts";
 
 //DEPRECATED Ne plus exporter lors du nettoyage des dépréciés, mettre dans la class
 export const mbApi = new MusicBrainzApi({
@@ -23,8 +24,10 @@ export const mbApi = new MusicBrainzApi({
   appContactInfo: "https://github.com/LeoDPlouc/Quaver",
 });
 
+const mbApi2 = new mba("Quaver", APP_VERSION, "https://github.com/LeoDPlouc/Quaver")
+
 class MusicBrainzApiAccess {
-  public async getMBId(this: MusicBrainzApiAccess, album: Album): Promise<string[]> {
+  public async getMBId(this: MusicBrainzApiAccess, album: Album): Promise<string[]> { // DEPRECIATED
     //Build query with available info
     let query = `release:${album.title as string}`;
 
@@ -36,6 +39,16 @@ class MusicBrainzApiAccess {
       .search<IReleaseList>("release", { query })
       .then((result) => result.releases.filter((release) => release.score == 100))
       .then((releases) => releases.map((release) => release.id))
+      .catch((err) => {
+        throw new MusicBrainzException(__filename, "getMBId", err);
+      });
+  }
+
+  public async getSongMBId(this: MusicBrainzApiAccess, song: SongData): Promise<string[]> {
+    //Build query with available info
+    return await mbApi2.searchRecording({ recording: song.title, artist: song.artist, release: song.album, date: String(song.year) })
+      .then(result => result.recordings.filter(recording => recording.score == 100))
+      .then(recordings => recordings.map(recording => recording.id))
       .catch((err) => {
         throw new MusicBrainzException(__filename, "getMBId", err);
       });
@@ -57,6 +70,26 @@ class MusicBrainzApiAccess {
     }
 
     return album;
+  }
+
+  public async getSongMetadata(this: MusicBrainzApiAccess, mbids: string[]): Promise<Song> {
+    let song: Song = { path: "dummy-path" };
+
+    for (let i = 0; i < mbids.length; i++) {
+      try {
+        let recording = await mbApi2.lookupRecording({ mbid: mbids[i], inc: ["artists", "releases", "media"] })
+        let release = recording.releases?.find(r => r.date == recording["first-release-date"])
+
+        if (!song.artist) song.artist = recording?.["artist-credit"]?.[0]?.name
+        if (!song.title) song.title = recording.title;
+        if (!song.year) song.year = new Date(recording["first-release-date"]).getFullYear();
+        if (!song.n) song.n = release.media[0].position
+      } catch (err) {
+        logger.error(new MusicBrainzException(__filename, "getSongMetadata", err));
+      }
+    }
+
+    return song;
   }
 }
 

@@ -11,10 +11,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { songDAO } from "../access/database/songDAO";
 import { songFileAccess } from "../access/file/songFile";
 import { mapSong } from "../mappers/songMapper";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
+import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
 
 class SongService {
@@ -67,6 +69,35 @@ class SongService {
     return await songDAO.getAllSongModelPaths().catch((err) => {
       throw new ServiceException(__filename, "getAllSongPaths", err);
     });
+  }
+
+  public async getSongMbids(this: SongService, song: SongData): Promise<string[]> {
+    return await musicBrainzApiAccess.getSongMBId(song).catch(err => {
+      throw new ServiceException(__filename, "getSongMbids", err)
+    })
+  }
+
+  public async getMbidlessSongs(this: SongService): Promise<Song[]> {
+    return await songDAO
+      .getMbidlessSongModels()
+      .then((result) => result.map(mapSong))
+      .catch((err) => {
+        throw new ServiceException(__filename, "getMbidlessSongs", err);
+      });
+  }
+
+  public async metadataGrabberGet(this: SongService): Promise<Song[]> {
+    return await songDAO.metadataGrabberGet()
+      .catch((err) => {
+        throw new ServiceException(__filename, "getUpdatableAlbum", err);
+      });
+  }
+
+  public async getSongMetadata(this: SongService, song: Song): Promise<Song> {
+    return await musicBrainzApiAccess.getSongMetadata(song.mbids)
+      .catch(err => {
+        throw new ServiceException(__filename, "getSongMetadata", err)
+      })
   }
 }
 

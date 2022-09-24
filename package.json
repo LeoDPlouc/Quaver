@@ -30,6 +30,7 @@
     "mongoose": "^5.13.14",
     "music-metadata": "^7.11.4",
     "musicbrainz-api": "^0.7.2",
+    "musicbrainz-ts": "^1.2.2",
     "uuid": "^8.3.2",
     "vue": "^3.2.26",
     "winston": "^3.6.0"
