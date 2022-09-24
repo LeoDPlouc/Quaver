@@ -12,6 +12,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
+import { UPDATE_METADATA_PERIOD } from "../../config/appConfig";
+import { logger } from "../../utils/logger";
 import { DAOException } from "./exceptions/DAOException";
 import { songModel } from "./models/songModel";
 
@@ -62,9 +64,28 @@ class SongDAO {
   }
 
   public async getMbidlessSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
-    return await songModel.find({ mbids: { $size: 0 } }).catch((err) => {
-      throw new DAOException(__filename, "getMbidlessSongModels", err);
-    });
+    return await songModel.find({
+      $or: [
+        { mbids: { $size: 0 } },
+        { mbids: { $exists: false } }
+      ]
+    })
+      .catch((err) => {
+        throw new DAOException(__filename, "getMbidlessSongModels", err);
+      });
+  }
+
+  public async metadataGrabberGet(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
+    return await songModel
+      .find({
+        $or: [
+          { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
+          { lastUpdated: { $exists: false } }
+        ],
+      })
+      .catch((err) => {
+        throw new DAOException(__filename, "getUpdatableAlbumModels", err);
+      });
   }
 }
 

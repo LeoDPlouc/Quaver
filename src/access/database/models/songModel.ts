@@ -55,9 +55,6 @@ const songSchema = new Schema<Song>({
     lastUpdated: {
         type: Number,
     },
-    lastCoverUpdate: {
-        type: Number,
-    },
     mbids: {
         type: [String]
     }

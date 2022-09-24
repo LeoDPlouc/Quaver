@@ -35,6 +35,30 @@ async function grabMbids() { // DEPRECATED
   }
 }
 
+async function updateSongMetadata() {
+  let songs = await songService.metadataGrabberGet();
+
+  for (let i = 0; i < songs.length; i++) {
+    try {
+      if (!songs[i].mbids.length) continue
+
+      let metadata = await songService.getSongMetadata(songs[i]);
+
+      if (metadata.title) songs[i].title = metadata.title;
+      if (metadata.artist) songs[i].artist = metadata.artist;
+      if (metadata.year) songs[i].year = metadata.year;
+      if (metadata.n) songs[i].n = metadata.n
+
+      songs[i].lastUpdated = Date.now();
+
+      await songService.updateSong(songs[i]);
+      logger.info(`Updated metadata for song ${songs[i].id}`, "Metadata Grabber");
+    } catch (err) {
+      logger.error(new TaskException(__filename, "updateSongMetadata", err));
+    }
+  }
+}
+
 async function updateMetadata() {
   let albums = await albumService.getUpdatableAlbum();
 
@@ -59,5 +83,5 @@ async function updateMetadata() {
 export default async function doWork() {
   logger.info("Metadata grabber started", "Metadata Grabber");
   await grabMbids();
-  await updateMetadata();
+  await updateSongMetadata();
 }

@@ -26,4 +26,5 @@ interface Song {
     year?: number,
     format?: string,
     mbids?: string[]
+    lastUpdated?: number
 }

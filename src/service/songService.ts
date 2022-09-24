@@ -16,6 +16,7 @@ import { songDAO } from "../access/database/songDAO";
 import { songFileAccess } from "../access/file/songFile";
 import { mapSong } from "../mappers/songMapper";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
+import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
 
 class SongService {
@@ -83,6 +84,20 @@ class SongService {
       .catch((err) => {
         throw new ServiceException(__filename, "getMbidlessSongs", err);
       });
+  }
+
+  public async metadataGrabberGet(this: SongService): Promise<Song[]> {
+    return await songDAO.metadataGrabberGet()
+      .catch((err) => {
+        throw new ServiceException(__filename, "getUpdatableAlbum", err);
+      });
+  }
+
+  public async getSongMetadata(this: SongService, song: Song): Promise<Song> {
+    return await musicBrainzApiAccess.getSongMetadata(song.mbids)
+      .catch(err => {
+        throw new ServiceException(__filename, "getSongMetadata", err)
+      })
   }
 }
 
