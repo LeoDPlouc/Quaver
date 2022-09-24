@@ -60,12 +60,6 @@ class AlbumDAO {
     });
   }
 
-  public async getMbidlessAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
-    return await albumModel.find({ mbids: { $size: 0 } }).catch((err) => {
-      throw new DAOException(__filename, "getMbidlessAlbumModels", err);
-    });
-  }
-
   public async getUpdatableAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel
       .find({

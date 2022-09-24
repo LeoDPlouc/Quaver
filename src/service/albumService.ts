@@ -75,15 +75,6 @@ class AlbumService {
     });
   }
 
-  public async getMbidlessAlbum(this: AlbumService): Promise<Album[]> {
-    return await albumDAO
-      .getMbidlessAlbumModels()
-      .then((result) => result.map(mapAlbum))
-      .catch((err) => {
-        throw new ServiceException(__filename, "getMbidlessAlbum", err);
-      });
-  }
-
   public async getToCoverGrabAlbums(this: AlbumService): Promise<Album[]> {
     return await albumDAO
       .getToCoverGrabAlbumsModels()

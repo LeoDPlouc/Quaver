@@ -46,19 +46,6 @@ class MusicBrainzApiAccess {
 
   public async getSongMBId(this: MusicBrainzApiAccess, song: SongData): Promise<string[]> {
     //Build query with available info
-
-    let query = `title:${song.title as string}`;
-
-    if (song.artist) {
-      query += ` AND artist:${song.artist}`;
-    }
-    if (song.album) {
-      query += ` AND release:${song.album}`;
-    }
-    if (song.year) {
-      query += ` AND date:${song.year}`;
-    }
-
     return await mbApi2.searchRecording({ recording: song.title, artist: song.artist, release: song.album, date: String(song.year) })
       .then(result => result.recordings.filter(recording => recording.score == 100))
       .then(recordings => recordings.map(recording => recording.id))

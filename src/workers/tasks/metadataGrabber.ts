@@ -12,23 +12,25 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { albumService } from "../../service/albumService";
+import { songService } from "../../service/songService";
 import { logger } from "../../utils/logger";
 import { TaskException } from "./exceptions/taskException";
 
-async function grabMbids() {
-  let albums = await albumService.getMbidlessAlbum();
+async function grabMbids() { // DEPRECATED
+  let songs = await songService.getMbidlessSongs();
 
-  for (let i = 0; i < albums.length; i++) {
+  for (let i = 0; i < songs.length; i++) {
     try {
-      let mbids = await albumService.getAlbumMbid(albums[i]);
+      let mbids = await songService.getSongMbids(songs[i]);
       if (!mbids.length) continue; //Pass if no Mbid have been found
 
-      albums[i].mbids = mbids;
-      await albumService.updateAlbum(albums[i]);
+      songs[i].mbids = mbids;
+      await songService.updateSong(songs[i]);
 
-      logger.info(`Found Mbids for ${albums[i].id}`, "Metadata Grabber");
+      logger.info(`Found Mbids for song ${songs[i].id}`, "Metadata Grabber");
     } catch (err) {
       logger.error(new TaskException(__filename, "grabMbids", err));
+      logger.debug(1, `SongData : ${JSON.stringify(songs[i])}`, "metadataGrabber")
     }
   }
 }

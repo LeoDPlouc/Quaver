@@ -75,6 +75,15 @@ class SongService {
       throw new ServiceException(__filename, "getSongMbids", err)
     })
   }
+
+  public async getMbidlessSongs(this: SongService): Promise<Song[]> {
+    return await songDAO
+      .getMbidlessSongModels()
+      .then((result) => result.map(mapSong))
+      .catch((err) => {
+        throw new ServiceException(__filename, "getMbidlessSongs", err);
+      });
+  }
 }
 
 export const songService = new SongService();

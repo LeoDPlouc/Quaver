@@ -60,6 +60,12 @@ class SongDAO {
         throw new DAOException(__filename, "getAllSongModelPaths", err);
       });
   }
+
+  public async getMbidlessSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
+    return await songModel.find({ mbids: { $size: 0 } }).catch((err) => {
+      throw new DAOException(__filename, "getMbidlessSongModels", err);
+    });
+  }
 }
 
 export const songDAO = new SongDAO();
