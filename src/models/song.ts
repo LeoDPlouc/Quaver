@@ -17,10 +17,12 @@ interface Song {
     n?: number,
     duration?: number,
     like?: number,
-    artist?: string,
-    artistId?: string,
-    album?: string,
-    albumId?: string,
+    artist?: string, // DEPRECATED
+    artistId?: string, // DEPRECATED
+    album?: string, // DEPRECATED
+    albumId?: string, // DEPRECATED
+    albumV2?: Album
+    artistV2?: Artist
     path: string,
     acoustid?: string,
     year?: number,

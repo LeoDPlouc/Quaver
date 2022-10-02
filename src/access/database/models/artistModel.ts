@@ -12,14 +12,18 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Schema, model } from "mongoose"
+import { ArtistDb } from "./interfaces/artistDb"
 
-const artistSchema = new Schema<Artist>({
+const artistSchema = new Schema<ArtistDb>({
     name: {
         type: String
     },
-    cover: {
+    cover: { // DEPRECATED
         type: String
+    },
+    coverObjectId: {
+        type: Schema.Types.ObjectId
     }
 })
 
-export const artistModel = model<Artist>("Artist", artistSchema)
+export const artistModel = model<ArtistDb>("Artist", artistSchema)

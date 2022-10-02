@@ -12,8 +12,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Schema, model } from "mongoose"
+import { SongDb } from "./interfaces/songDb"
 
-const songSchema = new Schema<Song>({
+const songSchema = new Schema<SongDb>({
     title: {
         type: String
     },
@@ -33,11 +34,14 @@ const songSchema = new Schema<Song>({
     artistId: {
         type: String
     },
-    album: {
+    album: { // DEPRECATED
         type: String
     },
-    albumId: {
+    albumId: { // DEPRECATED
         type: String
+    },
+    albumObjectId: {
+        type: Schema.Types.ObjectId
     },
     path: {
         type: String,
@@ -59,4 +63,4 @@ const songSchema = new Schema<Song>({
         type: [String]
     }
 })
-export const songModel = model<Song>("Song", songSchema)
+export const songModel = model<SongDb>("Song", songSchema)
