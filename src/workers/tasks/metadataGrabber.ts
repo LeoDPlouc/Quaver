@@ -82,6 +82,10 @@ async function updateMetadata() {
 
 export default async function doWork() {
   logger.info("Metadata grabber started", "Metadata Grabber");
-  await grabMbids();
-  await updateSongMetadata();
+  try {
+    await grabMbids();
+    await updateSongMetadata();
+  } catch (err) {
+    logger.error(new TaskException(__filename, "doWork", err))
+  }
 }

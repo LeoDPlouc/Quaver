@@ -13,21 +13,26 @@
 
 import { Document } from "mongoose";
 import { UPDATE_METADATA_PERIOD } from "../../config/appConfig";
-import { logger } from "../../utils/logger";
 import { DAOException } from "./exceptions/DAOException";
 import { songModel } from "./models/songModel";
 
 class SongDAO {
   public async getAllSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
-    return await songModel.find().catch((err) => {
-      throw new DAOException(__filename, "getAllSongModels", err);
-    });
+    return await songModel.find()
+      .populate<Pick<Song, "albumV2">>("albumObjectId")
+      .populate<Pick<Song, "artistV2">>("artistObjectId")
+      .catch((err) => {
+        throw new DAOException(__filename, "getAllSongModels", err);
+      });
   }
 
   public async getSongModel(this: SongDAO, id: string): Promise<Song & Document<any, any, Song>> {
-    return await songModel.findById(id).catch((err) => {
-      throw new DAOException(__filename, "getSongModel", err);
-    });
+    return await songModel.findById(id)
+      .populate<Pick<Song, "albumV2">>("albumObjectId")
+      .populate<Pick<Song, "artistV2">>("artistObjectId")
+      .catch((err) => {
+        throw new DAOException(__filename, "getSongModel", err);
+      });
   }
 
   public async updateSongModel(this: SongDAO, song: Song): Promise<void> {
@@ -48,6 +53,8 @@ class SongDAO {
   public async findSongModelByPath(this: SongDAO, path: string): Promise<Song & Document<any, any, Song>> {
     return await songModel
       .find({ path })
+      .populate<Pick<Song, "albumV2">>("albumObjectId")
+      .populate<Pick<Song, "artistV2">>("artistObjectId")
       .then((s) => s[0])
       .catch((err) => {
         throw new DAOException(__filename, "findSongModelByPath", err);
@@ -70,6 +77,8 @@ class SongDAO {
         { mbids: { $exists: false } }
       ]
     })
+      .populate<Pick<Song, "albumV2">>("albumObjectId")
+      .populate<Pick<Song, "artistV2">>("artistObjectId")
       .catch((err) => {
         throw new DAOException(__filename, "getMbidlessSongModels", err);
       });
@@ -83,6 +92,8 @@ class SongDAO {
           { lastUpdated: { $exists: false } }
         ],
       })
+      .populate<Pick<Song, "albumV2">>("albumObjectId")
+      .populate<Pick<Song, "artistV2">>("artistObjectId")
       .catch((err) => {
         throw new DAOException(__filename, "getUpdatableAlbumModels", err);
       });

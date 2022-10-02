@@ -43,6 +43,9 @@ const songSchema = new Schema<SongDb>({
     albumObjectId: {
         type: Schema.Types.ObjectId
     },
+    artistObjectId: {
+        type: Schema.Types.ObjectId
+    },
     path: {
         type: String,
         require: [true, "Song must have a path"]
