@@ -17,7 +17,8 @@ export function mapArtist(data: Artist & Document<any, any, Artist>): Artist {
     let cleanedData: Artist = {
         id: data.id,
         name: data.name,
-        cover: data.cover
+        cover: data.cover, // DEPRECATED
+        coverV2: data.coverV2
     }
     return cleanedData
 }

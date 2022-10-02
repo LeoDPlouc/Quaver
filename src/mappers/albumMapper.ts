@@ -17,9 +17,13 @@ export function mapAlbum(data: Album & Document<any, any, Album>): Album {
     let cleanedData: Album = {
         id: data.id,
         title: data.title,
-        artist: data.artist,
-        artistId: data.artistId,
-        cover: data.cover,
+        artist: data.artist, // DEPRECATED
+        artistId: data.artistId, // DEPRECATED
+        cover: data.cover, // DEPRECATED
+        artistV2: data.artistV2,
+        coverV2: data.coverV2,
+        lastCoverUpdate: data.lastCoverUpdate,
+        lastUpdated: data.lastUpdated,
         year: data.year,
         mbid: data.mbid,
         mbids: data.mbids

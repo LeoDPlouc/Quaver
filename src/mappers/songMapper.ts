@@ -27,7 +27,11 @@ export function mapSong(data: Song & Document<any, any, Song>): Song {
         path: data.path,
         acoustid: data.acoustid,
         year: data.year,
-        format: data.format
+        format: data.format,
+        albumV2: data.albumV2,
+        artistV2: data.artistV2,
+        lastUpdated: data.lastUpdated,
+        mbids: data.mbids
     }
     return cleanedData
 }
