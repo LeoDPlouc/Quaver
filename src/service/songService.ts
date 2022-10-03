@@ -13,10 +13,8 @@
 
 import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { songDAO } from "../access/database/songDAO";
-import { songFileAccess } from "../access/file/songFile";
 import { mapSong } from "../mappers/songMapper";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
-import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
 
 class SongService {
@@ -71,9 +69,9 @@ class SongService {
     });
   }
 
-  public async getSongMbids(this: SongService, song: SongData): Promise<string[]> {
+  public async getSongMbid(this: SongService, song: SongData): Promise<string> {
     return await musicBrainzApiAccess.getSongMBId(song).catch(err => {
-      throw new ServiceException(__filename, "getSongMbids", err)
+      throw new ServiceException(__filename, "getSongMbid", err)
     })
   }
 
@@ -94,7 +92,7 @@ class SongService {
   }
 
   public async getSongMetadata(this: SongService, song: Song): Promise<Song> {
-    return await musicBrainzApiAccess.getSongMetadata(song.mbids)
+    return await musicBrainzApiAccess.getSongMetadata(song.mbid)
       .catch(err => {
         throw new ServiceException(__filename, "getSongMetadata", err)
       })

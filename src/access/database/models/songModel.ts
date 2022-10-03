@@ -62,8 +62,8 @@ const songSchema = new Schema<SongDb>({
     lastUpdated: {
         type: Number,
     },
-    mbids: {
-        type: [String]
+    mbid: {
+        type: String
     }
 })
 export const songModel = model<SongDb>("Song", songSchema)

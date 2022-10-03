@@ -44,13 +44,13 @@ class MusicBrainzApiAccess {
       });
   }
 
-  public async getSongMBId(this: MusicBrainzApiAccess, song: SongData): Promise<string[]> {
+  public async getSongMBId(this: MusicBrainzApiAccess, song: SongData): Promise<string> {
     //Build query with available info
     return await mbApi2.searchRecording({ recording: song.title, artist: song.artist, release: song.album, date: String(song.year) })
-      .then(result => result.recordings.filter(recording => recording.score == 100))
-      .then(recordings => recordings.map(recording => recording.id))
+      .then(result => result.recordings.find(recording => recording.score == 100))
+      .then(recording => recording ? recording.id : null)
       .catch((err) => {
-        throw new MusicBrainzException(__filename, "getMBId", err);
+        throw new MusicBrainzException(__filename, "getSongMBId", err);
       });
   }
 
@@ -72,21 +72,19 @@ class MusicBrainzApiAccess {
     return album;
   }
 
-  public async getSongMetadata(this: MusicBrainzApiAccess, mbids: string[]): Promise<Song> {
+  public async getSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<Song> {
     let song: Song = { path: "dummy-path" };
 
-    for (let i = 0; i < mbids.length; i++) {
-      try {
-        let recording = await mbApi2.lookupRecording({ mbid: mbids[i], inc: ["artists", "releases", "media"] })
-        let release = recording.releases?.find(r => r.date == recording["first-release-date"])
+    try {
+      let recording = await mbApi2.lookupRecording({ mbid: mbid, inc: ["artists", "releases", "media"] })
+      let release = recording.releases?.find(r => r.date == recording["first-release-date"])
 
-        if (!song.artist) song.artist = recording?.["artist-credit"]?.[0]?.name
-        if (!song.title) song.title = recording.title;
-        if (!song.year) song.year = new Date(recording["first-release-date"]).getFullYear();
-        if (!song.n) song.n = release.media[0].position
-      } catch (err) {
-        logger.error(new MusicBrainzException(__filename, "getSongMetadata", err));
-      }
+      if (!song.artist) song.artist = recording?.["artist-credit"]?.[0]?.name
+      if (!song.title) song.title = recording.title;
+      if (!song.year) song.year = new Date(recording["first-release-date"]).getFullYear();
+      if (!song.n) song.n = release.media[0].position
+    } catch (err) {
+      logger.error(new MusicBrainzException(__filename, "getSongMetadata", err));
     }
 
     return song;

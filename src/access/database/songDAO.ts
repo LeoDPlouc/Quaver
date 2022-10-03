@@ -72,10 +72,7 @@ class SongDAO {
 
   public async getMbidlessSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find({
-      $or: [
-        { mbids: { $size: 0 } },
-        { mbids: { $exists: false } }
-      ]
+      mbid: { $exists: false }
     })
       .populate<Pick<Song, "albumV2">>("albumObjectId")
       .populate<Pick<Song, "artistV2">>("artistObjectId")

@@ -12,24 +12,26 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { albumService } from "../../service/albumService";
+import { fileService } from "../../service/fileService";
 import { songService } from "../../service/songService";
 import { logger } from "../../utils/logger";
 import { TaskException } from "./exceptions/taskException";
 
-async function grabMbids() { // DEPRECATED
+async function grabMbid() {
   let songs = await songService.getMbidlessSongs();
 
   for (let i = 0; i < songs.length; i++) {
     try {
-      let mbids = await songService.getSongMbids(songs[i]);
-      if (!mbids.length) continue; //Pass if no Mbid have been found
+      let songData = await fileService.getMetadataFromFile(songs[i].path)
+      let mbid = await songService.getSongMbid(songData);
+      if (!mbid) continue; //Pass if no Mbid have been found
 
-      songs[i].mbids = mbids;
+      songs[i].mbid = mbid;
       await songService.updateSong(songs[i]);
 
-      logger.info(`Found Mbids for song ${songs[i].id}`, "Metadata Grabber");
+      logger.info(`Found Mbid for song ${songs[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logger.error(new TaskException(__filename, "grabMbids", err));
+      logger.error(new TaskException(__filename, "grabMbid", err));
       logger.debug(1, `SongData : ${JSON.stringify(songs[i])}`, "metadataGrabber")
     }
   }
@@ -40,7 +42,7 @@ async function updateSongMetadata() {
 
   for (let i = 0; i < songs.length; i++) {
     try {
-      if (!songs[i].mbids.length) continue
+      if (!songs[i].mbid) continue
 
       let metadata = await songService.getSongMetadata(songs[i]);
 
@@ -83,7 +85,7 @@ async function updateMetadata() {
 export default async function doWork() {
   logger.info("Metadata grabber started", "Metadata Grabber");
   try {
-    await grabMbids();
+    await grabMbid();
     await updateSongMetadata();
   } catch (err) {
     logger.error(new TaskException(__filename, "doWork", err))

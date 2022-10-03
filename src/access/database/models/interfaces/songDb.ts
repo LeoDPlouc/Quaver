@@ -28,6 +28,6 @@ export interface SongDb {
     acoustid?: string,
     year?: number,
     format?: string,
-    mbids?: string[]
+    mbid?: string
     lastUpdated?: number
 }

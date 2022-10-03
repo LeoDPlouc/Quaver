@@ -31,7 +31,7 @@ export function mapSong(data: Song & Document<any, any, Song>): Song {
         albumV2: data.albumV2,
         artistV2: data.artistV2,
         lastUpdated: data.lastUpdated,
-        mbids: data.mbids
+        mbid: data.mbid
     }
     return cleanedData
 }
