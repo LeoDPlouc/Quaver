@@ -15,7 +15,7 @@ import { coverArtArchiveAccess } from "../access/api/coverArtArchive";
 import { imageFileData } from "../access/api/DTO/ImageFileData";
 import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { albumDAO } from "../access/database/albumDAO";
-import { mapAlbum } from "../mappers/albumMapper";
+import { mapAlbum, mapAlbumDb } from "../mappers/albumMapper";
 import { mapSong } from "../mappers/songMapper";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
@@ -55,9 +55,10 @@ class AlbumService {
   }
 
   public async createAlbum(this: AlbumService, album: Album): Promise<string> {
-    return await albumDAO.createAlbumModel(album).catch((err) => {
-      throw new ServiceException(__filename, "createAlbum", err);
-    });
+    return await albumDAO.createAlbumModel(album)
+      .catch((err) => {
+        throw new ServiceException(__filename, "createAlbum", err);
+      });
   }
 
   public async findAlbumByName(this: AlbumService, albumTitle: string, artistName?: string): Promise<Album[]> {
@@ -70,9 +71,10 @@ class AlbumService {
   }
 
   public async updateAlbum(this: AlbumService, album: Album): Promise<void> {
-    await albumDAO.updateAlbumModel(album).catch((err) => {
-      throw new ServiceException(__filename, "updateAlbum", err);
-    });
+    await albumDAO.updateAlbumModel(album)
+      .catch((err) => {
+        throw new ServiceException(__filename, "updateAlbum", err);
+      });
   }
 
   public async getToCoverGrabAlbums(this: AlbumService): Promise<Album[]> {

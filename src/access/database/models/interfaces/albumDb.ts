@@ -11,18 +11,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 
 export interface AlbumDb {
   title?: string;
   artist?: string; // DEPRECATED
   artistId?: string; // DEPRECATED
-  artistObjectId?: ObjectId
-  coverObjectId?: ObjectId
+  artistsObjectId?: Types.ObjectId[]
+  coverObjectId?: Types.ObjectId
   cover?: string;// DEPRECATED
   year?: number;
   mbid?: string;
-  mbids?: string[];
+  mbids?: string[]; // DEPRECATED
   lastUpdated?: number;
   lastCoverUpdate?: number;
 }

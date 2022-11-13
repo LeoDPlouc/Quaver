@@ -22,7 +22,7 @@ interface Song {
     album?: string, // DEPRECATED
     albumId?: string, // DEPRECATED
     albumV2?: Album
-    artistV2?: Artist
+    artists?: Artist[]
     path: string,
     acoustid?: string,
     year?: number,

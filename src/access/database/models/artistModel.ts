@@ -23,6 +23,9 @@ const artistSchema = new Schema<ArtistDb>({
     },
     coverObjectId: {
         type: Schema.Types.ObjectId
+    },
+    mbid: {
+        type: String
     }
 })
 

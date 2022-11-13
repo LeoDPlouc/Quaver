@@ -16,4 +16,5 @@ interface Artist {
     name?: string
     cover?: string // DEPRECATED
     coverV2?: Image
+    mbid?: string
 }

@@ -11,7 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document } from "mongoose"
+import { Document, Schema, Types } from "mongoose"
+import { AlbumDb } from "../access/database/models/interfaces/albumDb"
 
 export function mapAlbum(data: Album & Document<any, any, Album>): Album {
     let cleanedData: Album = {
@@ -20,7 +21,7 @@ export function mapAlbum(data: Album & Document<any, any, Album>): Album {
         artist: data.artist, // DEPRECATED
         artistId: data.artistId, // DEPRECATED
         cover: data.cover, // DEPRECATED
-        artistV2: data.artistV2,
+        artists: data.artists,
         coverV2: data.coverV2,
         lastCoverUpdate: data.lastCoverUpdate,
         lastUpdated: data.lastUpdated,
@@ -40,5 +41,23 @@ export function mapAlbumDTO(data: Album): AlbumDTO {
         cover: data.cover,
         year: data.year
     }
+    return cleanedData
+}
+
+export function mapAlbumDb(data: Album): AlbumDb {
+    let cleanedData: AlbumDb = {
+        artist: data.artist, // DEPRECATED
+        artistId: data.artistId, // DEPRECATED
+        artistsObjectId: data.artists?.map(a => new Types.ObjectId(a.id)),
+        cover: data.cover, // DERECATED
+        coverObjectId: new Types.ObjectId(data.coverV2?.id),
+        lastCoverUpdate: data.lastCoverUpdate,
+        lastUpdated: data.lastUpdated,
+        mbid: data.mbid,
+        mbids: data.mbids, // DEPRECATED
+        title: data.title,
+        year: data.year
+    }
+
     return cleanedData
 }

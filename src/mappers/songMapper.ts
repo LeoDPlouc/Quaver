@@ -11,7 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document } from "mongoose"
+import { Document, Schema, Types } from "mongoose"
+import { SongDb } from "../access/database/models/interfaces/songDb"
 
 export function mapSong(data: Song & Document<any, any, Song>): Song {
     let cleanedData: Song = {
@@ -20,16 +21,16 @@ export function mapSong(data: Song & Document<any, any, Song>): Song {
         n: data.n,
         duration: data.duration,
         like: data.like,
-        artist: data.artist,
-        artistId: data.artistId,
-        album: data.album,
-        albumId: data.albumId,
+        artist: data.artist, // DEPRECATED
+        artistId: data.artistId, // DEPRECATED
+        album: data.album, // DEPRECATED
+        albumId: data.albumId, // DEPRECATED
         path: data.path,
         acoustid: data.acoustid,
         year: data.year,
         format: data.format,
         albumV2: data.albumV2,
-        artistV2: data.artistV2,
+        artists: data.artists,
         lastUpdated: data.lastUpdated,
         mbid: data.mbid
     }
@@ -50,5 +51,28 @@ export function mapSongDTO(data: Song): SongDTO {
         year: data.year,
         format: data.format
     }
+    return cleanedData
+}
+
+export function mapSongDb(data: Song): SongDb {
+    let cleanedData: SongDb = {
+        path: data.path,
+        acoustid: data.acoustid,
+        album: data.album, // DEPRECATED
+        albumId: data.albumId, // DEPRECATED
+        albumObjectId: new Types.ObjectId(data.albumV2?.id),
+        artist: data.artist, // DEPRECATED
+        artistId: data.artistId, // DEPRECATED
+        artistsObjectId: data.artists?.map(a => new Types.ObjectId(a.id)),
+        duration: data.duration,
+        format: data.format,
+        lastUpdated: data.lastUpdated,
+        like: data.like,
+        mbid: data.mbid,
+        n: data.n,
+        title: data.title,
+        year: data.year
+    }
+
     return cleanedData
 }

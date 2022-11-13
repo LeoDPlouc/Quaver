@@ -11,7 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ObjectId } from "mongoose"
+import { Types } from "mongoose"
+
 
 export interface SongDb {
     title?: string,
@@ -22,8 +23,8 @@ export interface SongDb {
     artistId?: string, // DEPRECATED
     album?: string, // DEPRECATED
     albumId?: string, // DEPRECATED
-    artistObjectId?: ObjectId
-    albumObjectId?: ObjectId
+    artistsObjectId?: Types.ObjectId[]
+    albumObjectId?: Types.ObjectId
     path: string,
     acoustid?: string,
     year?: number,

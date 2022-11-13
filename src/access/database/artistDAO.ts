@@ -12,6 +12,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
+import { mapAlbumDb } from "../../mappers/albumMapper";
+import { mapArtistDb } from "../../mappers/artistMapper";
 import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
 import { artistModel } from "./models/artistModel";
@@ -36,8 +38,8 @@ class ArtistDAO {
 
   public async getArtistSongModels(this: ArtistDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find({ artistId: id })
-    .populate<Pick<Song, "albumV2">>("albumObjectId")
-    .populate<Pick<Song, "artistV2">>("artistObjectId")
+      .populate<Pick<Song, "albumV2">>("albumObjectId")
+      .populate<Pick<Song, "artists">>("artistsObjectId")
       .catch((err) => {
         throw new DAOException(__filename, "getArtistSongModels", err);
       });
@@ -45,7 +47,7 @@ class ArtistDAO {
 
   public async getArtistAlbumModels(this: ArtistDAO, id: string): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find({ artistId: id })
-      .populate<Pick<Album, "artistV2">>("artistObjectId")
+      .populate<Pick<Album, "artists">>("artistsObjectId")
       .populate<Pick<Album, "coverV2">>("coverObjectId").catch((err) => {
         throw new DAOException(__filename, "getArtistAlbumModels", err);
       });
@@ -53,7 +55,7 @@ class ArtistDAO {
 
   public async createArtistModel(this: ArtistDAO, artist: Artist): Promise<string> {
     return await artistModel
-      .create(artist)
+      .create(mapArtistDb(artist))
       .then((a) => a.id)
       .catch((err) => {
         throw new DAOException(__filename, "createArtistModel", err);
@@ -69,7 +71,7 @@ class ArtistDAO {
   }
 
   public async updateArtistModel(this: ArtistDAO, artist: Artist): Promise<void> {
-    await artistModel.findByIdAndUpdate(artist.id, artist).catch((err) => {
+    await artistModel.findByIdAndUpdate(artist.id, mapAlbumDb(artist)).catch((err) => {
       throw new DAOException(__filename, "updateArtistModel", err);
     });
   }

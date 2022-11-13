@@ -40,15 +40,17 @@ class SongService {
   }
 
   public async updateSong(this: SongService, song: Song): Promise<void> {
-    await songDAO.updateSongModel(song).catch((err) => {
-      throw new ServiceException(__filename, "updateSong", err);
-    });
+    await songDAO.updateSongModel(song)
+      .catch((err) => {
+        throw new ServiceException(__filename, "updateSong", err);
+      });
   }
 
   public async createSong(this: SongService, song: Song): Promise<string> {
-    return await songDAO.createSongModel(song).catch((err) => {
-      throw new ServiceException(__filename, "createSong", err);
-    });
+    return await songDAO.createSongModel(song)
+      .catch((err) => {
+        throw new ServiceException(__filename, "createSong", err);
+      });
   }
 
   public async findSongByPath(this: SongService, path: string): Promise<Song> {

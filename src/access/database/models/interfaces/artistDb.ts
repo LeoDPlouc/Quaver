@@ -11,10 +11,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ObjectId } from "mongoose"
+import { Types } from "mongoose"
+
 
 export interface ArtistDb {
     name?: string
     cover?: string // DEPRECATED
-    coverObjectId?: ObjectId
+    coverObjectId?: Types.ObjectId
+    mbid?: string
 }

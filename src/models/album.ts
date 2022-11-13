@@ -16,12 +16,12 @@ interface Album {
   title?: string;
   artist?: string; // DEPRECATED
   artistId?: string; // DEPRECATED
-  artistV2?: Artist
+  artists?: Artist[]
   coverV2?: Image
   cover?: string; // DEPRECATED
   year?: number;
   mbid?: string;
-  mbids?: string[];
+  mbids?: string[]; // DEPRECATED
   lastUpdated?: number;
   lastCoverUpdate?: number;
 }

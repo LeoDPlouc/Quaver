@@ -27,8 +27,8 @@ const albumSchema = new Schema<AlbumDb>({
   cover: { // DEPRECATED
     type: String,
   },
-  artistObjectId: {
-    type: Schema.Types.ObjectId
+  artistsObjectId: {
+    type: [Schema.Types.ObjectId]
   },
   coverObjectId: {
     type: Schema.Types.ObjectId
