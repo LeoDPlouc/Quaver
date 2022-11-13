@@ -92,8 +92,8 @@ class AlbumService {
     });
   }
 
-  public async getAlbumMetadata(this: AlbumService, album: Album): Promise<Album> {
-    return await musicBrainzApiAccess.getMetadataFromMB(album.mbids);
+  public async getAlbumMetadata(this: AlbumService, album: Album): Promise<{ album: Album, artistsMbid: string[] }> {
+    return await musicBrainzApiAccess.getAlbumMetadata(album.mbid);
   }
 
   public async getUpdatableAlbum(this: AlbumService): Promise<Album[]> {
@@ -119,6 +119,14 @@ class AlbumService {
       await this.createAlbum({ mbid })
       return { mbid }
     }
+  }
+
+  public async metadataGrabberGet(this: AlbumService): Promise<Album[]> {
+    return await albumDAO.metadataGrabberGet()
+      .then(results => results.map(mapAlbum))
+      .catch(err => {
+        throw new ServiceException(__filename, "metadataGrabberGet", err)
+      })
   }
 }
 

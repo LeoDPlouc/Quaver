@@ -65,23 +65,27 @@ async function updateSongMetadata() {
   }
 }
 
-async function updateMetadata() {
-  let albums = await albumService.getUpdatableAlbum();
+async function updateAlbumMetadata() {
+  let albums = await albumService.metadataGrabberGet()
 
   for (let i = 0; i < albums.length; i++) {
     try {
-      let metadata = await albumService.getAlbumMetadata(albums[i]);
+      if (!albums[i].mbid) continue
 
-      if (metadata.title) albums[i].title = metadata.title;
-      if (metadata.artist) albums[i].artist = metadata.artist;
-      if (metadata.year) albums[i].year = metadata.year;
+      let { album, artistsMbid } = await albumService.getAlbumMetadata(albums[i])
 
-      albums[i].lastUpdated = Date.now();
+      if (album.artist) albums[i].artist = album.artist
+      if (album.title) albums[i].title = album.title
+      if (album.year) albums[i].year = album.year
 
-      await albumService.updateAlbum(albums[i]);
-      logger.info(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
+      albums[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
+
+      albums[i].lastUpdated = Date.now()
+
+      await albumService.updateAlbum(albums[i])
+      logger.info(`Updated metadata for album ${albums[i].id}`, "Metadata Grabber")
     } catch (err) {
-      logger.error(new TaskException(__filename, "updateMetadata", err));
+      logger.error(new TaskException(__filename, "updateAlbumMetadata", err))
     }
   }
 }
@@ -91,6 +95,7 @@ export default async function doWork() {
   try {
     await grabMbid();
     await updateSongMetadata();
+    await updateAlbumMetadata()
   } catch (err) {
     logger.error(new TaskException(__filename, "doWork", err))
   }

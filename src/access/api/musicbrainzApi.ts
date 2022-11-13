@@ -54,24 +54,6 @@ class MusicBrainzApiAccess {
       });
   }
 
-  public async getMetadataFromMB(this: MusicBrainzApiAccess, mbids: string[]): Promise<Album> {
-    let album: Album = {};
-
-    for (let i = 0; i < mbids.length; i++) {
-      try {
-        let release = await mbApi.getRelease(mbids[i]);
-
-        if (!album.artist) album.artist = release["artist-credit"]?.[0]?.name;
-        if (!album.title) album.title = release.title;
-        if (!album.year) album.year = new Date(release.date).getFullYear();
-      } catch (err) {
-        logger.error(new MusicBrainzException(__filename, "getMetadataFromMB", err));
-      }
-    }
-
-    return album;
-  }
-
   public async getSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<{ song: Song, albumMbid: string, artistsMbid: string[] }> {
     let song: Song = { path: "dummy-path" };
 
@@ -79,7 +61,7 @@ class MusicBrainzApiAccess {
       let recording = await mbApi2.lookupRecording({ mbid: mbid, inc: ["artists", "releases", "media"] })
       let release = recording.releases?.find(r => r.date == recording["first-release-date"])
       let artists = recording["artist-credit"]
-      
+
       song.artist = recording?.["artist-credit"]?.[0]?.name
       song.title = recording.title;
       song.year = new Date(recording["first-release-date"]).getFullYear();
@@ -92,6 +74,25 @@ class MusicBrainzApiAccess {
     }
 
     return { song, albumMbid, artistsMbid }
+  }
+
+  public async getAlbumMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<{ album: Album, artistsMbid: string[] }> {
+    let album: Album = {};
+
+    try {
+      let release = await mbApi2.lookupRelease({ mbid: mbid, inc: ["artists", "artist-credits"] })
+      let artists = release["artist-credit"]
+
+      album.artist = release["artist-credit"]?.[0]?.name;
+      album.title = release.title;
+      album.year = new Date(release.date).getFullYear();
+
+      var artistsMbid = artists.map(a => a.artist.id)
+    } catch (err) {
+      logger.error(new MusicBrainzException(__filename, "getAlbumMetadata", err));
+    }
+
+    return { album, artistsMbid };
   }
 }
 

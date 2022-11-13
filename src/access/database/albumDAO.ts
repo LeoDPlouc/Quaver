@@ -110,6 +110,21 @@ class AlbumDAO {
         throw new DAOException(__filename, "findAlbumsByMbid", err);
       });
   }
+
+  public async metadataGrabberGet(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel
+      .find({
+        $or: [
+          { lastUpdated: null },
+          { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
+        ],
+      })
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .catch(err => {
+        throw new DAOException(__filename, "metadataGrabberGet", err)
+      })
+  }
 }
 
 export const albumDAO = new AlbumDAO();
