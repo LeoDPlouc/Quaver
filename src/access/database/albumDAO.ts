@@ -101,6 +101,15 @@ class AlbumDAO {
         throw new DAOException(__filename, "getToCoverGrabAlbumsModels", err);
       });
   }
+
+  public async findAlbumsByMbid(this: AlbumDAO, mbid: string): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel.find({ mbid: mbid })
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .catch((err) => {
+        throw new DAOException(__filename, "findAlbumsByMbid", err);
+      });
+  }
 }
 
 export const albumDAO = new AlbumDAO();

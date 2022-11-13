@@ -75,6 +75,16 @@ class ArtistDAO {
       throw new DAOException(__filename, "updateArtistModel", err);
     });
   }
+
+  public async findArtistsByMbids(this: ArtistDAO, mbids: string[]): Promise<(Artist & Document<any, any, Artist>)[]> {
+    return await artistModel.find({
+      mbid: { $in: mbids }
+    })
+      .populate<Pick<Artist, "coverV2">>("coverObjectId")
+      .catch((err) => {
+        throw new DAOException(__filename, "findArtistsByMbids", err)
+      })
+  }
 }
 
 export const artistDAO = new ArtistDAO();

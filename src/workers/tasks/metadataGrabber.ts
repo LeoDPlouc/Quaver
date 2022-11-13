@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { albumService } from "../../service/albumService";
+import { artistService } from "../../service/artistService";
 import { fileService } from "../../service/fileService";
 import { songService } from "../../service/songService";
 import { logger } from "../../utils/logger";
@@ -44,12 +45,15 @@ async function updateSongMetadata() {
     try {
       if (!songs[i].mbid) continue
 
-      let metadata = await songService.getSongMetadata(songs[i]);
+      let { song, albumMbid, artistsMbid } = await songService.getSongMetadata(songs[i]);
 
-      if (metadata.title) songs[i].title = metadata.title;
-      if (metadata.artist) songs[i].artist = metadata.artist;
-      if (metadata.year) songs[i].year = metadata.year;
-      if (metadata.n) songs[i].n = metadata.n
+      if (song.title) songs[i].title = song.title;
+      if (song.artist) songs[i].artist = song.artist;
+      if (song.year) songs[i].year = song.year;
+      if (song.n) songs[i].n = song.n
+
+      songs[i].albumV2 = await albumService.getAlbumByMbidOrCreate(albumMbid)
+      songs[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
 
       songs[i].lastUpdated = Date.now();
 

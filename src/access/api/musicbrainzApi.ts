@@ -72,22 +72,26 @@ class MusicBrainzApiAccess {
     return album;
   }
 
-  public async getSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<Song> {
+  public async getSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<{ song: Song, albumMbid: string, artistsMbid: string[] }> {
     let song: Song = { path: "dummy-path" };
 
     try {
       let recording = await mbApi2.lookupRecording({ mbid: mbid, inc: ["artists", "releases", "media"] })
       let release = recording.releases?.find(r => r.date == recording["first-release-date"])
+      let artists = recording["artist-credit"]
+      
+      song.artist = recording?.["artist-credit"]?.[0]?.name
+      song.title = recording.title;
+      song.year = new Date(recording["first-release-date"]).getFullYear();
+      song.n = release.media[0].position
 
-      if (!song.artist) song.artist = recording?.["artist-credit"]?.[0]?.name
-      if (!song.title) song.title = recording.title;
-      if (!song.year) song.year = new Date(recording["first-release-date"]).getFullYear();
-      if (!song.n) song.n = release.media[0].position
+      var albumMbid = release.id
+      var artistsMbid = artists.map(a => a.artist.id)
     } catch (err) {
       logger.error(new MusicBrainzException(__filename, "getSongMetadata", err));
     }
 
-    return song;
+    return { song, albumMbid, artistsMbid }
   }
 }
 

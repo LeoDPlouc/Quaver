@@ -105,6 +105,21 @@ class AlbumService {
   public async getCover(this: AlbumService, album: Album): Promise<imageFileData> {
     return await coverArtArchiveAccess.getAlbumCover(album.mbids);
   }
+
+  public async getAlbumByMbidOrCreate(this: AlbumService, mbid: string): Promise<Album> {
+    let albums = await albumDAO.findAlbumsByMbid(mbid)
+      .then(results => results.map(mapAlbum))
+      .catch((err) => {
+        throw new ServiceException(__filename, "findAlbumsByMbid", err);
+      });
+
+    if (albums.length) {
+      return albums[0]
+    } else {
+      await this.createAlbum({ mbid })
+      return { mbid }
+    }
+  }
 }
 
 export const albumService = new AlbumService();

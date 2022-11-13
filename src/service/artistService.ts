@@ -83,6 +83,23 @@ class ArtistService {
         throw new ServiceException(__filename, "updateArtist", err);
       });
   }
+
+  public async getArtistsByMbidOrCreate(this: ArtistService, mbids: string[]): Promise<Artist[]> {
+    let artists = await artistDAO.findArtistsByMbids(mbids)
+      .then(results => results.map(mapArtist))
+      .catch((err) => {
+        throw new ServiceException(__filename, "getArtistsByMbidOrCreate", err);
+      });
+
+    if (artists.length) {
+      return artists
+    } else {
+      for (let i = 0; i < mbids.length; i++) {
+        await this.createArtist({ mbid: mbids[i] })
+      }
+      return mbids.map(mbid => { return { mbid } })
+    }
+  }
 }
 
 export const artistService = new ArtistService();
