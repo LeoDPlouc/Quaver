@@ -46,7 +46,7 @@ async function updateAlbumCover(album: Album) {
       verylarge: verylargePath,
     });
 
-    album.cover = id;
+    album.coverV2 = await imageService.getImage(id)
     album.lastCoverUpdate = Date.now();
     albumService.updateAlbum(album);
     logger.info(`Updated cover of album ${album.id}`, "Cover Grabber");
@@ -60,8 +60,9 @@ export default async function doWork() {
   let albums = await albumService.getToCoverGrabAlbums();
 
   for (let i = 0; i < albums.length; i++) {
-    await updateAlbumCover(albums[i]).catch((err) => {
-      logger.error(new TaskException(__filename, "doWork", err));
-    });
+    await updateAlbumCover(albums[i])
+      .catch((err) => {
+        logger.error(new TaskException(__filename, "doWork", err));
+      });
   }
 }

@@ -13,8 +13,8 @@
 
 import { Exception } from "../../../utils/Exception"
 
-export class MusicBrainzException extends Exception {
+export class CoverArtArchiveException extends Exception {
     public override getType(): string {
-        return "MusicBrainz Exception"
+        return "CoverArtArchive Exception"
     }
 }

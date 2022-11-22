@@ -104,7 +104,10 @@ class AlbumService {
   }
 
   public async getCover(this: AlbumService, album: Album): Promise<imageFileData> {
-    return await coverArtArchiveAccess.getAlbumCover(album.mbids);
+    return await coverArtArchiveAccess.getAlbumCover(album.mbid)
+      .catch(err => {
+        throw new ServiceException(__filename, "getCover", err)
+      })
   }
 
   public async getAlbumByMbidOrCreate(this: AlbumService, mbid: string): Promise<Album> {

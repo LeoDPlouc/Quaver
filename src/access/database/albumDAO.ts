@@ -93,10 +93,9 @@ class AlbumDAO {
     return await albumModel
       .find({
         $or: [
-          { cover: { $eq: null } },
+          { coverV2: { $eq: null } },
           { lastCoverUpdate: null },
           { lastCoverUpdate: { $lt: Date.now() - UPDATE_COVER_PERIOD } },
-          { coverObjectId: { $eq: null } }
         ],
       })
       .populate<Pick<Album, "artists">>("artists")
