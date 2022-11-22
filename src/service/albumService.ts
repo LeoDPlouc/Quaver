@@ -18,6 +18,7 @@ import { albumDAO } from "../access/database/albumDAO";
 import { mapAlbum, mapAlbumDb } from "../mappers/albumMapper";
 import { mapSong } from "../mappers/songMapper";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
+import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
 
 class AlbumService {
@@ -116,8 +117,9 @@ class AlbumService {
     if (albums.length) {
       return albums[0]
     } else {
-      await this.createAlbum({ mbid })
-      return { mbid }
+      let id = await this.createAlbum({ mbid })
+      logger.info(`Found new album ${id}`, "Album Service")
+      return { id, mbid }
     }
   }
 

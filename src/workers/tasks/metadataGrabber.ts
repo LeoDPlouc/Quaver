@@ -52,8 +52,13 @@ async function updateSongMetadata() {
       if (song.year) songs[i].year = song.year;
       if (song.n) songs[i].n = song.n
 
-      songs[i].albumV2 = await albumService.getAlbumByMbidOrCreate(albumMbid)
-      songs[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
+      if (albumMbid) {
+        songs[i].albumV2 = await albumService.getAlbumByMbidOrCreate(albumMbid)
+      }
+
+      if (artistsMbid?.length) {
+        songs[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
+      }
 
       songs[i].lastUpdated = Date.now();
 
@@ -78,7 +83,9 @@ async function updateAlbumMetadata() {
       if (album.title) albums[i].title = album.title
       if (album.year) albums[i].year = album.year
 
-      albums[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
+      if (artistsMbid?.length) {
+        albums[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
+      }
 
       albums[i].lastUpdated = Date.now()
 

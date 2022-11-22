@@ -16,6 +16,7 @@ import { mapAlbum } from "../mappers/albumMapper";
 import { mapArtist, mapArtistDb } from "../mappers/artistMapper";
 import { mapSong } from "../mappers/songMapper";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
+import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
 
 class ArtistService {
@@ -91,14 +92,14 @@ class ArtistService {
         throw new ServiceException(__filename, "getArtistsByMbidOrCreate", err);
       });
 
-    if (artists.length) {
-      return artists
-    } else {
-      for (let i = 0; i < mbids.length; i++) {
-        await this.createArtist({ mbid: mbids[i] })
-      }
-      return mbids.map(mbid => { return { mbid } })
+    let notFoundMbids = mbids.filter(id => !artists.find(a => a.mbid == id))
+
+    for (let i = 0; i < notFoundMbids.length; i++) {
+      let id = await this.createArtist({ mbid: notFoundMbids[i] })
+      logger.info(`Found new artist ${id}`, "Artist Service")
+      artists.push({ id, mbid: notFoundMbids[i] })
     }
+    return artists
   }
 }
 

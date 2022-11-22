@@ -88,6 +88,7 @@ class SongService {
 
   public async metadataGrabberGet(this: SongService): Promise<Song[]> {
     return await songDAO.metadataGrabberGet()
+      .then((result) => result.map(mapSong))
       .catch((err) => {
         throw new ServiceException(__filename, "getUpdatableAlbum", err);
       });
