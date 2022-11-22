@@ -14,12 +14,14 @@
 interface Album {
   id?: string;
   title?: string;
-  artist?: string;
-  artistId?: string;
-  cover?: string;
+  artist?: string; // DEPRECATED
+  artistId?: string; // DEPRECATED
+  artists?: Artist[]
+  coverV2?: Image
+  cover?: string; // DEPRECATED
   year?: number;
   mbid?: string;
-  mbids?: string[];
+  mbids?: string[]; // DEPRECATED
   lastUpdated?: number;
   lastCoverUpdate?: number;
 }

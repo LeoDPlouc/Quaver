@@ -15,7 +15,7 @@ import { coverArtArchiveAccess } from "../access/api/coverArtArchive";
 import { imageFileData } from "../access/api/DTO/ImageFileData";
 import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { albumDAO } from "../access/database/albumDAO";
-import { mapAlbum } from "../mappers/albumMapper";
+import { mapAlbum, mapAlbumDb } from "../mappers/albumMapper";
 import { mapSong } from "../mappers/songMapper";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
@@ -55,9 +55,10 @@ class AlbumService {
   }
 
   public async createAlbum(this: AlbumService, album: Album): Promise<string> {
-    return await albumDAO.createAlbumModel(album).catch((err) => {
-      throw new ServiceException(__filename, "createAlbum", err);
-    });
+    return await albumDAO.createAlbumModel(album)
+      .catch((err) => {
+        throw new ServiceException(__filename, "createAlbum", err);
+      });
   }
 
   public async findAlbumByName(this: AlbumService, albumTitle: string, artistName?: string): Promise<Album[]> {
@@ -70,9 +71,10 @@ class AlbumService {
   }
 
   public async updateAlbum(this: AlbumService, album: Album): Promise<void> {
-    await albumDAO.updateAlbumModel(album).catch((err) => {
-      throw new ServiceException(__filename, "updateAlbum", err);
-    });
+    await albumDAO.updateAlbumModel(album)
+      .catch((err) => {
+        throw new ServiceException(__filename, "updateAlbum", err);
+      });
   }
 
   public async getToCoverGrabAlbums(this: AlbumService): Promise<Album[]> {
@@ -90,8 +92,8 @@ class AlbumService {
     });
   }
 
-  public async getAlbumMetadata(this: AlbumService, album: Album): Promise<Album> {
-    return await musicBrainzApiAccess.getMetadataFromMB(album.mbids);
+  public async getAlbumMetadata(this: AlbumService, album: Album): Promise<{ album: Album, artistsMbid: string[] }> {
+    return await musicBrainzApiAccess.getAlbumMetadata(album.mbid);
   }
 
   public async getUpdatableAlbum(this: AlbumService): Promise<Album[]> {
@@ -102,6 +104,29 @@ class AlbumService {
 
   public async getCover(this: AlbumService, album: Album): Promise<imageFileData> {
     return await coverArtArchiveAccess.getAlbumCover(album.mbids);
+  }
+
+  public async getAlbumByMbidOrCreate(this: AlbumService, mbid: string): Promise<Album> {
+    let albums = await albumDAO.findAlbumsByMbid(mbid)
+      .then(results => results.map(mapAlbum))
+      .catch((err) => {
+        throw new ServiceException(__filename, "findAlbumsByMbid", err);
+      });
+
+    if (albums.length) {
+      return albums[0]
+    } else {
+      await this.createAlbum({ mbid })
+      return { mbid }
+    }
+  }
+
+  public async metadataGrabberGet(this: AlbumService): Promise<Album[]> {
+    return await albumDAO.metadataGrabberGet()
+      .then(results => results.map(mapAlbum))
+      .catch(err => {
+        throw new ServiceException(__filename, "metadataGrabberGet", err)
+      })
   }
 }
 

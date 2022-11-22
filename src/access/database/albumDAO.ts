@@ -13,21 +13,28 @@
 
 import { Document } from "mongoose";
 import { UPDATE_COVER_PERIOD, UPDATE_METADATA_PERIOD } from "../../config/appConfig";
+import { mapAlbumDb } from "../../mappers/albumMapper";
 import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";
 
 class AlbumDAO {
   public async getAllAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
-    return await albumModel.find().catch((err) => {
-      throw new DAOException(__filename, "getAllAlbumModels", err);
-    });
+    return await albumModel.find()
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .catch((err) => {
+        throw new DAOException(__filename, "getAllAlbumModels", err);
+      });
   }
 
   public async getAlbumModel(this: AlbumDAO, id: string): Promise<Album & Document<any, any, Album>> {
-    return await albumModel.findById(id).catch((err) => {
-      throw new DAOException(__filename, "getAlbumModel", err);
-    });
+    return await albumModel.findById(id)
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .catch((err) => {
+        throw new DAOException(__filename, "getAlbumModel", err);
+      });
   }
 
   public async getAlbumSongModel(this: AlbumDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
@@ -38,7 +45,7 @@ class AlbumDAO {
 
   public async createAlbumModel(this: AlbumDAO, album: Album): Promise<string> {
     return await albumModel
-      .create(album)
+      .create(mapAlbumDb(album))
       .then((a) => a.id)
       .catch((err) => {
         throw new DAOException(__filename, "createAlbumModel", err);
@@ -49,13 +56,16 @@ class AlbumDAO {
     var query: Album = { title: albumTitle };
     if (artistName) query.artist = artistName;
 
-    return await albumModel.find(query).catch((err) => {
-      throw new DAOException(__filename, "findAlbumModelByName", err);
-    });
+    return await albumModel.find(query)
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .catch((err) => {
+        throw new DAOException(__filename, "findAlbumModelByName", err);
+      });
   }
 
   public async updateAlbumModel(this: AlbumDAO, album: Album): Promise<void> {
-    await albumModel.findByIdAndUpdate(album.id, album).catch((err) => {
+    await albumModel.findByIdAndUpdate(album.id, mapAlbumDb(album)).catch((err) => {
       throw new DAOException(__filename, "updateAlbumModel", err);
     });
   }
@@ -69,6 +79,8 @@ class AlbumDAO {
           { lastUpdated: null },
         ],
       })
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
       .catch((err) => {
         throw new DAOException(__filename, "getUpdatableAlbumModels", err);
       });
@@ -83,9 +95,35 @@ class AlbumDAO {
           { lastCoverUpdate: { $lt: Date.now() - UPDATE_COVER_PERIOD } },
         ],
       })
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
       .catch((err) => {
         throw new DAOException(__filename, "getToCoverGrabAlbumsModels", err);
       });
+  }
+
+  public async findAlbumsByMbid(this: AlbumDAO, mbid: string): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel.find({ mbid: mbid })
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .catch((err) => {
+        throw new DAOException(__filename, "findAlbumsByMbid", err);
+      });
+  }
+
+  public async metadataGrabberGet(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+    return await albumModel
+      .find({
+        $or: [
+          { lastUpdated: null },
+          { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
+        ],
+      })
+      .populate<Pick<Album, "artists">>("artistsObjectId")
+      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .catch(err => {
+        throw new DAOException(__filename, "metadataGrabberGet", err)
+      })
   }
 }
 

@@ -13,7 +13,7 @@
 
 import { artistDAO } from "../access/database/artistDAO";
 import { mapAlbum } from "../mappers/albumMapper";
-import { mapArtist } from "../mappers/artistMapper";
+import { mapArtist, mapArtistDb } from "../mappers/artistMapper";
 import { mapSong } from "../mappers/songMapper";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
@@ -62,9 +62,10 @@ class ArtistService {
   }
 
   public async createArtist(this: ArtistService, artist: Artist): Promise<string> {
-    return await artistDAO.createArtistModel(artist).catch((err) => {
-      throw new ServiceException(__filename, "createArtist", err);
-    });
+    return await artistDAO.createArtistModel(artist)
+      .catch((err) => {
+        throw new ServiceException(__filename, "createArtist", err);
+      });
   }
 
   public async findArtistByName(this: ArtistService, name: string): Promise<Artist[]> {
@@ -77,9 +78,27 @@ class ArtistService {
   }
 
   public async updateArtist(artist: Artist): Promise<void> {
-    return await artistDAO.updateArtistModel(artist).catch((err) => {
-      throw new ServiceException(__filename, "updateArtist", err);
-    });
+    return await artistDAO.updateArtistModel(artist)
+      .catch((err) => {
+        throw new ServiceException(__filename, "updateArtist", err);
+      });
+  }
+
+  public async getArtistsByMbidOrCreate(this: ArtistService, mbids: string[]): Promise<Artist[]> {
+    let artists = await artistDAO.findArtistsByMbids(mbids)
+      .then(results => results.map(mapArtist))
+      .catch((err) => {
+        throw new ServiceException(__filename, "getArtistsByMbidOrCreate", err);
+      });
+
+    if (artists.length) {
+      return artists
+    } else {
+      for (let i = 0; i < mbids.length; i++) {
+        await this.createArtist({ mbid: mbids[i] })
+      }
+      return mbids.map(mbid => { return { mbid } })
+    }
   }
 }
 

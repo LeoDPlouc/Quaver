@@ -33,8 +33,7 @@ async function collect() {
       if (songPaths.find((p) => p == paths[i])) continue; //Pass if song already exists
 
       let songData = await fileService.getMetadataFromFile(paths[i]);
-      let song: Song = { ...songData, path: paths[i] }
-      song.mbids = await songService.getSongMbids(songData)
+      let song: Song = {  path: paths[i], duration: songData.duration, year: songData.year, title: songData.title }
 
       await songService.createSong(song);
       logger.info(`Found new song ${song.path}`, "Song Collector");

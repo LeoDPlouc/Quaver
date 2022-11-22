@@ -11,13 +11,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document } from "mongoose"
+import { Document, Schema, Types } from "mongoose"
+import { ArtistDb } from "../access/database/models/interfaces/artistDb"
 
 export function mapArtist(data: Artist & Document<any, any, Artist>): Artist {
     let cleanedData: Artist = {
         id: data.id,
         name: data.name,
-        cover: data.cover
+        cover: data.cover, // DEPRECATED
+        coverV2: data.coverV2,
+        mbid: data.mbid
     }
     return cleanedData
 }
@@ -27,6 +30,16 @@ export function mapArtistDTO(data: Artist): ArtistDTO {
         id: data.id,
         name: data.name,
         cover: data.cover
+    }
+    return cleanedData
+}
+
+export function mapArtistDb(data: Artist): ArtistDb {
+    let cleanedData: ArtistDb = {
+        cover: data.cover, // DEPRECATED
+        coverObjectId: new Types.ObjectId(data.coverV2?.id),
+        mbid: data.mbid,
+        name: data.name
     }
     return cleanedData
 }

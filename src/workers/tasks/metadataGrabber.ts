@@ -12,24 +12,27 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { albumService } from "../../service/albumService";
+import { artistService } from "../../service/artistService";
+import { fileService } from "../../service/fileService";
 import { songService } from "../../service/songService";
 import { logger } from "../../utils/logger";
 import { TaskException } from "./exceptions/taskException";
 
-async function grabMbids() { // DEPRECATED
+async function grabMbid() {
   let songs = await songService.getMbidlessSongs();
 
   for (let i = 0; i < songs.length; i++) {
     try {
-      let mbids = await songService.getSongMbids(songs[i]);
-      if (!mbids.length) continue; //Pass if no Mbid have been found
+      let songData = await fileService.getMetadataFromFile(songs[i].path)
+      let mbid = await songService.getSongMbid(songData);
+      if (!mbid) continue; //Pass if no Mbid have been found
 
-      songs[i].mbids = mbids;
+      songs[i].mbid = mbid;
       await songService.updateSong(songs[i]);
 
-      logger.info(`Found Mbids for song ${songs[i].id}`, "Metadata Grabber");
+      logger.info(`Found Mbid for song ${songs[i].id}`, "Metadata Grabber");
     } catch (err) {
-      logger.error(new TaskException(__filename, "grabMbids", err));
+      logger.error(new TaskException(__filename, "grabMbid", err));
       logger.debug(1, `SongData : ${JSON.stringify(songs[i])}`, "metadataGrabber")
     }
   }
@@ -40,14 +43,17 @@ async function updateSongMetadata() {
 
   for (let i = 0; i < songs.length; i++) {
     try {
-      if (!songs[i].mbids.length) continue
+      if (!songs[i].mbid) continue
 
-      let metadata = await songService.getSongMetadata(songs[i]);
+      let { song, albumMbid, artistsMbid } = await songService.getSongMetadata(songs[i]);
 
-      if (metadata.title) songs[i].title = metadata.title;
-      if (metadata.artist) songs[i].artist = metadata.artist;
-      if (metadata.year) songs[i].year = metadata.year;
-      if (metadata.n) songs[i].n = metadata.n
+      if (song.title) songs[i].title = song.title;
+      if (song.artist) songs[i].artist = song.artist;
+      if (song.year) songs[i].year = song.year;
+      if (song.n) songs[i].n = song.n
+
+      songs[i].albumV2 = await albumService.getAlbumByMbidOrCreate(albumMbid)
+      songs[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
 
       songs[i].lastUpdated = Date.now();
 
@@ -59,29 +65,38 @@ async function updateSongMetadata() {
   }
 }
 
-async function updateMetadata() {
-  let albums = await albumService.getUpdatableAlbum();
+async function updateAlbumMetadata() {
+  let albums = await albumService.metadataGrabberGet()
 
   for (let i = 0; i < albums.length; i++) {
     try {
-      let metadata = await albumService.getAlbumMetadata(albums[i]);
+      if (!albums[i].mbid) continue
 
-      if (metadata.title) albums[i].title = metadata.title;
-      if (metadata.artist) albums[i].artist = metadata.artist;
-      if (metadata.year) albums[i].year = metadata.year;
+      let { album, artistsMbid } = await albumService.getAlbumMetadata(albums[i])
 
-      albums[i].lastUpdated = Date.now();
+      if (album.artist) albums[i].artist = album.artist
+      if (album.title) albums[i].title = album.title
+      if (album.year) albums[i].year = album.year
 
-      await albumService.updateAlbum(albums[i]);
-      logger.info(`Updated metadata for ${albums[i].id}`, "Metadata Grabber");
+      albums[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
+
+      albums[i].lastUpdated = Date.now()
+
+      await albumService.updateAlbum(albums[i])
+      logger.info(`Updated metadata for album ${albums[i].id}`, "Metadata Grabber")
     } catch (err) {
-      logger.error(new TaskException(__filename, "updateMetadata", err));
+      logger.error(new TaskException(__filename, "updateAlbumMetadata", err))
     }
   }
 }
 
 export default async function doWork() {
   logger.info("Metadata grabber started", "Metadata Grabber");
-  await grabMbids();
-  await updateSongMetadata();
+  try {
+    await grabMbid();
+    await updateSongMetadata();
+    await updateAlbumMetadata()
+  } catch (err) {
+    logger.error(new TaskException(__filename, "doWork", err))
+  }
 }

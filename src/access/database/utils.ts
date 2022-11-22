@@ -21,12 +21,7 @@ const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_
 
 export async function connectToDb(source: String) {
   await mongoose
-    .connect(mongoUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      dbName: "quaver",
-    })
+    .connect(mongoUrl, { dbName: "quaver" })
     .then(() => logger.info("Successfully connected to database", source))
     .catch((err) => {
       logger.error(new DatabaseException(__filename, "connectToDb", err));

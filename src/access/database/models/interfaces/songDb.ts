@@ -10,16 +10,25 @@
 // GNU General Public License for more details.
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-{
-    "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true,
-        "target": "ES5",
-        "esModuleInterop": true,
-        "moduleResolution": "node",
-        //"strict": true
-    },
-    "include": [
-        "./src/**/*"
-    ]
+
+import { Types } from "mongoose"
+
+
+export interface SongDb {
+    title?: string,
+    n?: number,
+    duration?: number,
+    like?: number,
+    artist?: string, // DEPRECATED
+    artistId?: string, // DEPRECATED
+    album?: string, // DEPRECATED
+    albumId?: string, // DEPRECATED
+    artistsObjectId?: Types.ObjectId[]
+    albumObjectId?: Types.ObjectId
+    path: string,
+    acoustid?: string,
+    year?: number,
+    format?: string,
+    mbid?: string
+    lastUpdated?: number
 }

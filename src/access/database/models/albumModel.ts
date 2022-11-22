@@ -12,19 +12,26 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Schema, model } from "mongoose";
+import { AlbumDb } from "./interfaces/albumDb";
 
-const albumSchema = new Schema<Album>({
+const albumSchema = new Schema<AlbumDb>({
   title: {
     type: String,
   },
-  artist: {
+  artist: { // DEPRECATED
     type: String,
   },
-  artistId: {
+  artistId: { // DEPRECATED
     type: String,
   },
-  cover: {
+  cover: { // DEPRECATED
     type: String,
+  },
+  artistsObjectId: {
+    type: [Schema.Types.ObjectId]
+  },
+  coverObjectId: {
+    type: Schema.Types.ObjectId
   },
   year: {
     type: Number,
@@ -43,4 +50,4 @@ const albumSchema = new Schema<Album>({
   },
 });
 
-export const albumModel = model<Album>("Album", albumSchema);
+export const albumModel = model<AlbumDb>("Album", albumSchema);
