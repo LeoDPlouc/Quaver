@@ -21,8 +21,8 @@ import { songModel } from "./models/songModel";
 class AlbumDAO {
   public async getAllAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find()
-      .populate<Pick<Album, "artists">>("artistsObjectId")
-      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .populate<Pick<Album, "artists">>("artists")
+      .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "getAllAlbumModels", err);
       });
@@ -30,17 +30,20 @@ class AlbumDAO {
 
   public async getAlbumModel(this: AlbumDAO, id: string): Promise<Album & Document<any, any, Album>> {
     return await albumModel.findById(id)
-      .populate<Pick<Album, "artists">>("artistsObjectId")
-      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .populate<Pick<Album, "artists">>("artists")
+      .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "getAlbumModel", err);
       });
   }
 
   public async getAlbumSongModel(this: AlbumDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
-    return await songModel.find({ albumId: id }).catch((err) => {
-      throw new DAOException(__filename, "getAlbumSongModel", err);
-    });
+    return await songModel.find({ albumId: id })
+    .populate<Pick<Song, "albumV2">>("albumV2")
+    .populate<Pick<Song, "artists">>("artists")
+      .catch((err) => {
+        throw new DAOException(__filename, "getAlbumSongModel", err);
+      });
   }
 
   public async createAlbumModel(this: AlbumDAO, album: Album): Promise<string> {
@@ -57,8 +60,8 @@ class AlbumDAO {
     if (artistName) query.artist = artistName;
 
     return await albumModel.find(query)
-      .populate<Pick<Album, "artists">>("artistsObjectId")
-      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .populate<Pick<Album, "artists">>("artists")
+      .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "findAlbumModelByName", err);
       });
@@ -79,8 +82,8 @@ class AlbumDAO {
           { lastUpdated: null },
         ],
       })
-      .populate<Pick<Album, "artists">>("artistsObjectId")
-      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .populate<Pick<Album, "artists">>("artists")
+      .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "getUpdatableAlbumModels", err);
       });
@@ -93,10 +96,11 @@ class AlbumDAO {
           { cover: { $eq: null } },
           { lastCoverUpdate: null },
           { lastCoverUpdate: { $lt: Date.now() - UPDATE_COVER_PERIOD } },
+          { coverObjectId: { $eq: null } }
         ],
       })
-      .populate<Pick<Album, "artists">>("artistsObjectId")
-      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .populate<Pick<Album, "artists">>("artists")
+      .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "getToCoverGrabAlbumsModels", err);
       });
@@ -104,8 +108,8 @@ class AlbumDAO {
 
   public async findAlbumsByMbid(this: AlbumDAO, mbid: string): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find({ mbid: mbid })
-      .populate<Pick<Album, "artists">>("artistsObjectId")
-      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .populate<Pick<Album, "artists">>("artists")
+      .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "findAlbumsByMbid", err);
       });
@@ -119,8 +123,8 @@ class AlbumDAO {
           { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
         ],
       })
-      .populate<Pick<Album, "artists">>("artistsObjectId")
-      .populate<Pick<Album, "coverV2">>("coverObjectId")
+      .populate<Pick<Album, "artists">>("artists")
+      .populate<Pick<Album, "coverV2">>("coverV2")
       .catch(err => {
         throw new DAOException(__filename, "metadataGrabberGet", err)
       })

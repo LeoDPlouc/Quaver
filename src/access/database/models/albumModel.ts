@@ -27,11 +27,13 @@ const albumSchema = new Schema<AlbumDb>({
   cover: { // DEPRECATED
     type: String,
   },
-  artistsObjectId: {
-    type: [Schema.Types.ObjectId]
+  artists: {
+    type: [Schema.Types.ObjectId],
+    ref: "Artist"
   },
-  coverObjectId: {
-    type: Schema.Types.ObjectId
+  coverV2: {
+    type: Schema.Types.ObjectId,
+    ref: "Image"
   },
   year: {
     type: Number,

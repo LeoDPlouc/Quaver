@@ -34,7 +34,7 @@ export const migration2: IMigration = {
 
         logger.info(`Migration 2 -> 3 album ${a.id}`, "Migration");
 
-        let mbids = await musicBrainzApiAccess.getMBId(a);
+        let mbids = await musicBrainzApiAccess.getMBId({});
         if (!mbids) {
           continue;
         }

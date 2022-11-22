@@ -33,7 +33,7 @@ export const migration0: IMigration = {
         if (!a.mbid) {
           logger.info(`Migration 0 -> 1 album ${a.id}`, "Migration");
 
-          let mbid = await getAlbumMBIdLegacy(a);
+          let mbid = await getAlbumMBIdLegacy({});
           if (!mbid) {
             continue;
           }

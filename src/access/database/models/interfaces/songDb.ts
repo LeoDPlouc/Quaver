@@ -23,8 +23,8 @@ export interface SongDb {
     artistId?: string, // DEPRECATED
     album?: string, // DEPRECATED
     albumId?: string, // DEPRECATED
-    artistsObjectId?: Types.ObjectId[]
-    albumObjectId?: Types.ObjectId
+    artists?: Types.ObjectId[]
+    albumV2?: Types.ObjectId
     path: string,
     acoustid?: string,
     year?: number,

@@ -48,9 +48,9 @@ export function mapAlbumDb(data: Album): AlbumDb {
     let cleanedData: AlbumDb = {
         artist: data.artist, // DEPRECATED
         artistId: data.artistId, // DEPRECATED
-        artistsObjectId: data.artists?.map(a => new Types.ObjectId(a.id)),
+        artists: data.artists?.map(a => new Types.ObjectId(a.id)),
         cover: data.cover, // DERECATED
-        coverObjectId: new Types.ObjectId(data.coverV2?.id),
+        coverV2: new Types.ObjectId(data.coverV2?.id),
         lastCoverUpdate: data.lastCoverUpdate,
         lastUpdated: data.lastUpdated,
         mbid: data.mbid,

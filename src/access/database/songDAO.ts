@@ -20,8 +20,8 @@ import { songModel } from "./models/songModel";
 class SongDAO {
   public async getAllSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find()
-      .populate<Pick<Song, "albumV2">>("albumObjectId")
-      .populate<Pick<Song, "artists">>("artistsObjectId")
+      .populate<Pick<Song, "albumV2">>("albumV2")
+      .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
         throw new DAOException(__filename, "getAllSongModels", err);
       });
@@ -29,8 +29,8 @@ class SongDAO {
 
   public async getSongModel(this: SongDAO, id: string): Promise<Song & Document<any, any, Song>> {
     return await songModel.findById(id)
-      .populate<Pick<Song, "albumV2">>("albumObjectId")
-      .populate<Pick<Song, "artists">>("artistsObjectId")
+      .populate<Pick<Song, "albumV2">>("albumV2")
+      .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
         throw new DAOException(__filename, "getSongModel", err);
       });
@@ -55,8 +55,8 @@ class SongDAO {
   public async findSongModelByPath(this: SongDAO, path: string): Promise<Song & Document<any, any, Song>> {
     return await songModel
       .find({ path })
-      .populate<Pick<Song, "albumV2">>("albumObjectId")
-      .populate<Pick<Song, "artists">>("artistsObjectId")
+      .populate<Pick<Song, "albumV2">>("albumV2")
+      .populate<Pick<Song, "artists">>("artists")
       .then((s) => s[0])
       .catch((err) => {
         throw new DAOException(__filename, "findSongModelByPath", err);
@@ -76,8 +76,8 @@ class SongDAO {
     return await songModel.find({
       mbid: { $exists: false }
     })
-      .populate<Pick<Song, "albumV2">>("albumObjectId")
-      .populate<Pick<Song, "artists">>("artistsObjectId")
+      .populate<Pick<Song, "albumV2">>("albumV2")
+      .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
         throw new DAOException(__filename, "getMbidlessSongModels", err);
       });
@@ -91,8 +91,8 @@ class SongDAO {
           { lastUpdated: { $exists: false } }
         ],
       })
-      .populate<Pick<Song, "albumV2">>("albumObjectId")
-      .populate<Pick<Song, "artists">>("artistsObjectId")
+      .populate<Pick<Song, "albumV2">>("albumV2")
+      .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
         throw new DAOException(__filename, "getUpdatableAlbumModels", err);
       });

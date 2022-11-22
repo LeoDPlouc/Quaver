@@ -17,6 +17,6 @@ import { Types } from "mongoose"
 export interface ArtistDb {
     name?: string
     cover?: string // DEPRECATED
-    coverObjectId?: Types.ObjectId
+    coverV2?: Types.ObjectId
     mbid?: string
 }

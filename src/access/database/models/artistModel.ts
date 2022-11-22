@@ -21,8 +21,9 @@ const artistSchema = new Schema<ArtistDb>({
     cover: { // DEPRECATED
         type: String
     },
-    coverObjectId: {
-        type: Schema.Types.ObjectId
+    coverV2: {
+        type: Schema.Types.ObjectId,
+        ref: "Image"
     },
     mbid: {
         type: String

@@ -60,10 +60,10 @@ export function mapSongDb(data: Song): SongDb {
         acoustid: data.acoustid,
         album: data.album, // DEPRECATED
         albumId: data.albumId, // DEPRECATED
-        albumObjectId: new Types.ObjectId(data.albumV2?.id),
+        albumV2: new Types.ObjectId(data.albumV2?.id),
         artist: data.artist, // DEPRECATED
         artistId: data.artistId, // DEPRECATED
-        artistsObjectId: data.artists?.map(a => new Types.ObjectId(a.id)),
+        artists: data.artists?.map(a => new Types.ObjectId(a.id)),
         duration: data.duration,
         format: data.format,
         lastUpdated: data.lastUpdated,

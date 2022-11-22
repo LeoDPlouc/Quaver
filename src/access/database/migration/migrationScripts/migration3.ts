@@ -33,15 +33,15 @@ export const migration3: IMigration = {
         if (!a.cover) {
           logger.info(`Migration 3 -> 4 album ${a.id}`, "Migration");
 
-          let cover = await getAlbumCoverLegacy2(a);
-          if (!cover) {
-            continue;
-          }
+          // let cover = await getAlbumCoverLegacy2(a);
+          // if (!cover) {
+          //   continue;
+          // }
 
-          await cover.save();
+          // await cover.save();
 
-          a.cover = cover.id;
-          await a.save();
+          // a.cover = cover.id;
+          // await a.save();
         }
       }
     } catch (err) {

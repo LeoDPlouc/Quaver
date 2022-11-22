@@ -37,7 +37,7 @@ export function mapArtistDTO(data: Artist): ArtistDTO {
 export function mapArtistDb(data: Artist): ArtistDb {
     let cleanedData: ArtistDb = {
         cover: data.cover, // DEPRECATED
-        coverObjectId: new Types.ObjectId(data.coverV2?.id),
+        coverV2: new Types.ObjectId(data.coverV2?.id),
         mbid: data.mbid,
         name: data.name
     }
