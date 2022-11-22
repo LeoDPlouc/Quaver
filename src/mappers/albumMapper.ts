@@ -50,7 +50,7 @@ export function mapAlbumDb(data: Album): AlbumDb {
         artistId: data.artistId, // DEPRECATED
         artists: data.artists?.map(a => new Types.ObjectId(a.id)),
         cover: data.cover, // DERECATED
-        coverV2: new Types.ObjectId(data.coverV2?.id),
+        coverV2: data.coverV2 ? new Types.ObjectId(data.coverV2.id) : undefined,
         lastCoverUpdate: data.lastCoverUpdate,
         lastUpdated: data.lastUpdated,
         mbid: data.mbid,
