@@ -22,7 +22,7 @@ import { songModel } from "./models/songModel";
 class ArtistDAO {
   public async getAllArtistModels(this: ArtistDAO): Promise<(Artist & Document<any, any, Artist>)[]> {
     return await artistModel.find()
-      .populate<Pick<Artist, "coverV2">>("coverObjectId")
+      .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "getAllArtistModels", err);
       });
@@ -30,7 +30,7 @@ class ArtistDAO {
 
   public async getArtistModel(this: ArtistDAO, id: string): Promise<Artist & Document<any, any, Artist>> {
     return await artistModel.findById(id)
-      .populate<Pick<Artist, "coverV2">>("coverObjectId")
+      .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "getArtistModel", err);
       });
@@ -38,8 +38,8 @@ class ArtistDAO {
 
   public async getArtistSongModels(this: ArtistDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
     return await songModel.find({ artistId: id })
-      .populate<Pick<Song, "albumV2">>("albumObjectId")
-      .populate<Pick<Song, "artists">>("artistsObjectId")
+      .populate<Pick<Song, "albumV2">>("albumV2")
+      .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
         throw new DAOException(__filename, "getArtistSongModels", err);
       });
@@ -47,8 +47,8 @@ class ArtistDAO {
 
   public async getArtistAlbumModels(this: ArtistDAO, id: string): Promise<(Album & Document<any, any, Album>)[]> {
     return await albumModel.find({ artistId: id })
-      .populate<Pick<Album, "artists">>("artistsObjectId")
-      .populate<Pick<Album, "coverV2">>("coverObjectId").catch((err) => {
+      .populate<Pick<Album, "artists">>("artists")
+      .populate<Pick<Album, "coverV2">>("coverV2").catch((err) => {
         throw new DAOException(__filename, "getArtistAlbumModels", err);
       });
   }
@@ -64,7 +64,7 @@ class ArtistDAO {
 
   public async findArtistModelByName(this: ArtistDAO, name: string): Promise<(Artist & Document<any, any, Artist>)[]> {
     return await artistModel.find({ name: name })
-      .populate<Pick<Artist, "coverV2">>("coverObjectId")
+      .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "findArtistModelByName", err);
       });
@@ -80,7 +80,7 @@ class ArtistDAO {
     return await artistModel.find({
       mbid: { $in: mbids }
     })
-      .populate<Pick<Artist, "coverV2">>("coverObjectId")
+      .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "findArtistsByMbids", err)
       })

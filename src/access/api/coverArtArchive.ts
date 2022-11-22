@@ -14,6 +14,7 @@
 import { APP_VERSION } from "../../config/appConfig";
 import coverart from "coverart";
 import { imageFileData } from "./DTO/ImageFileData";
+import { CoverArtArchiveException } from "./exceptions/CovertArtArchiveException";
 
 //DEPRECIATED Ne plus exporter lors du nettoyage des dépréciés, déplacer dans la class
 export const caApi = new coverart({
@@ -21,40 +22,26 @@ export const caApi = new coverart({
 });
 
 class CoverArtArchiveAccess {
-  public async getAlbumCover(mbids: string[]): Promise<imageFileData> {
-    let cover;
-    let ext;
+  public async getAlbumCover(mbid: string): Promise<imageFileData> {
+    //Fetch Cover art
+    let p = new Promise<any>((resolve, reject) => {
+      caApi.release(mbid, { piece: "front", size: "large" }, (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
+      });
+    });
 
-    let i = 0;
-    //Try fetching cover art for every MB ID
-    while (!cover && i < mbids.length) {
-      try {
-        //Fetch Cover art
-        let p = new Promise<any>((resolve, reject) => {
-          caApi.release(mbids[i], { piece: "front" }, (err, data) => {
-            if (err) {
-              reject(err);
-            }
-            resolve(data);
-          });
-        });
-        let { image, extension } = await p;
-        cover = image;
-        ext = extension;
-      } catch {
-      } finally {
-        i++;
-      }
-    }
+    let { image, extension } = await p
+      .catch(err => {
+        throw new CoverArtArchiveException(__filename, "getAlbumCover", JSON.stringify(err))
+      });
 
-    if (!cover) {
+    if (!image) {
       return null;
     }
-
-    return {
-      data: cover,
-      extension: ext,
-    };
+    return { data: image, extension };
   }
 }
 

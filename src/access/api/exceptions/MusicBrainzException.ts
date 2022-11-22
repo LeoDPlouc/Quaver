@@ -15,6 +15,6 @@ import { Exception } from "../../../utils/Exception"
 
 export class MusicBrainzException extends Exception {
     public override getType(): string {
-        return "MusicBrainzFailure"
+        return "MusicBrainz Exception"
     }
 }

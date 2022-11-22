@@ -17,8 +17,8 @@ export interface AlbumDb {
   title?: string;
   artist?: string; // DEPRECATED
   artistId?: string; // DEPRECATED
-  artistsObjectId?: Types.ObjectId[]
-  coverObjectId?: Types.ObjectId
+  artists?: Types.ObjectId[]
+  coverV2?: Types.ObjectId
   cover?: string;// DEPRECATED
   year?: number;
   mbid?: string;

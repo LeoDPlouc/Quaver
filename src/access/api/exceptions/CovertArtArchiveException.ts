@@ -11,45 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose";
-import { AlbumDb } from "./interfaces/albumDb";
+import { Exception } from "../../../utils/Exception"
 
-const albumSchema = new Schema<AlbumDb>({
-  title: {
-    type: String,
-  },
-  artist: { // DEPRECATED
-    type: String,
-  },
-  artistId: { // DEPRECATED
-    type: String,
-  },
-  cover: { // DEPRECATED
-    type: String,
-  },
-  artists: {
-    type: [Schema.Types.ObjectId],
-    ref: "Artist"
-  },
-  coverV2: {
-    type: Schema.Types.ObjectId,
-    ref: "Image"
-  },
-  year: {
-    type: Number,
-  },
-  mbid: {
-    type: String,
-  },
-  mbids: {
-    type: [String],
-  },
-  lastUpdated: {
-    type: Number,
-  },
-  lastCoverUpdate: {
-    type: Number,
-  },
-});
-
-export const albumModel = model<AlbumDb>("Album", albumSchema);
+export class CoverArtArchiveException extends Exception {
+    public override getType(): string {
+        return "CoverArtArchive Exception"
+    }
+}

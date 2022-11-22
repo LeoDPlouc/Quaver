@@ -40,11 +40,13 @@ const songSchema = new Schema<SongDb>({
     albumId: { // DEPRECATED
         type: String
     },
-    albumObjectId: {
-        type: Schema.Types.ObjectId
+    albumV2: {
+        type: Schema.Types.ObjectId,
+        ref: "Album"
     },
-    artistsObjectId: {
-        type: [Schema.Types.ObjectId]
+    artists: {
+        type: [Schema.Types.ObjectId],
+        ref: "Artist"
     },
     path: {
         type: String,
