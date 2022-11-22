@@ -26,7 +26,7 @@ async function cleanAlbumlessImages() {
   }
 
   for (let i = 0; i < images.length; i++) {
-    if (!albums.find((a) => a.cover == images[i].id)) {
+    if (!albums.find((a) => a.coverV2?.id == images[i].id)) {
       try {
         await imageService.deleteImageModel(images[i].id);
         logger.info(`Deleted image ${images[i].id}`, "Cover Cleaner");
@@ -58,14 +58,16 @@ async function cleanTinyLessFiles() {
 }
 
 async function cleanTinylessImages() {
-  var images = await imageService.getTinyLessImage().catch((err) => {
-    throw new TaskException(__filename, "cleanTinylessImages", err);
-  });
+  var images = await imageService.getTinyLessImage()
+    .catch((err) => {
+      throw new TaskException(__filename, "cleanTinylessImages", err);
+    });
 
   for (let i = 0; i < images.length; i++) {
-    await imageService.deleteImageModel(images[i].id).catch((err) => {
-      logger.error(new TaskException(__filename, "cleanTinylessImages", err));
-    });
+    await imageService.deleteImageModel(images[i].id)
+      .catch((err) => {
+        logger.error(new TaskException(__filename, "cleanTinylessImages", err));
+      });
   }
 }
 
@@ -103,8 +105,8 @@ async function cleanAlbumCoverId() {
 
   try {
     for (let i = 0; i < albums.length; i++) {
-      if (albums[i].cover && !images.find((im) => im.id == albums[i].cover)) {
-        albums[i].cover = null;
+      if (albums[i].coverV2 && !images.find((im) => im.id == albums[i].coverV2.id)) {
+        albums[i].coverV2 = null;
         await albumService.updateAlbum(albums[i]);
         logger.info(`Clean cover id for ${albums[i].id}`, "Cover Cleaner");
       }
