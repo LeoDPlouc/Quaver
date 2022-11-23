@@ -11,18 +11,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document, Schema, Types } from "mongoose"
+import { Document, Types } from "mongoose"
 import { AlbumDb } from "../access/database/models/interfaces/albumDb"
+import { mapArtist, mapArtistDTO } from "./artistMapper"
+import { mapImage, mapImageDTO } from "./imageMapper"
 
 export function mapAlbum(data: Album & Document<any, any, Album>): Album {
     let cleanedData: Album = {
-        id: data.id,
+        id: data._id,
         title: data.title,
         artist: data.artist, // DEPRECATED
         artistId: data.artistId, // DEPRECATED
         cover: data.cover, // DEPRECATED
-        artists: data.artists,
-        coverV2: data.coverV2,
+        artists: data.artists.map(a => mapArtist(<Artist & Document<any, any, Artist>>a)),
+        coverV2: data.coverV2 ? mapImage(<Image & Document<any, any, Image>>data.coverV2) : undefined,
         lastCoverUpdate: data.lastCoverUpdate,
         lastUpdated: data.lastUpdated,
         year: data.year,
@@ -36,9 +38,11 @@ export function mapAlbumDTO(data: Album): AlbumDTO {
     let cleanedData: AlbumDTO = {
         id: data.id,
         title: data.title,
-        artist: data.artist,
-        artistId: data.artistId,
-        cover: data.cover,
+        artist: data.artist, // DEPRECATED
+        artistId: data.artistId, // DEPRECATED
+        artists: data.artists?.map(mapArtistDTO),
+        cover: data.cover, // DEPRECATED
+        coverV2: data.coverV2 ? mapImageDTO(data.coverV2) : undefined,
         year: data.year
     }
     return cleanedData
