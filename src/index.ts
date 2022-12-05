@@ -19,6 +19,8 @@ import { logger } from "./utils/logger";
 import app from "./app";
 import { connectToDb } from "./access/database/utils";
 import { AppException } from "./utils/exceptions/appException";
+import { songService } from "./service/songService";
+import { fileService } from "./service/fileService";
 
 //Declare the objects stored in session
 declare module "express-session" {
@@ -31,6 +33,8 @@ logger.debug(1, `Debug level: ${DEBUG_LVL}`, "App")
 
 //Connect to the db
 connectToDb("App").then(async () => {
+  await fileService.checkDataDirectores()
+
   //Apply database migration
   await Migrate().catch((err) => {
     logger.error(new AppException(__filename, "main", err));
