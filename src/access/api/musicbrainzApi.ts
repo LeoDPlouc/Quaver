@@ -54,8 +54,8 @@ class MusicBrainzApiAccess {
       });
   }
 
-  public async getSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<{ song: Song, albumMbid: string, artistsMbid: string[] }> {
-    let song: Song = { path: "dummy-path" };
+  public async getSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<SongMetadataAndMbids> {
+    let song: SongMetadata = {}
 
     try {
       let recording = await mbApi2.lookupRecording({ mbid: mbid, inc: ["artists", "releases", "media"] })
@@ -76,8 +76,8 @@ class MusicBrainzApiAccess {
     return { song, albumMbid, artistsMbid }
   }
 
-  public async getAlbumMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<{ album: Album, artistsMbid: string[] }> {
-    let album: Album = {};
+  public async getAlbumMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<AlbumMetadataAndMbids> {
+    let album: AlbumMetadata = {}
 
     try {
       let release = await mbApi2.lookupRelease({ mbid: mbid, inc: ["artists", "artist-credits"] })

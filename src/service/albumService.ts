@@ -93,7 +93,7 @@ class AlbumService {
     });
   }
 
-  public async getAlbumMetadata(this: AlbumService, album: Album): Promise<{ album: Album, artistsMbid: string[] }> {
+  public async getAlbumMetadata(this: AlbumService, album: Album): Promise<AlbumMetadataAndMbids> {
     return await musicBrainzApiAccess.getAlbumMetadata(album.mbid);
   }
 
