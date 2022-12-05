@@ -11,12 +11,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document, Schema, Types } from "mongoose"
+import { Document, Types } from "mongoose"
 import { SongDb } from "../access/database/models/interfaces/songDb"
+import { logger } from "../utils/logger"
+import { mapAlbum, mapAlbumDTO } from "./albumMapper"
+import { mapArtist, mapArtistDTO } from "./artistMapper"
 
 export function mapSong(data: Song & Document<any, any, Song>): Song {
     let cleanedData: Song = {
-        id: data.id,
+        id: data._id,
         title: data.title,
         n: data.n,
         duration: data.duration,
@@ -29,8 +32,8 @@ export function mapSong(data: Song & Document<any, any, Song>): Song {
         acoustid: data.acoustid,
         year: data.year,
         format: data.format,
-        albumV2: data.albumV2,
-        artists: data.artists,
+        albumV2: data.albumV2 ? mapAlbum(<Album & Document<any, any, Album>>data.albumV2) : undefined,
+        artists: data.artists.map(a => mapArtist(<Artist & Document<any, any, Artist>>a)),
         lastUpdated: data.lastUpdated,
         mbid: data.mbid
     }
@@ -44,10 +47,12 @@ export function mapSongDTO(data: Song): SongDTO {
         n: data.n,
         duration: data.duration,
         like: data.like,
-        artist: data.artist,
-        artistId: data.artistId,
-        album: data.album,
-        albumId: data.albumId,
+        artist: data.artist, // DEPRECATED
+        artistId: data.artistId, // DEPRECATED
+        album: data.album, // DEPRECATED
+        albumId: data.albumId, // DEPRECATED
+        artists: data.artists?.map(mapArtistDTO),
+        albumV2: data.albumV2 ? mapAlbumDTO(data.albumV2) : undefined,
         year: data.year,
         format: data.format
     }

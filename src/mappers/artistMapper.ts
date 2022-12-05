@@ -13,13 +13,15 @@
 
 import { Document, Schema, Types } from "mongoose"
 import { ArtistDb } from "../access/database/models/interfaces/artistDb"
+import { logger } from "../utils/logger"
+import { mapImage, mapImageDTO } from "./imageMapper"
 
 export function mapArtist(data: Artist & Document<any, any, Artist>): Artist {
     let cleanedData: Artist = {
-        id: data.id,
+        id: data._id,
         name: data.name,
         cover: data.cover, // DEPRECATED
-        coverV2: data.coverV2,
+        coverV2: data.coverV2 ? mapImage(<Image & Document<any, any, Image>>data.coverV2) : undefined,
         mbid: data.mbid
     }
     return cleanedData
@@ -29,7 +31,8 @@ export function mapArtistDTO(data: Artist): ArtistDTO {
     let cleanedData: ArtistDTO = {
         id: data.id,
         name: data.name,
-        cover: data.cover
+        cover: data.cover, // DEPRECATED
+        coverV2: data.coverV2 ? mapImageDTO(data.coverV2) : undefined
     }
     return cleanedData
 }

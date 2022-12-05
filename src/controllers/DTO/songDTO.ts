@@ -11,8 +11,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface ArtistDTO {
-    id: string,
-    name?: string
-    cover?: string
+interface SongDTO {
+    id: string
+    title?: string,
+    n?: number,
+    duration?: number,
+    like?: number,
+    artist?: string, // DEPRECATED
+    artistId?: string, // DEPRECATED
+    album?: string, // DEPRECATED
+    albumId?: string, // DEPRECATED
+    artists?: ArtistDTO[],
+    albumV2?: AlbumDTO,
+    year?: number,
+    format?: string
 }
