@@ -94,7 +94,7 @@ class SongService {
       });
   }
 
-  public async getSongMetadata(this: SongService, song: Song): Promise<{ song: Song, albumMbid: string, artistsMbid: string[] }> {
+  public async getSongMetadata(this: SongService, song: Song): Promise<SongMetadataAndMbids> {
     return await musicBrainzApiAccess.getSongMetadata(song.mbid)
       .catch(err => {
         throw new ServiceException(__filename, "getSongMetadata", err)
