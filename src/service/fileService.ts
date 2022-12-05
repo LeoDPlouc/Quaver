@@ -59,11 +59,7 @@ class FileService {
 
   public getImagesPath(this: FileService) {
     try {
-      let imageDir = path.join(DATA_PATH, "images")
-      if (!fs.access(imageDir).then(_ => true).catch(_ => false)) {
-        fs.mkdir(imageDir)
-      }
-      return imageDir
+      return path.join(DATA_PATH, "images")
     } catch (err) {
       throw new FileSystemException(__filename, "getImagesPath", err)
     }
@@ -71,11 +67,7 @@ class FileService {
 
   public getLogsPath(this: FileService) {
     try {
-      let logsDir = path.join(DATA_PATH, "logs")
-      if (!fs.access(logsDir).then(_ => true).catch(_ => false)) {
-        fs.mkdir(logsDir)
-      }
-      return logsDir
+      return path.join(DATA_PATH, "logs")
     } catch (err) {
       throw new FileSystemException(__filename, "getImagesPath", err)
     }
@@ -85,6 +77,24 @@ class FileService {
     return await songFileAccess.getMetadataFromFile(songPath).catch((err) => {
       throw new ServiceException(__filename, "getMetadataFromFile", err);
     });
+  }
+
+  public async checkDataDirectores(this: FileService): Promise<void> {
+    try {
+      let logsDir = this.getLogsPath()
+      if (!(await fs.access(logsDir).then(_ => true).catch(_ => false))) {
+        await fs.mkdir(logsDir, { recursive: true })
+        logger.info("Created Log directory", "File Service")
+      }
+
+      let imageDir = this.getImagesPath()
+      if (!(await fs.access(imageDir).then(_ => true).catch(_ => false))) {
+        await fs.mkdir(imageDir, { recursive: true })
+        logger.info("Created Images directory", "File Service")
+      }
+    } catch (err) {
+      throw new ServiceException(__filename, "checkDataDirectores", err)
+    }
   }
 }
 
