@@ -17,8 +17,10 @@ import { mapSongDb } from "../../mappers/songMapper";
 import { DAOException } from "./exceptions/DAOException";
 import { songModel } from "./models/songModel";
 
+export type SongDocument = Song & Document<any, any, Song>;
+
 class SongDAO {
-  public async getAllSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
+  public async getAllSongModels(this: SongDAO): Promise<SongDocument[]> {
     return await songModel.find()
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
@@ -27,7 +29,7 @@ class SongDAO {
       });
   }
 
-  public async getSongModel(this: SongDAO, id: string): Promise<Song & Document<any, any, Song>> {
+  public async getSongModel(this: SongDAO, id: string): Promise<SongDocument> {
     return await songModel.findById(id)
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
@@ -52,7 +54,7 @@ class SongDAO {
       });
   }
 
-  public async findSongModelByPath(this: SongDAO, path: string): Promise<Song & Document<any, any, Song>> {
+  public async findSongModelByPath(this: SongDAO, path: string): Promise<SongDocument> {
     return await songModel
       .find({ path })
       .populate<Pick<Song, "albumV2">>("albumV2")
@@ -72,7 +74,7 @@ class SongDAO {
       });
   }
 
-  public async getMbidlessSongModels(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
+  public async getMbidlessSongModels(this: SongDAO): Promise<SongDocument[]> {
     return await songModel.find({
       mbid: { $exists: false }
     })
@@ -83,7 +85,7 @@ class SongDAO {
       });
   }
 
-  public async metadataGrabberGet(this: SongDAO): Promise<(Song & Document<any, any, Song>)[]> {
+  public async metadataGrabberGet(this: SongDAO): Promise<SongDocument[]> {
     return await songModel
       .find({
         $or: [

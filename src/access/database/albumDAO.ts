@@ -11,15 +11,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { UPDATE_COVER_PERIOD, UPDATE_METADATA_PERIOD } from "../../config/appConfig";
 import { mapAlbumDb } from "../../mappers/albumMapper";
 import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";
+import { SongDocument } from "./songDAO";
+
+export type AlbumDocument = Album & Document<any, any, Album>;
 
 class AlbumDAO {
-  public async getAllAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+  public async getAllAlbumModels(this: AlbumDAO): Promise<AlbumDocument[]> {
     return await albumModel.find()
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
@@ -28,7 +31,7 @@ class AlbumDAO {
       });
   }
 
-  public async getAlbumModel(this: AlbumDAO, id: string): Promise<Album & Document<any, any, Album>> {
+  public async getAlbumModel(this: AlbumDAO, id: string): Promise<AlbumDocument> {
     return await albumModel.findById(id)
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
@@ -37,10 +40,10 @@ class AlbumDAO {
       });
   }
 
-  public async getAlbumSongModel(this: AlbumDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
+  public async getAlbumSongModel(this: AlbumDAO, id: string): Promise<SongDocument[]> {
     return await songModel.find({ albumId: id })
-    .populate<Pick<Song, "albumV2">>("albumV2")
-    .populate<Pick<Song, "artists">>("artists")
+      .populate<Pick<Song, "albumV2">>("albumV2")
+      .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
         throw new DAOException(__filename, "getAlbumSongModel", err);
       });
@@ -55,7 +58,7 @@ class AlbumDAO {
       });
   }
 
-  public async findAlbumModelByName(this: AlbumDAO, albumTitle: string, artistName?: string): Promise<(Album & Document<any, any, Album>)[]> {
+  public async findAlbumModelByName(this: AlbumDAO, albumTitle: string, artistName?: string): Promise<AlbumDocument[]> {
     var query: Album = { title: albumTitle };
     if (artistName) query.artist = artistName;
 
@@ -73,7 +76,7 @@ class AlbumDAO {
     });
   }
 
-  public async getUpdatableAlbumModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+  public async getUpdatableAlbumModels(this: AlbumDAO): Promise<AlbumDocument[]> {
     return await albumModel
       .find({
         $or: [
@@ -89,7 +92,7 @@ class AlbumDAO {
       });
   }
 
-  public async getToCoverGrabAlbumsModels(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+  public async getToCoverGrabAlbumsModels(this: AlbumDAO): Promise<AlbumDocument[]> {
     return await albumModel
       .find({
         $or: [
@@ -105,7 +108,7 @@ class AlbumDAO {
       });
   }
 
-  public async findAlbumsByMbid(this: AlbumDAO, mbid: string): Promise<(Album & Document<any, any, Album>)[]> {
+  public async findAlbumsByMbid(this: AlbumDAO, mbid: string): Promise<AlbumDocument[]> {
     return await albumModel.find({ mbid: mbid })
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
@@ -114,7 +117,7 @@ class AlbumDAO {
       });
   }
 
-  public async metadataGrabberGet(this: AlbumDAO): Promise<(Album & Document<any, any, Album>)[]> {
+  public async metadataGrabberGet(this: AlbumDAO): Promise<AlbumDocument[]> {
     return await albumModel
       .find({
         $or: [
