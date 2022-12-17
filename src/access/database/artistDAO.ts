@@ -14,13 +14,17 @@
 import { Document } from "mongoose";
 import { mapAlbumDb } from "../../mappers/albumMapper";
 import { mapArtistDb } from "../../mappers/artistMapper";
+import { AlbumDocument } from "./albumDAO";
 import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
 import { artistModel } from "./models/artistModel";
 import { songModel } from "./models/songModel";
+import { SongDocument } from "./songDAO";
+
+export type ArtistDocument = Artist & Document<any, any, Artist>;
 
 class ArtistDAO {
-  public async getAllArtistModels(this: ArtistDAO): Promise<(Artist & Document<any, any, Artist>)[]> {
+  public async getAllArtistModels(this: ArtistDAO): Promise<ArtistDocument[]> {
     return await artistModel.find()
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
@@ -28,7 +32,7 @@ class ArtistDAO {
       });
   }
 
-  public async getArtistModel(this: ArtistDAO, id: string): Promise<Artist & Document<any, any, Artist>> {
+  public async getArtistModel(this: ArtistDAO, id: string): Promise<ArtistDocument> {
     return await artistModel.findById(id)
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
@@ -36,7 +40,7 @@ class ArtistDAO {
       });
   }
 
-  public async getArtistSongModels(this: ArtistDAO, id: string): Promise<(Song & Document<any, any, Song>)[]> {
+  public async getArtistSongModels(this: ArtistDAO, id: string): Promise<SongDocument[]> {
     return await songModel.find({ artistId: id })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
@@ -45,7 +49,7 @@ class ArtistDAO {
       });
   }
 
-  public async getArtistAlbumModels(this: ArtistDAO, id: string): Promise<(Album & Document<any, any, Album>)[]> {
+  public async getArtistAlbumModels(this: ArtistDAO, id: string): Promise<AlbumDocument[]> {
     return await albumModel.find({ artistId: id })
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2").catch((err) => {
@@ -62,7 +66,7 @@ class ArtistDAO {
       });
   }
 
-  public async findArtistModelByName(this: ArtistDAO, name: string): Promise<(Artist & Document<any, any, Artist>)[]> {
+  public async findArtistModelByName(this: ArtistDAO, name: string): Promise<ArtistDocument[]> {
     return await artistModel.find({ name: name })
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
@@ -76,7 +80,7 @@ class ArtistDAO {
     });
   }
 
-  public async findArtistsByMbids(this: ArtistDAO, mbids: string[]): Promise<(Artist & Document<any, any, Artist>)[]> {
+  public async findArtistsByMbids(this: ArtistDAO, mbids: string[]): Promise<ArtistDocument[]> {
     return await artistModel.find({
       mbid: { $in: mbids }
     })

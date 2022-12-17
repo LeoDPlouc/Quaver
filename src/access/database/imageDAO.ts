@@ -15,14 +15,16 @@ import { Document } from "mongoose";
 import { DAOException } from "./exceptions/DAOException";
 import { imageModel } from "./models/imageModel";
 
+export type ImageDocument = Image & Document<any, any, Image>;
+
 class ImageDAO {
-  public async getAllImagesModels(this: ImageDAO): Promise<(Image & Document<any, any, Image>)[]> {
+  public async getAllImagesModels(this: ImageDAO): Promise<ImageDocument[]> {
     return await imageModel.find().catch((err) => {
       throw new DAOException(__filename, "getAllImagesModels", err);
     });
   }
 
-  public async getImageModel(this: ImageDAO, id: string): Promise<void | (Image & Document<any, any, Image>)> {
+  public async getImageModel(this: ImageDAO, id: string): Promise<ImageDocument> {
     return await imageModel.findById(id).catch((err) => {
       throw new DAOException(__filename, "getImageModel", err);
     });
@@ -43,7 +45,7 @@ class ImageDAO {
     });
   }
 
-  public async getTinyLessImageModel(this: ImageDAO): Promise<(Image & Document<any, any, Image>)[]> {
+  public async getTinyLessImageModel(this: ImageDAO): Promise<ImageDocument[]> {
     return await imageModel.find({ tiny: null }).catch((err) => {
       throw new DAOException(__filename, "getTinyLessImageModel", err);
     });
