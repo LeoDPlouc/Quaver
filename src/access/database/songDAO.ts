@@ -11,13 +11,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { UPDATE_METADATA_PERIOD } from "../../config/appConfig";
 import { mapSongDb } from "../../mappers/songMapper";
 import { DAOException } from "./exceptions/DAOException";
+import { SongDb } from "./models/interfaces/songDb";
 import { songModel } from "./models/songModel";
 
-export type SongDocument = Song & Document<any, any, Song>;
+export type SongDocument = Omit<Omit<Document<unknown, any, SongDb> & SongDb & { _id: Types.ObjectId; }, "albumV2"> & Pick<Song, "albumV2">, "artists"> & Pick<Song, "artists">;
 
 class SongDAO {
   public async getAllSongModels(this: SongDAO): Promise<SongDocument[]> {

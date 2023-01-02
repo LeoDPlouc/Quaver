@@ -13,13 +13,13 @@
 
 import { Document, Types } from "mongoose"
 import { SongDb } from "../access/database/models/interfaces/songDb"
-import { logger } from "../utils/logger"
+import { SongDocument } from "../access/database/songDAO"
 import { mapAlbum, mapAlbumDTO } from "./albumMapper"
 import { mapArtist, mapArtistDTO } from "./artistMapper"
 
-export function mapSong(data: Song & Document<any, any, Song>): Song {
+export function mapSong(data: SongDocument): Song {
     let cleanedData: Song = {
-        id: data._id,
+        id: data._id.toString(),
         title: data.title,
         n: data.n,
         duration: data.duration,
