@@ -26,7 +26,7 @@ async function cleanAlbumlessImages() {
   }
 
   for (let i = 0; i < images.length; i++) {
-    if (!albums.find((a) => a.coverV2?.id == images[i].id)) {
+    if (!albums.find((a) => String(a.coverV2?.id) == String(images[i].id))) {
       try {
         await imageService.deleteImageModel(images[i].id);
         logger.info(`Deleted image ${images[i].id}`, "Cover Cleaner");
@@ -105,7 +105,7 @@ async function cleanAlbumCoverId() {
 
   try {
     for (let i = 0; i < albums.length; i++) {
-      if (albums[i].coverV2 && !images.find((im) => im.id == albums[i].coverV2.id)) {
+      if (albums[i].coverV2 && !images.find((im) => String(im.id) == String(albums[i].coverV2.id))) {
         albums[i].coverV2 = null;
         await albumService.updateAlbum(albums[i]);
         logger.info(`Clean cover id for ${albums[i].id}`, "Cover Cleaner");
