@@ -19,12 +19,12 @@ import { logger } from "../../utils/logger";
 import { TaskException } from "./exceptions/taskException";
 
 async function grabMbid() {
-  let songs = await songService.getMbidlessSongs();
+  let songs = await songService.getMbidlessSong();
 
   for (let i = 0; i < songs.length; i++) {
     try {
       let songData = await fileService.getMetadataFromFile(songs[i].path)
-      let mbid = await songService.getSongMbid(songData);
+      let mbid = await songService.fetchSongMBId(songData);
       if (!mbid) continue; //Pass if no Mbid have been found
 
       songs[i].mbid = mbid;
@@ -39,13 +39,13 @@ async function grabMbid() {
 }
 
 async function updateSongMetadata() {
-  let songs = await songService.metadataGrabberGet();
+  let songs = await songService.getSongForMetadataGrabber();
 
   for (let i = 0; i < songs.length; i++) {
     try {
       if (!songs[i].mbid) continue
 
-      let { song, albumMbid, artistsMbid } = await songService.getSongMetadata(songs[i]);
+      let { song, albumMbid, artistsMbid } = await songService.fetchSongMetadata(songs[i]);
 
       if (song.title) songs[i].title = song.title;
       if (song.artist) songs[i].artist = song.artist;
@@ -71,13 +71,13 @@ async function updateSongMetadata() {
 }
 
 async function updateAlbumMetadata() {
-  let albums = await albumService.metadataGrabberGet()
+  let albums = await albumService.getAlbumForMetadataGrabber()
 
   for (let i = 0; i < albums.length; i++) {
     try {
       if (!albums[i].mbid) continue
 
-      let { album, artistsMbid } = await albumService.getAlbumMetadata(albums[i])
+      let { album, artistsMbid } = await albumService.fetchAlbumMetadata(albums[i])
 
       if (album.artist) albums[i].artist = album.artist
       if (album.title) albums[i].title = album.title

@@ -18,11 +18,11 @@ import { songService } from "../service/songService";
 import { logger } from "../utils/logger";
 import { ControllerException } from "./exceptions/controllerException";
 
-export async function getAllSongsInfoCtrl(req: Request, res: Response) {
+export async function getAllSongInfo(req: Request, res: Response) {
   try {
-    var result = await songService.getAllSongs();
+    var result = await songService.getAllSong();
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getAllSongsInfoCtrl", err));
+    logger.error(new ControllerException(__filename, "getAllSongInfo", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -44,7 +44,7 @@ export async function getAllSongsInfoCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getOneSongInfoCtrl(req: Request, res: Response) {
+export async function getSongInfoById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -58,7 +58,7 @@ export async function getOneSongInfoCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getOneSongInfoCtrl", err));
+    logger.error(new ControllerException(__filename, "getSongInfoById", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -79,7 +79,7 @@ export async function getOneSongInfoCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getSongStreamCtrl(req: Request, res: Response) {
+export async function getSongFileById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -93,7 +93,7 @@ export async function getSongStreamCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getSongStreamCtrl", err));
+    logger.error(new ControllerException(__filename, "getSongFileById", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -105,7 +105,7 @@ export async function getSongStreamCtrl(req: Request, res: Response) {
   res.sendFile(result.path);
 }
 
-export async function updateLikeCtrl(req: Request, res: Response) {
+export async function updateLike(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -119,7 +119,7 @@ export async function updateLikeCtrl(req: Request, res: Response) {
   try {
     var result = await songService.getSong(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "updateLikeCtrl", err));
+    logger.error(new ControllerException(__filename, "updateLike", err));
     res.json({
       status: "fail",
       statusCode: 1,

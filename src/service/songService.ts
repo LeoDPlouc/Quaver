@@ -18,12 +18,12 @@ import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
 
 class SongService {
-  public async getAllSongs(this: SongService): Promise<Song[]> {
+  public async getAllSong(this: SongService): Promise<Song[]> {
     return await songDAO
-      .getAllSongModels()
+      .getAllSongModel()
       .then((result) => result.map(mapSong))
       .catch((err) => {
-        throw new ServiceException(__filename, "getAllSongs", err);
+        throw new ServiceException(__filename, "getAllSong", err);
       });
   }
 
@@ -65,39 +65,39 @@ class SongService {
     return mapSong(result);
   }
 
-  public async getAllSongPaths(this: SongService): Promise<string[]> {
-    return await songDAO.getAllSongModelPaths().catch((err) => {
-      throw new ServiceException(__filename, "getAllSongPaths", err);
+  public async getPathsFromAllSong(this: SongService): Promise<string[]> {
+    return await songDAO.getPathsFromAllSong().catch((err) => {
+      throw new ServiceException(__filename, "getPathsFromAllSong", err);
     });
   }
 
-  public async getSongMbid(this: SongService, song: SongData): Promise<string> {
-    return await musicBrainzApiAccess.getSongMBId(song).catch(err => {
-      throw new ServiceException(__filename, "getSongMbid", err)
+  public async fetchSongMBId(this: SongService, song: SongData): Promise<string> {
+    return await musicBrainzApiAccess.fetchSongMBId(song).catch(err => {
+      throw new ServiceException(__filename, "fetchSongMBId", err)
     })
   }
 
-  public async getMbidlessSongs(this: SongService): Promise<Song[]> {
+  public async getMbidlessSong(this: SongService): Promise<Song[]> {
     return await songDAO
-      .getMbidlessSongModels()
+      .getMbidlessSongModel()
       .then((result) => result.map(mapSong))
       .catch((err) => {
-        throw new ServiceException(__filename, "getMbidlessSongs", err);
+        throw new ServiceException(__filename, "getMbidlessSong", err);
       });
   }
 
-  public async metadataGrabberGet(this: SongService): Promise<Song[]> {
-    return await songDAO.metadataGrabberGet()
+  public async getSongForMetadataGrabber(this: SongService): Promise<Song[]> {
+    return await songDAO.getSongModelForMetadataGrabber()
       .then((result) => result.map(mapSong))
       .catch((err) => {
-        throw new ServiceException(__filename, "getUpdatableAlbum", err);
+        throw new ServiceException(__filename, "getSongForMetadataGrabber", err);
       });
   }
 
-  public async getSongMetadata(this: SongService, song: Song): Promise<SongMetadataAndMbids> {
-    return await musicBrainzApiAccess.getSongMetadata(song.mbid)
+  public async fetchSongMetadata(this: SongService, song: Song): Promise<SongMetadataAndMbids> {
+    return await musicBrainzApiAccess.fetchSongMetadata(song.mbid)
       .catch(err => {
-        throw new ServiceException(__filename, "getSongMetadata", err)
+        throw new ServiceException(__filename, "fetchSongMetadata", err)
       })
   }
 }

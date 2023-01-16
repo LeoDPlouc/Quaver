@@ -18,23 +18,23 @@ import { TaskException } from "./exceptions/taskException";
 
 async function updateAlbumCover(album: Album) {
   try {
-    let coverData = await albumService.getCover(album);
+    let coverData = await albumService.fetchAlbumCover(album);
     if (!coverData) return;
 
     let resizes = await imageService.makeResizing(coverData);
 
-    let tinyPath = await imageService.saveImageFile(resizes.tiny);
+    let tinyPath = await imageService.saveImageFileToDisk(resizes.tiny);
     if (resizes.small) {
-      var smallPath = await imageService.saveImageFile(resizes.small);
+      var smallPath = await imageService.saveImageFileToDisk(resizes.small);
     }
     if (resizes.medium) {
-      var mediumPath = await imageService.saveImageFile(resizes.medium);
+      var mediumPath = await imageService.saveImageFileToDisk(resizes.medium);
     }
     if (resizes.large) {
-      var largePath = await imageService.saveImageFile(resizes.large);
+      var largePath = await imageService.saveImageFileToDisk(resizes.large);
     }
     if (resizes.verylarge) {
-      var verylargePath = await imageService.saveImageFile(resizes.verylarge);
+      var verylargePath = await imageService.saveImageFileToDisk(resizes.verylarge);
     }
 
     let id = await imageService.createImage({
@@ -57,7 +57,7 @@ async function updateAlbumCover(album: Album) {
 
 export default async function doWork() {
   logger.info("Cover grabber started", "Cover Grabber");
-  let albums = await albumService.getToCoverGrabAlbums();
+  let albums = await albumService.getAlbumToCoverGrab();
 
   for (let i = 0; i < albums.length; i++) {
     await updateAlbumCover(albums[i])

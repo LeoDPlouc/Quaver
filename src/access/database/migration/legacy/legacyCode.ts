@@ -60,7 +60,7 @@ export async function getAlbumCoverLegacy(album: Album & Document<any, any, Albu
     //Save the image cover on the hard drive
 
     try {
-      var path = await imageFileAccess.saveImage(image, extension);
+      var path = await imageFileAccess.saveImageFileToDisk(image, extension);
     } catch (err) {
       throw new MigrationException(__filename, "getAlbumCoverLegacy", err);
     }
@@ -107,7 +107,7 @@ export async function getAlbumCoverLegacy2(album: Album & Document<any, any, Alb
     //Save the image cover on the hard drive
 
     try {
-      var path = await imageFileAccess.saveImage(cover, ext);
+      var path = await imageFileAccess.saveImageFileToDisk(cover, ext);
     } catch (err) {
       throw new MigrationException(__filename, "getAlbumCoverLegacy2", err);
     }

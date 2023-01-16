@@ -44,7 +44,7 @@ async function collect() {
 }
 
 async function updatePaths(): Promise<void> {
-  songPaths = await songService.getAllSongPaths().catch((err) => {
+  songPaths = await songService.getPathsFromAllSong().catch((err) => {
     throw new TaskException(__filename, "updatePaths", err);
   });
 }

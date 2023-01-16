@@ -18,13 +18,13 @@ import { fileService } from "../../service/fileService";
 import { FileSystemException } from "../../utils/exceptions/fileSystemException";
 
 class ImageFileAccess {
-  public async saveImage(this: ImageFileAccess, data: string, extension: string): Promise<string> {
+  public async saveImageFileToDisk(this: ImageFileAccess, data: string, extension: string): Promise<string> {
     //Create an UUID for the name of the file
     let filename = v4() + extension;
     let p = path.resolve(fileService.getImagesPath(), filename);
 
     await fs.writeFile(p, data, { encoding: "binary" }).catch((err) => {
-      throw new FileSystemException(__filename, "saveImage", err);
+      throw new FileSystemException(__filename, "saveImageFileToDisk", err);
     });
 
     return p;

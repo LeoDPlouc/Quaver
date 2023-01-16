@@ -20,11 +20,11 @@ import { logger } from "../utils/logger";
 import { artistService } from "../service/artistService";
 import { ControllerException } from "./exceptions/controllerException";
 
-export async function getAllArtistsCtrl(req: Request, res: Response) {
+export async function getAllArtist(req: Request, res: Response) {
   try {
-    var result = await artistService.getAllArtists();
+    var result = await artistService.getAllArtist();
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getAllArtistsCtrl", err));
+    logger.error(new ControllerException(__filename, "getAllArtist", err));
     res.json({
       statusCode: 1,
       errorMessage: "Server error",
@@ -46,7 +46,7 @@ export async function getAllArtistsCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getOneArtistCtrl(req: Request, res: Response) {
+export async function getArtistById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -60,7 +60,7 @@ export async function getOneArtistCtrl(req: Request, res: Response) {
   try {
     var result = await artistService.getArtist(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getOneArtistCtrl", err));
+    logger.error(new ControllerException(__filename, "getArtistById", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -81,7 +81,7 @@ export async function getOneArtistCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getArtistSongsCtrl(req: Request, res: Response) {
+export async function getSongFromArtistById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -93,9 +93,9 @@ export async function getArtistSongsCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await artistService.getArtistSongs(req.params.id);
+    var result = await artistService.getSongFromArtist(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getArtistSongsCtrl", err));
+    logger.error(new ControllerException(__filename, "getSongFromArtistById", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -117,7 +117,7 @@ export async function getArtistSongsCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getArtistAlbumsCtrl(req: Request, res: Response) {
+export async function getAlbumFromArtistById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -129,9 +129,9 @@ export async function getArtistAlbumsCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await artistService.getArtistAlbums(req.params.id);
+    var result = await artistService.getAlbumFromArtist(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getArtistAlbumsCtrl", err));
+    logger.error(new ControllerException(__filename, "getAlbumFromArtistById", err));
     res.json({
       status: "fail",
       statusCode: 1,

@@ -19,11 +19,11 @@ import { ImageSize } from "../models/imageSize";
 import { imageService } from "../service/imageService";
 import { ControllerException } from "./exceptions/controllerException";
 
-export async function getAllImagesInfoCtrl(req: Request, res: Response) {
+export async function getAllImageInfo(req: Request, res: Response) {
   try {
     var result = await imageService.getAllImages();
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getAllImagesInfoCtrl", err));
+    logger.error(new ControllerException(__filename, "getAllImageInfo", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -45,7 +45,7 @@ export async function getAllImagesInfoCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getOneImageInfoCtrl(req: Request, res: Response) {
+export async function getImageInfoById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -59,7 +59,7 @@ export async function getOneImageInfoCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getOneImageInfoCtrl", err));
+    logger.error(new ControllerException(__filename, "getImageInfoById", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -79,7 +79,9 @@ export async function getOneImageInfoCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getImageFileCtrl(req: Request, res: Response) {
+
+// DEPRECATED
+export async function getImageFileById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -93,7 +95,7 @@ export async function getImageFileCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getImageFileCtrl", err));
+    logger.error(new ControllerException(__filename, "getImageFileById", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -111,7 +113,7 @@ export async function getImageFileCtrl(req: Request, res: Response) {
 
 // DEPRECIATED - retirer le fallback sur path
 
-export async function getImageFileWithSizeCtrl(req: Request, res: Response) {
+export async function getImageFileWithSizeById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -125,7 +127,7 @@ export async function getImageFileWithSizeCtrl(req: Request, res: Response) {
   try {
     var result = await imageService.getImage(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getImageFileWithSizeCtrl", err));
+    logger.error(new ControllerException(__filename, "getImageFileWithSizeById", err));
     res.json({
       status: "fail",
       statusCode: 1,
@@ -135,6 +137,8 @@ export async function getImageFileWithSizeCtrl(req: Request, res: Response) {
   }
 
   let size = req.params.size;
+
+  // Refacto controllers : utiliser un switch
 
   if (size == ImageSize.verylarge) {
     if (result.verylarge) {

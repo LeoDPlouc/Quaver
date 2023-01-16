@@ -12,25 +12,20 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Router } from "express";
-import {
-  getAllSongsInfoCtrl,
-  getOneSongInfoCtrl,
-  getSongStreamCtrl,
-  updateLikeCtrl,
-} from "../controllers/songController";
 import { protect } from "../middleware/authMiddleware";
 import { param, body } from "express-validator";
+import { getAllSongInfo, getSongFileById, getSongInfoById, updateLike } from "../controllers/songController";
 
 const router = Router();
 
-router.route("/").get(protect, getAllSongsInfoCtrl);
+router.route("/").get(protect, getAllSongInfo);
 
 router
   .route("/:id")
   .get(
     protect,
     param("id").not().equals("undefined").not().equals("null"),
-    getOneSongInfoCtrl
+    getSongInfoById
   );
 
 router
@@ -38,7 +33,7 @@ router
   .get(
     protect,
     param("id").not().equals("undefined").not().equals("null"),
-    getSongStreamCtrl
+    getSongFileById
   );
 
 router
@@ -46,7 +41,7 @@ router
   .patch(
     param("id").not().equals("undefined").not().equals("null"),
     body("like").isIn([-1, 0, 1]),
-    updateLikeCtrl
+    updateLike
   );
 
 export = router;
