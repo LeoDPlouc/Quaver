@@ -12,9 +12,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Router } from "express"
-import { getAllAlbumsCtrl, getAlbumCtrl, getAlbumSongsCtrl } from "../controllers/albumController"
 import { protect } from "../middleware/authMiddleware"
 import { param } from "express-validator"
+import { getAlbumById, getAllAlbum, getSongFromAlbumById } from "../controllers/albumController"
 
 const router = Router()
 
@@ -22,21 +22,21 @@ const router = Router()
 router.route("/")
     .get(
         protect,
-        getAllAlbumsCtrl
+        getAllAlbum
     )
 
 router.route("/:id")
     .get(
         protect,
         param("id").not().equals("undefined").not().equals("null"),
-        getAlbumCtrl
+        getAlbumById
     )
 
 router.route("/:id/songs")
     .get(
         protect,
         param("id").not().equals("undefined").not().equals("null"),
-        getAlbumSongsCtrl
+        getSongFromAlbumById
     )
 
 export = router

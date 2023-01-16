@@ -22,12 +22,12 @@ import { SongDocument } from "./songDAO";
 export type AlbumDocument = Album & Document<any, any, Album>;
 
 class AlbumDAO {
-  public async getAllAlbumModels(this: AlbumDAO): Promise<AlbumDocument[]> {
+  public async getAllAlbumModel(this: AlbumDAO): Promise<AlbumDocument[]> {
     return await albumModel.find()
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
-        throw new DAOException(__filename, "getAllAlbumModels", err);
+        throw new DAOException(__filename, "getAllAlbumModel", err);
       });
   }
 
@@ -40,12 +40,12 @@ class AlbumDAO {
       });
   }
 
-  public async getAlbumSongModel(this: AlbumDAO, id: string): Promise<SongDocument[]> {
+  public async getSongModelFromAlbum(this: AlbumDAO, id: string): Promise<SongDocument[]> {
     return await songModel.find({ albumId: id })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
-        throw new DAOException(__filename, "getAlbumSongModel", err);
+        throw new DAOException(__filename, "getSongModelFromAlbum", err);
       });
   }
 
@@ -76,7 +76,7 @@ class AlbumDAO {
     });
   }
 
-  public async getUpdatableAlbumModels(this: AlbumDAO): Promise<AlbumDocument[]> {
+  public async getAlbumModelToUpdate(this: AlbumDAO): Promise<AlbumDocument[]> {
     return await albumModel
       .find({
         $or: [
@@ -88,11 +88,11 @@ class AlbumDAO {
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
-        throw new DAOException(__filename, "getUpdatableAlbumModels", err);
+        throw new DAOException(__filename, "getAlbumModelToUpdate", err);
       });
   }
 
-  public async getToCoverGrabAlbumsModels(this: AlbumDAO): Promise<AlbumDocument[]> {
+  public async getAlbumModelToCoverGrab(this: AlbumDAO): Promise<AlbumDocument[]> {
     return await albumModel
       .find({
         $or: [
@@ -104,7 +104,7 @@ class AlbumDAO {
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
-        throw new DAOException(__filename, "getToCoverGrabAlbumsModels", err);
+        throw new DAOException(__filename, "getAlbumModelToCoverGrab", err);
       });
   }
 
@@ -117,7 +117,7 @@ class AlbumDAO {
       });
   }
 
-  public async metadataGrabberGet(this: AlbumDAO): Promise<AlbumDocument[]> {
+  public async getAlbumModelForMetadataGrabber(this: AlbumDAO): Promise<AlbumDocument[]> {
     return await albumModel
       .find({
         $or: [
@@ -128,7 +128,7 @@ class AlbumDAO {
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
       .catch(err => {
-        throw new DAOException(__filename, "metadataGrabberGet", err)
+        throw new DAOException(__filename, "getAlbumModelForMetadataGrabber", err)
       })
   }
 }

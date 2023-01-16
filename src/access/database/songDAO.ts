@@ -21,12 +21,12 @@ import { songModel } from "./models/songModel";
 export type SongDocument = Omit<Omit<Document<unknown, any, SongDb> & SongDb & { _id: Types.ObjectId; }, "albumV2"> & Pick<Song, "albumV2">, "artists"> & Pick<Song, "artists">;
 
 class SongDAO {
-  public async getAllSongModels(this: SongDAO): Promise<SongDocument[]> {
+  public async getAllSongModel(this: SongDAO): Promise<SongDocument[]> {
     return await songModel.find()
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
-        throw new DAOException(__filename, "getAllSongModels", err);
+        throw new DAOException(__filename, "getAllSongModel", err);
       });
   }
 
@@ -66,27 +66,27 @@ class SongDAO {
       });
   }
 
-  public async getAllSongModelPaths(this: SongDAO): Promise<string[]> {
+  public async getPathsFromAllSong(this: SongDAO): Promise<string[]> {
     return await songModel
       .find({}, { path: 1 })
       .then((s) => s.map((s) => s.path))
       .catch((err) => {
-        throw new DAOException(__filename, "getAllSongModelPaths", err);
+        throw new DAOException(__filename, "getPathsFromAllSong", err);
       });
   }
 
-  public async getMbidlessSongModels(this: SongDAO): Promise<SongDocument[]> {
+  public async getMbidlessSongModel(this: SongDAO): Promise<SongDocument[]> {
     return await songModel.find({
       mbid: { $exists: false }
     })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
-        throw new DAOException(__filename, "getMbidlessSongModels", err);
+        throw new DAOException(__filename, "getMbidlessSongModel", err);
       });
   }
 
-  public async metadataGrabberGet(this: SongDAO): Promise<SongDocument[]> {
+  public async getSongModelForMetadataGrabber(this: SongDAO): Promise<SongDocument[]> {
     return await songModel
       .find({
         $or: [
@@ -97,7 +97,7 @@ class SongDAO {
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
-        throw new DAOException(__filename, "getUpdatableAlbumModels", err);
+        throw new DAOException(__filename, "getSongModelForMetadataGrabber", err);
       });
   }
 }

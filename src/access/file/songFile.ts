@@ -20,7 +20,7 @@ import { FileSystemException } from "../../utils/exceptions/fileSystemException"
 import { logger } from "../../utils/logger";
 
 class SongFileAccess {
-  public async getAcoustid(this: SongFileAccess, songPath: string): Promise<string> {
+  public async computeAcoustid(this: SongFileAccess, songPath: string): Promise<string> {
     let fingerprint: FpcalcResult<string>;
 
     //If fpcalc isn't in PATH, use fpcalc with its path
@@ -28,7 +28,7 @@ class SongFileAccess {
       if (FPCALC_PATH) fingerprint = await fp(songPath, { command: FPCALC_PATH });
       else fingerprint = await fp(songPath);
     } catch (err) {
-      throw new FileSystemException(__filename, "getAcoustid", err);
+      throw new FileSystemException(__filename, "computeAcoustid", err);
     }
 
     return fingerprint.fingerprint;

@@ -24,11 +24,11 @@ import { SongDocument } from "./songDAO";
 export type ArtistDocument = Artist & Document<any, any, Artist>;
 
 class ArtistDAO {
-  public async getAllArtistModels(this: ArtistDAO): Promise<ArtistDocument[]> {
+  public async getAllArtistModel(this: ArtistDAO): Promise<ArtistDocument[]> {
     return await artistModel.find()
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
-        throw new DAOException(__filename, "getAllArtistModels", err);
+        throw new DAOException(__filename, "getAllArtistModel", err);
       });
   }
 
@@ -40,20 +40,20 @@ class ArtistDAO {
       });
   }
 
-  public async getArtistSongModels(this: ArtistDAO, id: string): Promise<SongDocument[]> {
+  public async getSongModelFromArtist(this: ArtistDAO, id: string): Promise<SongDocument[]> {
     return await songModel.find({ artistId: id })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
-        throw new DAOException(__filename, "getArtistSongModels", err);
+        throw new DAOException(__filename, "getSongModelFromArtist", err);
       });
   }
 
-  public async getArtistAlbumModels(this: ArtistDAO, id: string): Promise<AlbumDocument[]> {
+  public async getAlbumModelFromArtist(this: ArtistDAO, id: string): Promise<AlbumDocument[]> {
     return await albumModel.find({ artistId: id })
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2").catch((err) => {
-        throw new DAOException(__filename, "getArtistAlbumModels", err);
+        throw new DAOException(__filename, "getAlbumModelFromArtist", err);
       });
   }
 

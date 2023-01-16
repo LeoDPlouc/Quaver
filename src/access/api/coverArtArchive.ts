@@ -22,7 +22,7 @@ export const caApi = new coverart({
 });
 
 class CoverArtArchiveAccess {
-  public async getAlbumCover(mbid: string): Promise<imageFileData> {
+  public async fetchAlbumCover(mbid: string): Promise<imageFileData> {
     //Fetch Cover art
     let p = new Promise<any>((resolve, reject) => {
       caApi.release(mbid, { piece: "front", size: "large" }, (err, data) => {
@@ -35,7 +35,7 @@ class CoverArtArchiveAccess {
 
     let { image, extension } = await p
       .catch(err => {
-        throw new CoverArtArchiveException(__filename, "getAlbumCover", JSON.stringify(err))
+        throw new CoverArtArchiveException(__filename, "fetchAlbumCover", JSON.stringify(err))
       });
 
     if (!image) {

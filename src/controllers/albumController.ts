@@ -19,11 +19,11 @@ import { albumService } from "../service/albumService";
 import { logger } from "../utils/logger";
 import { ControllerException } from "./exceptions/controllerException";
 
-export async function getAllAlbumsCtrl(req: Request, res: Response) {
+export async function getAllAlbum(req: Request, res: Response) {
   try {
     var result = await albumService.getAllAlbums();
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getAllAlbumsCtrl", err));
+    logger.error(new ControllerException(__filename, "getAllAlbum", err));
 
     res.json({
       status: "fail",
@@ -46,7 +46,7 @@ export async function getAllAlbumsCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getAlbumCtrl(req: Request, res: Response) {
+export async function getAlbumById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -61,7 +61,7 @@ export async function getAlbumCtrl(req: Request, res: Response) {
   try {
     var result = await albumService.getAlbum(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getAlbumCtrl", err));
+    logger.error(new ControllerException(__filename, "getAlbumById", err));
 
     res.json({
       status: "fail",
@@ -82,7 +82,7 @@ export async function getAlbumCtrl(req: Request, res: Response) {
   });
 }
 
-export async function getAlbumSongsCtrl(req: Request, res: Response) {
+export async function getSongFromAlbumById(req: Request, res: Response) {
   let err = validationResult(req);
   if (!err.isEmpty()) {
     res.json({
@@ -94,9 +94,9 @@ export async function getAlbumSongsCtrl(req: Request, res: Response) {
   }
 
   try {
-    var result = await albumService.getAlbumSongs(req.params.id);
+    var result = await albumService.getSongFromAlbum(req.params.id);
   } catch (err) {
-    logger.error(new ControllerException(__filename, "getAlbumSongsCtrl", err));
+    logger.error(new ControllerException(__filename, "getSongFromAlbumById", err));
     res.json({
       status: "fail",
       statusCode: 1,

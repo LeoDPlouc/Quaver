@@ -44,17 +44,17 @@ class MusicBrainzApiAccess {
       });
   }
 
-  public async getSongMBId(this: MusicBrainzApiAccess, song: SongData): Promise<string> {
+  public async fetchSongMBId(this: MusicBrainzApiAccess, song: SongData): Promise<string> {
     //Build query with available info
     return await mbApi2.searchRecording({ recording: song.title, artist: song.artist, release: song.album, date: String(song.year) })
       .then(result => result.recordings.find(recording => recording.score == 100))
       .then(recording => recording ? recording.id : null)
       .catch((err) => {
-        throw new MusicBrainzException(__filename, "getSongMBId", err);
+        throw new MusicBrainzException(__filename, "fetchSongMBId", err);
       });
   }
 
-  public async getSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<SongMetadataAndMbids> {
+  public async fetchSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<SongMetadataAndMbids> {
     let song: SongMetadata = {}
 
     try {
@@ -70,13 +70,13 @@ class MusicBrainzApiAccess {
       var albumMbid = release.id
       var artistsMbid = artists.map(a => a.artist.id)
     } catch (err) {
-      logger.error(new MusicBrainzException(__filename, "getSongMetadata", err));
+      logger.error(new MusicBrainzException(__filename, "fetchSongMetadata", err));
     }
 
     return { song, albumMbid, artistsMbid }
   }
 
-  public async getAlbumMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<AlbumMetadataAndMbids> {
+  public async fetchAlbumMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<AlbumMetadataAndMbids> {
     let album: AlbumMetadata = {}
 
     try {
@@ -89,7 +89,7 @@ class MusicBrainzApiAccess {
 
       var artistsMbid = artists.map(a => a.artist.id)
     } catch (err) {
-      logger.error(new MusicBrainzException(__filename, "getAlbumMetadata", err));
+      logger.error(new MusicBrainzException(__filename, "fetchAlbumMetadata", err));
     }
 
     return { album, artistsMbid };

@@ -13,25 +13,20 @@
 
 import { Router } from "express";
 
-import {
-  getAllImagesInfoCtrl,
-  getImageFileCtrl,
-  getImageFileWithSizeCtrl,
-  getOneImageInfoCtrl,
-} from "../controllers/imageController";
 import { protect } from "../middleware/authMiddleware";
 import { param } from "express-validator";
+import { getAllImageInfo, getImageFileById, getImageFileWithSizeById, getImageInfoById } from "../controllers/imageController";
 
 const router = Router();
 
-router.route("/").get(protect, getAllImagesInfoCtrl);
+router.route("/").get(protect, getAllImageInfo);
 
 router
   .route("/:id")
   .get(
     protect,
     param("id").not().equals("undefined").not().equals("null"),
-    getOneImageInfoCtrl
+    getImageInfoById
   );
 
 // DEPRECIATED
@@ -40,7 +35,7 @@ router
   .get(
     protect,
     param("id").not().equals("undefined").not().equals("null"),
-    getImageFileCtrl
+    getImageFileById
   );
 
 router
@@ -49,7 +44,7 @@ router
     protect,
     param("id").not().equals("undefined").not().equals("null"),
     param("size").not().equals("undefined").not().equals("null"),
-    getImageFileWithSizeCtrl
+    getImageFileWithSizeById
   );
 
 export = router;

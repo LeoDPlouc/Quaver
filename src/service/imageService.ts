@@ -50,13 +50,13 @@ class ImageService {
     return mapImage(result);
   }
 
-  public async saveImageFile(this: ImageService, fileData: imageFileData): Promise<string> {
+  public async saveImageFileToDisk(this: ImageService, fileData: imageFileData): Promise<string> {
     if (!fileData) {
       return;
     }
 
-    return await imageFileAccess.saveImage(fileData.data, fileData.extension).catch((err) => {
-      throw new ServiceException(__filename, "saveImageFile", err);
+    return await imageFileAccess.saveImageFileToDisk(fileData.data, fileData.extension).catch((err) => {
+      throw new ServiceException(__filename, "saveImageFileToDisk", err);
     });
   }
 

@@ -20,12 +20,12 @@ import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
 
 class ArtistService {
-  public async getAllArtists(this: ArtistService): Promise<Artist[]> {
+  public async getAllArtist(this: ArtistService): Promise<Artist[]> {
     return await artistDAO
-      .getAllArtistModels()
+      .getAllArtistModel()
       .then((result) => result.map(mapArtist))
       .catch((err) => {
-        throw new ServiceException(__filename, "getAllArtists", err);
+        throw new ServiceException(__filename, "getAllArtist", err);
       });
   }
 
@@ -41,22 +41,22 @@ class ArtistService {
     return mapArtist(result);
   }
 
-  public async getArtistSongs(this: ArtistService, id: string): Promise<Song[]> {
+  public async getSongFromArtist(this: ArtistService, id: string): Promise<Song[]> {
     return await artistDAO
-      .getArtistSongModels(id)
+      .getSongModelFromArtist(id)
       .then((result) => result.map(mapSong))
       .catch((err) => {
-        throw new ServiceException(__filename, "getArtistSongs", err);
+        throw new ServiceException(__filename, "getSongFromArtist", err);
       });
   }
 
-  public async getArtistAlbums(id: string): Promise<Album[]> {
-    let result = await artistDAO.getArtistAlbumModels(id).catch((err) => {
-      throw new ServiceException(__filename, "getArtistAlbums", err);
+  public async getAlbumFromArtist(id: string): Promise<Album[]> {
+    let result = await artistDAO.getAlbumModelFromArtist(id).catch((err) => {
+      throw new ServiceException(__filename, "getAlbumFromArtist", err);
     });
 
     if (!result) {
-      throw new NotFoundException(__filename, "getArtistAlbums", "Artist not found");
+      throw new NotFoundException(__filename, "getAlbumFromArtist", "Artist not found");
     }
 
     return result.map(mapAlbum);
