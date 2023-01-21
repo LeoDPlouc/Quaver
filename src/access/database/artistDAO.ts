@@ -12,8 +12,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
+import { UPDATE_METADATA_PERIOD } from "../../config/appConfig";
 import { mapAlbumDb } from "../../mappers/albumMapper";
 import { mapArtistDb } from "../../mappers/artistMapper";
+import { Album } from "../../models/album";
+import { Song } from "../../models/song";
 import { AlbumDocument } from "./albumDAO";
 import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
@@ -75,7 +78,7 @@ class ArtistDAO {
   }
 
   public async updateArtistModel(this: ArtistDAO, artist: Artist): Promise<void> {
-    await artistModel.findByIdAndUpdate(artist.id, mapAlbumDb(artist)).catch((err) => {
+    await artistModel.findByIdAndUpdate(artist.id, mapArtistDb(artist)).catch((err) => {
       throw new DAOException(__filename, "updateArtistModel", err);
     });
   }
@@ -87,6 +90,20 @@ class ArtistDAO {
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "findArtistsByMbids", err)
+      })
+  }
+
+  public async getArtistModelForMetadataGrabber(this: ArtistDAO): Promise<ArtistDocument[]> {
+    return await artistModel
+      .find({
+        $or: [
+          { lastUpdated: null },
+          { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
+        ],
+      })
+      .populate<Pick<Artist, "coverV2">>("coverV2")
+      .catch(err => {
+        throw new DAOException(__filename, "getArtistModelForMetadataGrabber", err)
       })
   }
 }

@@ -27,6 +27,12 @@ const artistSchema = new Schema<ArtistDb>({
     },
     mbid: {
         type: String
+    },
+    createdAt: {
+        type: Number
+    },
+    lastUpdated: {
+        type: Number
     }
 })
 

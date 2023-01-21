@@ -1,5 +1,5 @@
 // Quaver is a self-hostable music player and music library manager
-// Copyright (C) 2022  DPlouc
+// Copyright (C) 2023  DPlouc
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -11,7 +11,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface AlbumMetadataAndMbids {
-    album: AlbumMetadata
-    artistsMbid: string[]
+interface ArtistMetadata {
+    name?: string
 }

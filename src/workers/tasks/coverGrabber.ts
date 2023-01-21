@@ -11,6 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Album } from "../../models/album";
 import { albumService } from "../../service/albumService";
 import { imageService } from "../../service/imageService";
 import { logger } from "../../utils/logger";

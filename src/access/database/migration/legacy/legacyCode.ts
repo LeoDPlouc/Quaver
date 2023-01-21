@@ -19,6 +19,7 @@ import { imageModel } from "../../models/imageModel";
 import { logger } from "../../../../utils/logger";
 import { imageFileAccess } from "../../../file/imageFile";
 import { MigrationException } from "../exceptions/MigrationException";
+import { Album } from "../../../../models/album";
 
 export async function getAlbumMBIdLegacy(album: Album): Promise<string> {
   let query = `release:${album.title as string}`;

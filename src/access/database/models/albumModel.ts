@@ -50,6 +50,10 @@ const albumSchema = new Schema<AlbumDb>({
   lastCoverUpdate: {
     type: Number,
   },
+  joinings: [{
+      mbid: String,
+      joinphrase: String
+  }]
 });
 
 export const albumModel = model<AlbumDb>("Album", albumSchema);

@@ -11,7 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface Song {
+import { Album } from "./album"
+import { Joining } from "./joining"
+
+export interface Song {
     id?: string
     title?: string,
     n?: number,
@@ -29,4 +32,5 @@ interface Song {
     format?: string,
     mbid?: string
     lastUpdated?: number
+    joinings?: Joining[]
 }

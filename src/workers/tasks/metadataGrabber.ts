@@ -11,6 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { AlbumMetadata } from "../../access/api/DTO/albumMetadata";
 import { albumService } from "../../service/albumService";
 import { artistService } from "../../service/artistService";
 import { fileService } from "../../service/fileService";
@@ -45,17 +46,20 @@ async function updateSongMetadata() {
     try {
       if (!songs[i].mbid) continue
 
-      let { song, albumMbid, artistsMbid } = await songService.fetchSongMetadata(songs[i]);
+      let song = await songService.fetchSongMetadata(songs[i]);
 
       if (song.title) songs[i].title = song.title;
-      if (song.artist) songs[i].artist = song.artist;
+      if (song.artists) songs[i].artists = song.artists;
       if (song.year) songs[i].year = song.year;
       if (song.n) songs[i].n = song.n
+      songs[i].joinings = song.joinings
 
+      let albumMbid = song.album.mbid
       if (albumMbid) {
         songs[i].albumV2 = await albumService.getAlbumByMbidOrCreate(albumMbid)
       }
 
+      let artistsMbid = song.artists.map(artist => artist.mbid)
       if (artistsMbid?.length) {
         songs[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
       }
@@ -77,12 +81,13 @@ async function updateAlbumMetadata() {
     try {
       if (!albums[i].mbid) continue
 
-      let { album, artistsMbid } = await albumService.fetchAlbumMetadata(albums[i])
-
-      if (album.artist) albums[i].artist = album.artist
+      let album = await albumService.fetchAlbumMetadata(albums[i])
+      if (album.artists) albums[i].artists = album.artists
       if (album.title) albums[i].title = album.title
       if (album.year) albums[i].year = album.year
+      albums[i].joinings = album.joinings
 
+      let artistsMbid = album.artists.map(artist => artist.mbid)
       if (artistsMbid?.length) {
         albums[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
       }
@@ -97,12 +102,34 @@ async function updateAlbumMetadata() {
   }
 }
 
+async function updateArtistMetadata() {
+  let artists = await artistService.getArtistForMetadataGrabber()
+
+  for (let i = 0; i < artists.length; i++) {
+    try {
+      if (!artists[i].mbid) continue
+
+      let artist = await artistService.fetchArtistMetadata(artists[i])
+
+      if (artist.name) artists[i].name = artist.name
+
+      artists[i].lastUpdated = Date.now()
+
+      await artistService.updateArtist(artists[i])
+      logger.info(`Updated metadata for artist ${artists[i].id}`, "Metadata Grabber")
+    } catch (err) {
+      logger.error(new TaskException(__filename, "updateArtistMetadata", err))
+    }
+  }
+}
+
 export default async function doWork() {
   logger.info("Metadata grabber started", "Metadata Grabber");
   try {
     await grabMbid();
     await updateSongMetadata();
     await updateAlbumMetadata()
+    await updateArtistMetadata()
   } catch (err) {
     logger.error(new TaskException(__filename, "doWork", err))
   }

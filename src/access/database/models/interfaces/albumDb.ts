@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Types } from "mongoose";
+import { Joining } from "../../../../models/joining";
 
 export interface AlbumDb {
   title?: string;
@@ -25,4 +26,5 @@ export interface AlbumDb {
   mbids?: string[]; // DEPRECATED
   lastUpdated?: number;
   lastCoverUpdate?: number;
+  joinings?: Joining[]
 }

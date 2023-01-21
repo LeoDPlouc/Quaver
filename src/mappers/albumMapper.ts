@@ -13,6 +13,8 @@
 
 import { Document, Types } from "mongoose"
 import { AlbumDb } from "../access/database/models/interfaces/albumDb"
+import { AlbumDTO } from "../controllers/DTO/albumDTO"
+import { Album } from "../models/album"
 import { mapArtist, mapArtistDTO } from "./artistMapper"
 import { mapImage, mapImageDTO } from "./imageMapper"
 
@@ -29,7 +31,11 @@ export function mapAlbum(data: Album & Document<any, any, Album>): Album {
         lastUpdated: data.lastUpdated,
         year: data.year,
         mbid: data.mbid,
-        mbids: data.mbids
+        mbids: data.mbids,
+        joinings: data.joinings?.map(joining => ({
+            mbid: joining.mbid,
+            joinphrase: joining.joinphrase
+        }))
     }
     return cleanedData
 }
@@ -43,7 +49,11 @@ export function mapAlbumDTO(data: Album): AlbumDTO {
         artists: data.artists?.map(mapArtistDTO),
         cover: data.cover, // DEPRECATED
         coverV2: data.coverV2 ? mapImageDTO(data.coverV2) : undefined,
-        year: data.year
+        year: data.year,
+        joinings: data.joinings?.map(joining => ({
+            mbid: joining.mbid,
+            joinphrase: joining.joinphrase
+        }))
     }
     return cleanedData
 }
@@ -60,7 +70,11 @@ export function mapAlbumDb(data: Album): AlbumDb {
         mbid: data.mbid,
         mbids: data.mbids, // DEPRECATED
         title: data.title,
-        year: data.year
+        year: data.year,
+        joinings: data.joinings?.map(joining => ({
+            mbid: joining.mbid,
+            joinphrase: joining.joinphrase
+        }))
     }
 
     return cleanedData

@@ -14,6 +14,8 @@
 import { Document, Types } from "mongoose";
 import { UPDATE_COVER_PERIOD, UPDATE_METADATA_PERIOD } from "../../config/appConfig";
 import { mapAlbumDb } from "../../mappers/albumMapper";
+import { Album } from "../../models/album";
+import { Song } from "../../models/song";
 import { DAOException } from "./exceptions/DAOException";
 import { albumModel } from "./models/albumModel";
 import { songModel } from "./models/songModel";

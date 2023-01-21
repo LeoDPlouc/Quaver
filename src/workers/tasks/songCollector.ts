@@ -16,6 +16,7 @@ import { logger } from "../../utils/logger";
 import { songService } from "../../service/songService";
 import { fileService } from "../../service/fileService";
 import { TaskException } from "./exceptions/taskException";
+import { Song } from "../../models/song";
 
 let songPaths: string[];
 

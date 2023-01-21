@@ -11,7 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface SongDTO {
+import { Joining } from "../../models/joining"
+import { AlbumDTO } from "./albumDTO"
+
+export interface SongDTO {
     id: string
     title?: string,
     n?: number,
@@ -25,4 +28,5 @@ interface SongDTO {
     albumV2?: AlbumDTO,
     year?: number,
     format?: string
+    joinings?: Joining[]
 }
