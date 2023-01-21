@@ -11,7 +11,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface AlbumDTO {
+import { Joining } from "../../models/joining"
+
+export interface AlbumDTO {
     id: string,
     title?: string,
     artist?: string, // DEPRECATED
@@ -20,4 +22,5 @@ interface AlbumDTO {
     coverV2?: ImageDTO
     cover?: string, // DEPRECATED
     year?: number
+    joinings?: Joining[]
 }

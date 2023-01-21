@@ -14,6 +14,9 @@
 import { Document, Types } from "mongoose"
 import { SongDb } from "../access/database/models/interfaces/songDb"
 import { SongDocument } from "../access/database/songDAO"
+import { SongDTO } from "../controllers/DTO/songDTO"
+import { Album } from "../models/album"
+import { Song } from "../models/song"
 import { mapAlbum, mapAlbumDTO } from "./albumMapper"
 import { mapArtist, mapArtistDTO } from "./artistMapper"
 
@@ -35,7 +38,11 @@ export function mapSong(data: SongDocument): Song {
         albumV2: data.albumV2 ? mapAlbum(<Album & Document<any, any, Album>>data.albumV2) : undefined,
         artists: data.artists.map(a => mapArtist(<Artist & Document<any, any, Artist>>a)),
         lastUpdated: data.lastUpdated,
-        mbid: data.mbid
+        mbid: data.mbid,
+        joinings: data.joinings?.map(joining => ({
+            mbid: joining.mbid,
+            joinphrase: joining.joinphrase
+        }))
     }
     return cleanedData
 }
@@ -54,7 +61,11 @@ export function mapSongDTO(data: Song): SongDTO {
         artists: data.artists?.map(mapArtistDTO),
         albumV2: data.albumV2 ? mapAlbumDTO(data.albumV2) : undefined,
         year: data.year,
-        format: data.format
+        format: data.format,
+        joinings: data.joinings?.map(joining => ({
+            mbid: joining.mbid,
+            joinphrase: joining.joinphrase
+        }))
     }
     return cleanedData
 }
@@ -76,7 +87,11 @@ export function mapSongDb(data: Song): SongDb {
         mbid: data.mbid,
         n: data.n,
         title: data.title,
-        year: data.year
+        year: data.year,
+        joinings: data.joinings?.map(joining => ({
+            mbid: joining.mbid,
+            joinphrase: joining.joinphrase
+        }))
     }
 
     return cleanedData

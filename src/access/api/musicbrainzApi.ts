@@ -16,6 +16,9 @@ import { APP_VERSION } from "../../config/appConfig";
 import { logger } from "../../utils/logger";
 import { MusicBrainzException } from "./exceptions/MusicBrainzException"; // DEPRECATED 
 import { MusicBrainzApi as mba } from "musicbrainz-ts";
+import { SongMetadata } from "./DTO/songMetadata";
+import { AlbumMetadata } from "./DTO/albumMetadata";
+import { Album } from "../../models/album";
 
 //DEPRECATED Ne plus exporter lors du nettoyage des dépréciés, mettre dans la class
 export const mbApi = new MusicBrainzApi({
@@ -54,7 +57,7 @@ class MusicBrainzApiAccess {
       });
   }
 
-  public async fetchSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<SongMetadataAndMbids> {
+  public async fetchSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<SongMetadata> {
     try {
       let song: SongMetadata = {}
 
@@ -62,34 +65,38 @@ class MusicBrainzApiAccess {
       let release = recording.releases?.find(r => r.date == recording["first-release-date"])
       let artists = recording["artist-credit"]
 
-      song.artist = recording?.["artist-credit"]?.[0]?.name
+      song.artists = artists?.map((artist) => ({ mbid: artist.artist.id }))
+      song.album = { mbid: release.id }
       song.title = recording.title;
       song.year = new Date(recording["first-release-date"]).getFullYear();
       song.n = release.media[0].position
+      song.joinings = recording["artist-credit"].map((artist) => ({
+        mbid: artist.artist.id,
+        joinphrase: artist.joinphrase
+      }));
 
-      let albumMbid = release.id
-      let artistsMbid = artists.map(a => a.artist.id)
-
-      return { song, albumMbid, artistsMbid }
+      return song
     } catch (err) {
       throw new MusicBrainzException(__filename, "fetchSongMetadata", err);
     }
   }
 
-  public async fetchAlbumMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<AlbumMetadataAndMbids> {
+  public async fetchAlbumMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<AlbumMetadata> {
     try {
       let album: AlbumMetadata = {}
 
       let release = await mbApi2.lookupRelease({ mbid: mbid, inc: ["artists", "artist-credits"] })
       let artists = release["artist-credit"]
 
-      album.artist = release["artist-credit"]?.[0]?.name;
+      album.artists = release["artist-credit"]?.map((artist) => ({ mbid: artist.artist.id }))
       album.title = release.title;
       album.year = new Date(release.date).getFullYear();
+      album.joinings = release["artist-credit"].map((artist) => ({
+        mbid: artist.artist.id,
+        joinphrase: artist.joinphrase
+      }));
 
-      let artistsMbid = artists.map(a => a.artist.id)
-
-      return { album, artistsMbid };
+      return album
     } catch (err) {
       throw new MusicBrainzException(__filename, "fetchAlbumMetadata", err);
     }

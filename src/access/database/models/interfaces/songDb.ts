@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Types } from "mongoose"
+import { Joining } from "../../../../models/joining"
 
 
 export interface SongDb {
@@ -31,4 +32,5 @@ export interface SongDb {
     format?: string,
     mbid?: string
     lastUpdated?: number
+    joinings?: Joining[]
 }

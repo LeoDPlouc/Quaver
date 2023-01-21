@@ -11,9 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { SongMetadata } from "../access/api/DTO/songMetadata";
 import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { songDAO } from "../access/database/songDAO";
 import { mapSong } from "../mappers/songMapper";
+import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
 
@@ -94,7 +96,7 @@ class SongService {
       });
   }
 
-  public async fetchSongMetadata(this: SongService, song: Song): Promise<SongMetadataAndMbids> {
+  public async fetchSongMetadata(this: SongService, song: Song): Promise<SongMetadata> {
     return await musicBrainzApiAccess.fetchSongMetadata(song.mbid)
       .catch(err => {
         throw new ServiceException(__filename, "fetchSongMetadata", err)

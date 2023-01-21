@@ -11,8 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface AlbumMetadata {
-    artist?: string
+import { Joining } from "../../../models/joining"
+
+export interface AlbumMetadata {
+    artists?: Artist[]
     title?: string
     year?: number
+    joinings?: Joining[]
 }

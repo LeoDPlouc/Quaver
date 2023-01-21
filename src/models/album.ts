@@ -11,7 +11,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface Album {
+import { Joining } from "./joining";
+
+export interface Album {
   id?: string;
   title?: string;
   artist?: string; // DEPRECATED
@@ -24,4 +26,5 @@ interface Album {
   mbids?: string[]; // DEPRECATED
   lastUpdated?: number;
   lastCoverUpdate?: number;
+  joinings?: Joining[]
 }

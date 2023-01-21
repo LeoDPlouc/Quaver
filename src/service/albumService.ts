@@ -12,11 +12,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { coverArtArchiveAccess } from "../access/api/coverArtArchive";
+import { AlbumMetadata } from "../access/api/DTO/albumMetadata";
 import { imageFileData } from "../access/api/DTO/ImageFileData";
 import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { albumDAO } from "../access/database/albumDAO";
 import { mapAlbum, mapAlbumDb } from "../mappers/albumMapper";
 import { mapSong } from "../mappers/songMapper";
+import { Album } from "../models/album";
+import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
@@ -93,7 +96,7 @@ class AlbumService {
     });
   }
 
-  public async fetchAlbumMetadata(this: AlbumService, album: Album): Promise<AlbumMetadataAndMbids> {
+  public async fetchAlbumMetadata(this: AlbumService, album: Album): Promise<AlbumMetadata> {
     return await musicBrainzApiAccess.fetchAlbumMetadata(album.mbid).catch((err) => {
       throw new ServiceException(__filename, "fetchAlbumMetadata", err)
     });

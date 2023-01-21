@@ -16,6 +16,8 @@ import { artistDAO } from "../access/database/artistDAO";
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapArtist, mapArtistDb } from "../mappers/artistMapper";
 import { mapSong } from "../mappers/songMapper";
+import { Album } from "../models/album";
+import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";

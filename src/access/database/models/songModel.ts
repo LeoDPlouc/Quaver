@@ -11,7 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { Schema, model, Types } from "mongoose"
+import { Joining } from "../../../models/joining"
 import { SongDb } from "./interfaces/songDb"
 
 const songSchema = new Schema<SongDb>({
@@ -66,6 +67,10 @@ const songSchema = new Schema<SongDb>({
     },
     mbid: {
         type: String
-    }
+    },
+    joinings: [{
+        mbid: String,
+        joinphrase: String
+    }]
 })
 export const songModel = model<SongDb>("Song", songSchema)
