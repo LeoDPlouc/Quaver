@@ -19,4 +19,6 @@ export interface ArtistDb {
     cover?: string // DEPRECATED
     coverV2?: Types.ObjectId
     mbid?: string
+    createdAt?: number
+    lastUpdated?: number
 }

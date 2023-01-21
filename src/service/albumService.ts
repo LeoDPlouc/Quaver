@@ -94,7 +94,9 @@ class AlbumService {
   }
 
   public async fetchAlbumMetadata(this: AlbumService, album: Album): Promise<AlbumMetadataAndMbids> {
-    return await musicBrainzApiAccess.fetchAlbumMetadata(album.mbid);
+    return await musicBrainzApiAccess.fetchAlbumMetadata(album.mbid).catch((err) => {
+      throw new ServiceException(__filename, "fetchAlbumMetadata", err)
+    });
   }
 
   public async getAlbumToUpdate(this: AlbumService): Promise<Album[]> {

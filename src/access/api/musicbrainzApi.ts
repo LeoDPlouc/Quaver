@@ -55,9 +55,9 @@ class MusicBrainzApiAccess {
   }
 
   public async fetchSongMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<SongMetadataAndMbids> {
-    let song: SongMetadata = {}
-
     try {
+      let song: SongMetadata = {}
+
       let recording = await mbApi2.lookupRecording({ mbid: mbid, inc: ["artists", "releases", "media"] })
       let release = recording.releases?.find(r => r.date == recording["first-release-date"])
       let artists = recording["artist-credit"]
@@ -67,19 +67,19 @@ class MusicBrainzApiAccess {
       song.year = new Date(recording["first-release-date"]).getFullYear();
       song.n = release.media[0].position
 
-      var albumMbid = release.id
-      var artistsMbid = artists.map(a => a.artist.id)
-    } catch (err) {
-      logger.error(new MusicBrainzException(__filename, "fetchSongMetadata", err));
-    }
+      let albumMbid = release.id
+      let artistsMbid = artists.map(a => a.artist.id)
 
-    return { song, albumMbid, artistsMbid }
+      return { song, albumMbid, artistsMbid }
+    } catch (err) {
+      throw new MusicBrainzException(__filename, "fetchSongMetadata", err);
+    }
   }
 
   public async fetchAlbumMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<AlbumMetadataAndMbids> {
-    let album: AlbumMetadata = {}
-
     try {
+      let album: AlbumMetadata = {}
+
       let release = await mbApi2.lookupRelease({ mbid: mbid, inc: ["artists", "artist-credits"] })
       let artists = release["artist-credit"]
 
@@ -87,12 +87,26 @@ class MusicBrainzApiAccess {
       album.title = release.title;
       album.year = new Date(release.date).getFullYear();
 
-      var artistsMbid = artists.map(a => a.artist.id)
-    } catch (err) {
-      logger.error(new MusicBrainzException(__filename, "fetchAlbumMetadata", err));
-    }
+      let artistsMbid = artists.map(a => a.artist.id)
 
-    return { album, artistsMbid };
+      return { album, artistsMbid };
+    } catch (err) {
+      throw new MusicBrainzException(__filename, "fetchAlbumMetadata", err);
+    }
+  }
+
+  public async fetchArtistMetadata(this: MusicBrainzApiAccess, mbid: string): Promise<ArtistMetadata> {
+    try {
+      let artist: ArtistMetadata = {}
+
+      let artistMetadata = await mbApi2.lookupArtist({ mbid })
+
+      artist.name = artistMetadata.name
+
+      return artist
+    } catch (err) {
+      throw new MusicBrainzException(__filename, "fetchArtistMetadata", err);
+    }
   }
 }
 

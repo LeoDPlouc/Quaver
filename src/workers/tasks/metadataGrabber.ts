@@ -97,12 +97,34 @@ async function updateAlbumMetadata() {
   }
 }
 
+async function updateArtistMetadata() {
+  let artists = await artistService.getArtistForMetadataGrabber()
+
+  for (let i = 0; i < artists.length; i++) {
+    try {
+      if (!artists[i].mbid) continue
+
+      let artist = await artistService.fetchArtistMetadata(artists[i])
+
+      if (artist.name) artists[i].name = artist.name
+
+      artists[i].lastUpdated = Date.now()
+
+      await artistService.updateArtist(artists[i])
+      logger.info(`Updated metadata for artist ${artists[i].id}`, "Metadata Grabber")
+    } catch (err) {
+      logger.error(new TaskException(__filename, "updateArtistMetadata", err))
+    }
+  }
+}
+
 export default async function doWork() {
   logger.info("Metadata grabber started", "Metadata Grabber");
   try {
     await grabMbid();
     await updateSongMetadata();
     await updateAlbumMetadata()
+    await updateArtistMetadata()
   } catch (err) {
     logger.error(new TaskException(__filename, "doWork", err))
   }

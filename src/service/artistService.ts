@@ -11,6 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
 import { artistDAO } from "../access/database/artistDAO";
 import { mapAlbum } from "../mappers/albumMapper";
 import { mapArtist, mapArtistDb } from "../mappers/artistMapper";
@@ -100,6 +101,20 @@ class ArtistService {
       artists.push({ id, mbid: notFoundMbids[i] })
     }
     return artists
+  }
+
+  public async getArtistForMetadataGrabber(this: ArtistService): Promise<Artist[]> {
+    return await artistDAO.getArtistModelForMetadataGrabber()
+      .then(results => results.map(mapArtist))
+      .catch(err => {
+        throw new ServiceException(__filename, "getArtistForMetadataGrabber", err)
+      })
+  }
+
+  public async fetchArtistMetadata(this: ArtistService, artist: Artist): Promise<ArtistMetadata> {
+    return await musicBrainzApiAccess.fetchArtistMetadata(artist.mbid).catch((err) => {
+      throw new ServiceException(__filename, "fetchArtistMetadata", err)
+    })
   }
 }
 
