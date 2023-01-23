@@ -22,7 +22,9 @@ export function mapArtist(data: Artist & Document<any, any, Artist>): Artist {
         name: data.name,
         cover: data.cover, // DEPRECATED
         coverV2: data.coverV2 ? mapImage(<Image & Document<any, any, Image>>data.coverV2) : undefined,
-        mbid: data.mbid
+        mbid: data.mbid,
+        lastUpdated: data.lastUpdated,
+        createdAt: data.createdAt
     }
     return cleanedData
 }
@@ -42,7 +44,9 @@ export function mapArtistDb(data: Artist): ArtistDb {
         cover: data.cover, // DEPRECATED
         coverV2: data.coverV2 ? new Types.ObjectId(data.coverV2.id) : undefined,
         mbid: data.mbid,
-        name: data.name
+        name: data.name,
+        lastUpdated: data.lastUpdated,
+        createdAt: data.createdAt
     }
     return cleanedData
 }
