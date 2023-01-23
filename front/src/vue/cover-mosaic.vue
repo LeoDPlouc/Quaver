@@ -71,7 +71,7 @@ export default defineComponent({
     async fetchAlbumCovers() {
       try {
         let albums = (await getArtistAlbums(this.artist.id)) as Album[];
-        this.albumsCover = albums.map((a) => a.cover);
+        this.albumsCover = albums.map((a) => a.coverV2?.id);
         this.isFetching = false;
       } catch {}
     },

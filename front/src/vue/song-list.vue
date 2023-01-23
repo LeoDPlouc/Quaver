@@ -48,6 +48,9 @@ export default defineComponent({
     else if (this.$route.fullPath.match("/artist/"))
       this.songs = await getArtistSongs(this.$route.params.id);
     else this.songs = await getAllSongs();
+
+    
+  console.log(this.songs)
   },
   data() {
     return {

@@ -43,7 +43,7 @@ class AlbumDAO {
   }
 
   public async getSongModelFromAlbum(this: AlbumDAO, id: string): Promise<SongDocument[]> {
-    return await songModel.find({ albumId: id })
+    return await songModel.find({ albumV2: id })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {

@@ -19,12 +19,12 @@
     <div class="albumPresentationHeader">
       <cover
         class="albumPresentationCover"
-        :cover-id="album.cover"
+        :cover-id="album.coverV2?.id"
         :size="size"
       />
       <div class="albumPresentationInfos">
         <div class="albumPresentationInfo">{{ album.title }}</div>
-        <div class="albumPresentationInfo">{{ album.artist }}</div>
+        <div class="albumPresentationInfo">{{ album.artists[0].name }}</div>
         <div class="albumPresentationInfo">{{ album.year }}</div>
       </div>
     </div>

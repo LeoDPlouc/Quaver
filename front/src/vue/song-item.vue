@@ -22,8 +22,8 @@
       {{ song.title }}
     </div>
     <div class="songItemProp songItemDuration">{{ formatDuration(song.duration) }}</div>
-    <div class="songItemProp songItemArtist">{{ song.artist }}</div>
-    <div class="songItemProp songItemAlbum">{{ song.album }}</div>
+    <div class="songItemProp songItemArtist">{{ song.artists[0]?.name }}</div>
+    <div class="songItemProp songItemAlbum">{{ song.albumV2?.title }}</div>
     <div class="songItemProp songItemYear">{{ song.year }}</div>
   </div>
 </template>

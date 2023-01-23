@@ -20,9 +20,9 @@
     class="albumItem"
     @click="openPresentation('/album/' + album.id)"
   >
-    <cover class="albumCover" :cover-id="album.cover" :size="size" />
+    <cover class="albumCover" :cover-id="album.coverV2?.id" :size="size" />
     <div class="albumItemProp">{{ album.title }}</div>
-    <div class="albumItemProp">{{ album.artist }}</div>
+    <div class="albumItemProp">{{ album.artists[0].name }}</div>
     <div class="albumItemProp">{{ album.year }}</div>
   </div>
 </template>
