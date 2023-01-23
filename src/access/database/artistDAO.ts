@@ -44,7 +44,7 @@ class ArtistDAO {
   }
 
   public async getSongModelFromArtist(this: ArtistDAO, id: string): Promise<SongDocument[]> {
-    return await songModel.find({ artistId: id })
+    return await songModel.find({ artists: id })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
@@ -53,7 +53,7 @@ class ArtistDAO {
   }
 
   public async getAlbumModelFromArtist(this: ArtistDAO, id: string): Promise<AlbumDocument[]> {
-    return await albumModel.find({ artistId: id })
+    return await albumModel.find({ artists: id })
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2").catch((err) => {
         throw new DAOException(__filename, "getAlbumModelFromArtist", err);
