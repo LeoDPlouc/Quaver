@@ -13,7 +13,7 @@
 
 import mongoose from "mongoose";
 import { APP_PORT, DEBUG_LVL, } from "./config/config";
-import { runTaskManager } from "./workers/taskManager";
+import { runTaskManager } from "./taskManager/taskManager";
 import { Migrate } from "./access/database/migration/migration";
 import { logger } from "./utils/logger";
 import app from "./app";

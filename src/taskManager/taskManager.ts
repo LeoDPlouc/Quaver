@@ -13,10 +13,10 @@
 
 import { Worker } from "worker_threads";
 import { connectToDb } from "../access/database/utils";
-import songCollector from "./tasks/songCollector";
-import metadataGrabber from "./tasks/metadataGrabber";
-import coverGrabber from "./tasks/coverGrabber";
-import coverCleaner from "./tasks/coverCleaner";
+import songCollector from "./workers/songCollector/songCollector";
+import metadataGrabber from "./workers/metadataGrabber/metadataGrabber";
+import coverGrabber from "./workers/coverGrabber/coverGrabber";
+import coverCleaner from "./workers/coverCleaner/coverCleaner";
 import { TASK_MANAGER_PERIOD } from "../config/appConfig";
 
 function getWorker(path: string) {
