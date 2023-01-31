@@ -26,6 +26,16 @@ export abstract class Exception {
     this.sourceError = sourceError
   }
 
+  public isOfType(type: string): boolean {
+    if (this.getType() === type) { return true }
+
+    if (this.sourceError && this.sourceError instanceof Exception) {
+      return this.sourceError.isOfType(type)
+    }
+
+    return false
+  }
+
   public toString(): string {
     let display = `${this.getType()} in file ${this.file}: ${this.func}`
 
