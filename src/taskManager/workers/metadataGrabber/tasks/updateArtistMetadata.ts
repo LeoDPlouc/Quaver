@@ -13,25 +13,27 @@
 
 import { artistService } from "../../../../service/artistService"
 import { logger } from "../../../../utils/logger"
+import { MetadataGrabberException } from "../../exceptions/metadataGrabberException"
 import { TaskException } from "../../exceptions/taskException"
 
 export async function updateArtistMetadata() {
-    let artists = await artistService.getArtistForMetadataGrabber()
-  
-    for (let i = 0; i < artists.length; i++) {
-      try {
-        if (!artists[i].mbid) continue
-  
-        let artist = await artistService.fetchArtistMetadata(artists[i])
-  
-        if (artist.name) artists[i].name = artist.name
-  
-        artists[i].lastUpdated = Date.now()
-  
-        await artistService.updateArtist(artists[i])
-        logger.info(`Updated metadata for artist ${artists[i].id}`, "Metadata Grabber")
-      } catch (err) {
-        logger.error(new TaskException(__filename, "updateArtistMetadata", err))
-      }
+  let artists = await artistService.getArtistForMetadataGrabber()
+    .catch((err) => { throw new MetadataGrabberException(__filename, "grabMbid", err) })
+
+  for (let i = 0; i < artists.length; i++) {
+    try {
+      if (!artists[i].mbid) continue
+
+      let artist = await artistService.fetchArtistMetadata(artists[i])
+
+      if (artist.name) artists[i].name = artist.name
+
+      artists[i].lastUpdated = Date.now()
+
+      await artistService.updateArtist(artists[i])
+      logger.info(`Updated metadata for artist ${artists[i].id}`, "Metadata Grabber")
+    } catch (err) {
+      logger.error(new MetadataGrabberException(__filename, "updateArtistMetadata", err))
     }
   }
+}

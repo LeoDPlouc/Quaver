@@ -15,6 +15,7 @@ import { APP_VERSION } from "../../config/appConfig";
 import coverart from "coverart";
 import { imageFileData } from "./DTO/ImageFileData";
 import { CoverArtArchiveException } from "./exceptions/CovertArtArchiveException";
+import { CoverArtNotFoundException } from "./exceptions/CoverArtNotFoundException";
 
 //DEPRECIATED Ne plus exporter lors du nettoyage des dépréciés, déplacer dans la class
 export const caApi = new coverart({
@@ -35,13 +36,23 @@ class CoverArtArchiveAccess {
 
     let { image, extension } = await p
       .catch(err => {
-        throw new CoverArtArchiveException(__filename, "fetchAlbumCover", JSON.stringify(err))
+        handleException(err, "fetchAlbumCover")
       });
 
     if (!image) {
       return null;
     }
     return { data: image, extension };
+  }
+}
+
+function handleException(err: any, funcName: string): void {
+  let strErr = JSON.stringify(err)
+
+  if (strErr.match(/404/).length) {
+    throw new CoverArtNotFoundException(__filename, funcName, strErr)
+  } else {
+    throw new CoverArtArchiveException(__filename, funcName, JSON.stringify(err))
   }
 }
 

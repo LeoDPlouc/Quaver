@@ -14,10 +14,12 @@
 import { albumService } from "../../../../service/albumService";
 import { imageService } from "../../../../service/imageService";
 import { logger } from "../../../../utils/logger";
+import { CoverGrabberException } from "../../exceptions/coverGrabberException";
 import { TaskException } from "../../exceptions/taskException";
 
 export async function updateAlbumCover() {
-    let albums = await albumService.getAlbumToCoverGrab();
+    let albums = await albumService.getAlbumToCoverGrab()
+        .catch(err => { throw new CoverGrabberException(__filename, "updateAlbumCover", err) });
 
     for (let i = 0; i < albums.length; i++) {
         try {
@@ -54,7 +56,7 @@ export async function updateAlbumCover() {
             albumService.updateAlbum(albums[i]);
             logger.info(`Updated cover of album ${albums[i].id}`, "Cover Grabber");
         } catch (err) {
-            throw new TaskException(__filename, "updateAlbumCover", err);
+            throw new CoverGrabberException(__filename, "updateAlbumCover", err);
         }
     }
 }

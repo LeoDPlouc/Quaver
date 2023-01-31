@@ -14,6 +14,7 @@
 import { albumService } from "../../../../service/albumService";
 import { imageService } from "../../../../service/imageService";
 import { logger } from "../../../../utils/logger";
+import { CoverCleanerException } from "../../exceptions/coverCleanerException";
 import { TaskException } from "../../exceptions/taskException";
 
 export async function cleanImagesWithoutAlbum() {
@@ -21,7 +22,7 @@ export async function cleanImagesWithoutAlbum() {
       var images = await imageService.getAllImages();
       var albums = await albumService.getAllAlbums();
     } catch (err) {
-      throw new TaskException(__filename, "cleanImagesWithoutAlbum", err);
+      throw new CoverCleanerException(__filename, "cleanImagesWithoutAlbum", err);
     }
   
     for (let i = 0; i < images.length; i++) {
@@ -30,7 +31,7 @@ export async function cleanImagesWithoutAlbum() {
           await imageService.deleteImageModel(images[i].id);
           logger.info(`Deleted image ${images[i].id}`, "Cover Cleaner");
         } catch (err) {
-          logger.error(new TaskException(__filename, "cleanImagesWithoutAlbum", err));
+          logger.error(new CoverCleanerException(__filename, "cleanImagesWithoutAlbum", err));
         }
       }
     }

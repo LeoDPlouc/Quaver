@@ -14,6 +14,7 @@
 import { albumService } from "../../../../service/albumService";
 import { imageService } from "../../../../service/imageService";
 import { logger } from "../../../../utils/logger";
+import { CoverCleanerException } from "../../exceptions/coverCleanerException";
 import { TaskException } from "../../exceptions/taskException";
 
 export async function cleanAlbumCoverId() {
@@ -21,7 +22,7 @@ export async function cleanAlbumCoverId() {
       var images = await imageService.getAllImages();
       var albums = await albumService.getAllAlbums();
     } catch (err) {
-      throw new TaskException(__filename, "cleanAlbumCoverId", err);
+      throw new CoverCleanerException(__filename, "cleanAlbumCoverId", err);
     }
   
     try {
@@ -33,6 +34,6 @@ export async function cleanAlbumCoverId() {
         }
       }
     } catch (err) {
-      logger.error(new TaskException(__filename, "cleanAlbumCoverId", err));
+      logger.error(new CoverCleanerException(__filename, "cleanAlbumCoverId", err));
     }
   }
