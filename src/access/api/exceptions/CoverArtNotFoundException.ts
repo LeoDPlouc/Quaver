@@ -11,21 +11,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { imageService } from "../../../../service/imageService";
-import { logger } from "../../../../utils/logger";
-import { CoverCleanerException } from "../../exceptions/coverCleanerException";
-import { TaskException } from "../../exceptions/taskException";
+import { CoverArtArchiveException } from "./CovertArtArchiveException";
 
-export async function cleanImagesWithoutTinyField() {
-    var images = await imageService.getTinyLessImage()
-      .catch((err) => {
-        throw new CoverCleanerException(__filename, "cleanImagesWthoutTinyField", err);
-      });
-  
-    for (let i = 0; i < images.length; i++) {
-      await imageService.deleteImageModel(images[i].id)
-        .catch((err) => {
-          logger.error(new CoverCleanerException(__filename, "cleanImagesWthoutTinyField", err));
-        });
+export class CoverArtNotFoundException extends CoverArtArchiveException {
+    public override getType(): string {
+        return "CoverArtNotFound Exception"
     }
-  }
+}

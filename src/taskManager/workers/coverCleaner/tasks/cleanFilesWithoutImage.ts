@@ -14,6 +14,7 @@
 import { fileService } from "../../../../service/fileService";
 import { imageService } from "../../../../service/imageService";
 import { logger } from "../../../../utils/logger";
+import { CoverCleanerException } from "../../exceptions/coverCleanerException";
 import { TaskException } from "../../exceptions/taskException";
 
 export async function cleanFilesWithoutImage() {
@@ -25,7 +26,7 @@ export async function cleanFilesWithoutImage() {
         .then((result) => result.filter((p) => p));
       var files = await fileService.getAllFiles(fileService.getImagesPath());
     } catch (err) {
-      logger.error(new TaskException(__filename, "cleanFilesWithoutImage", err));
+      logger.error(new CoverCleanerException(__filename, "cleanFilesWithoutImage", err));
     }
   
     for (let i = 0; i < files.length; i++) {
@@ -34,7 +35,7 @@ export async function cleanFilesWithoutImage() {
           await imageService.deleteImageFile(files[i]);
           logger.info(`Deleted cover ${files[i]}`, "Cover Cleaner");
         } catch (err) {
-          logger.error(new TaskException(__filename, "cleanFilesWithoutImage", err));
+          logger.error(new CoverCleanerException(__filename, "cleanFilesWithoutImage", err));
         }
       }
     }

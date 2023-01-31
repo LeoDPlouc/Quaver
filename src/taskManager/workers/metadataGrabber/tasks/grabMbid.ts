@@ -14,10 +14,12 @@
 import { fileService } from "../../../../service/fileService";
 import { songService } from "../../../../service/songService";
 import { logger } from "../../../../utils/logger";
+import { MetadataGrabberException } from "../../exceptions/metadataGrabberException";
 import { TaskException } from "../../exceptions/taskException";
 
 export async function grabMbid() {
-    let songs = await songService.getMbidlessSong();
+    let songs = await songService.getMbidlessSong()
+    .catch((err) => {throw new MetadataGrabberException(__filename, "grabMbid", err)});
   
     for (let i = 0; i < songs.length; i++) {
       try {
@@ -30,7 +32,7 @@ export async function grabMbid() {
   
         logger.info(`Found Mbid for song ${songs[i].id}`, "Metadata Grabber");
       } catch (err) {
-        logger.error(new TaskException(__filename, "grabMbid", err));
+        logger.error(new MetadataGrabberException(__filename, "grabMbid", err));
         logger.debug(1, `SongData : ${JSON.stringify(songs[i])}`, "metadataGrabber")
       }
     }

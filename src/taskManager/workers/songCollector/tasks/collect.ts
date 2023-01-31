@@ -16,6 +16,7 @@ import { Song } from "../../../../models/song";
 import { fileService } from "../../../../service/fileService";
 import { songService } from "../../../../service/songService";
 import { logger } from "../../../../utils/logger";
+import { SongCollectorException } from "../../exceptions/songCollectorException";
 import { TaskException } from "../../exceptions/taskException";
 
 export async function collect() {
@@ -23,7 +24,7 @@ export async function collect() {
     var songPaths = await songService.getPathsFromAllSong()
     var paths = await fileService.getAllFiles(MUSIC_PATH);
   } catch (err) {
-    throw new TaskException(__filename, "collect", err);
+    throw new SongCollectorException(__filename, "collect", err);
   }
 
   for (let i = 0; i < paths.length; i++) {
@@ -38,7 +39,7 @@ export async function collect() {
       await songService.createSong(song);
       logger.info(`Found new song ${song.path}`, "Song Collector");
     } catch (err) {
-      logger.error(new TaskException(__filename, "collect", err));
+      logger.error(new SongCollectorException(__filename, "collect", err));
     }
   }
 }

@@ -14,6 +14,7 @@
 import { fileService } from "../../../../service/fileService";
 import { imageService } from "../../../../service/imageService";
 import { logger } from "../../../../utils/logger";
+import { CoverCleanerException } from "../../exceptions/coverCleanerException";
 import { TaskException } from "../../exceptions/taskException";
 
 export async function cleanImagesWithDeadFiles() {
@@ -21,7 +22,7 @@ export async function cleanImagesWithDeadFiles() {
       var images = await imageService.getAllImages();
       var files = await fileService.getAllFiles(fileService.getImagesPath());
     } catch (err) {
-      throw new TaskException(__filename, "cleanImagesWithDeadFiles", err);
+      throw new CoverCleanerException(__filename, "cleanImagesWithDeadFiles", err);
     }
   
     try {
@@ -37,6 +38,6 @@ export async function cleanImagesWithDeadFiles() {
         }
       }
     } catch (err) {
-      logger.error(new TaskException(__filename, "cleanImagesWithDeadFiles", err));
+      logger.error(new CoverCleanerException(__filename, "cleanImagesWithDeadFiles", err));
     }
   }

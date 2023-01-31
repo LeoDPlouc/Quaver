@@ -14,32 +14,34 @@
 import { albumService } from "../../../../service/albumService"
 import { artistService } from "../../../../service/artistService"
 import { logger } from "../../../../utils/logger"
+import { MetadataGrabberException } from "../../exceptions/metadataGrabberException"
 import { TaskException } from "../../exceptions/taskException"
 
 export async function updateAlbumMetadata() {
-    let albums = await albumService.getAlbumForMetadataGrabber()
-  
-    for (let i = 0; i < albums.length; i++) {
-      try {
-        if (!albums[i].mbid) continue
-  
-        let album = await albumService.fetchAlbumMetadata(albums[i])
-        if (album.artists) albums[i].artists = album.artists
-        if (album.title) albums[i].title = album.title
-        if (album.year) albums[i].year = album.year
-        albums[i].joinings = album.joinings
-  
-        let artistsMbid = album.artists.map(artist => artist.mbid)
-        if (artistsMbid?.length) {
-          albums[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
-        }
-  
-        albums[i].lastUpdated = Date.now()
-  
-        await albumService.updateAlbum(albums[i])
-        logger.info(`Updated metadata for album ${albums[i].id}`, "Metadata Grabber")
-      } catch (err) {
-        logger.error(new TaskException(__filename, "updateAlbumMetadata", err))
+  let albums = await albumService.getAlbumForMetadataGrabber()
+    .catch((err) => { throw new MetadataGrabberException(__filename, "grabMbid", err) })
+
+  for (let i = 0; i < albums.length; i++) {
+    try {
+      if (!albums[i].mbid) continue
+
+      let album = await albumService.fetchAlbumMetadata(albums[i])
+      if (album.artists) albums[i].artists = album.artists
+      if (album.title) albums[i].title = album.title
+      if (album.year) albums[i].year = album.year
+      albums[i].joinings = album.joinings
+
+      let artistsMbid = album.artists.map(artist => artist.mbid)
+      if (artistsMbid?.length) {
+        albums[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
       }
+
+      albums[i].lastUpdated = Date.now()
+
+      await albumService.updateAlbum(albums[i])
+      logger.info(`Updated metadata for album ${albums[i].id}`, "Metadata Grabber")
+    } catch (err) {
+      logger.error(new MetadataGrabberException(__filename, "updateAlbumMetadata", err))
     }
   }
+}
