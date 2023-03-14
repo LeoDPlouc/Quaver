@@ -31,6 +31,8 @@
     "music-metadata": "^7.11.4",
     "musicbrainz-api": "^0.7.2",
     "musicbrainz-ts": "^1.4.1",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.7.0",
     "uuid": "^8.3.2",
     "vue": "^3.2.26",
     "winston": "^3.6.0"
