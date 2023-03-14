@@ -11,71 +11,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { albumModel } from "../../models/albumModel";
 import { IMigration } from "../migration";
-import { getAlbumCoverLegacy2 } from "../legacy/legacyCode";
-import { logger } from "../../../../utils/logger";
-import { MigrationException } from "../exceptions/MigrationException";
 
 export const migration3: IMigration = {
   //Download album covers
-  async up(): Promise<void> {
-    try {
-      try {
-        var albums = await albumModel.find();
-      } catch (err) {
-        throw new MigrationException(__filename, "migration3.up", err);
-      }
-
-      for (let i = 0; i < albums.length; i++) {
-        let a = albums[i];
-
-        if (!a.cover) {
-          logger.info(`Migration 3 -> 4 album ${a.id}`, "Migration");
-
-          // let cover = await getAlbumCoverLegacy2(a);
-          // if (!cover) {
-          //   continue;
-          // }
-
-          // await cover.save();
-
-          // a.cover = cover.id;
-          // await a.save();
-        }
-      }
-    } catch (err) {
-      throw new MigrationException(__filename, "migration3.up", err);
-    }
-  },
+  async up(): Promise<void> { },
 
   //Remove MB ID list and keep only one
-  async down(): Promise<void> {
-    try {
-      try {
-        var albums = await albumModel.find();
-      } catch (err) {
-        throw new MigrationException(__filename, "migration3.down", err);
-      }
-
-      for (let i = 0; i < albums.length; i++) {
-        let a = albums[i];
-
-        if (a.mbids) {
-          logger.info(`Migration 3 -> 2 album ${a.id}`, "Migration");
-
-          a.mbid = a.mbids[0];
-          a.mbids = undefined;
-
-          try {
-            await a.save();
-          } catch (err) {
-            throw new MigrationException(__filename, "migration3.down", err);
-          }
-        }
-      }
-    } catch (err) {
-      throw new MigrationException(__filename, "migration3.down", err);
-    }
-  },
+  async down(): Promise<void> { },
 };

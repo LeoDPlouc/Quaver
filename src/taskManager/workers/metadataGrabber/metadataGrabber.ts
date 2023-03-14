@@ -11,26 +11,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AlbumMetadata } from "../../../access/api/DTO/albumMetadata";
-import { albumService } from "../../../service/albumService";
-import { artistService } from "../../../service/artistService";
-import { fileService } from "../../../service/fileService";
-import { songService } from "../../../service/songService";
-import { logger } from "../../../utils/logger";
+import { injectable } from "tsyringe";
 import { TaskException } from "../exceptions/taskException";
-import { grabMbid } from "./tasks/grabMbid";
-import { updateAlbumMetadata } from "./tasks/updateAlbumMetadata";
-import { updateArtistMetadata } from "./tasks/updateArtistMetadata";
-import { updateSongMetadata } from "./tasks/updateSongMetadata";
+import { GrabMbIDTask } from "./tasks/grabMbid";
+import { UpdateAlbumMetadataTask } from "./tasks/updateAlbumMetadata";
+import { UpdateArtistMetadataTask } from "./tasks/updateArtistMetadata";
+import { UpdateSongMetadataTask } from "./tasks/updateSongMetadata";
+import { Logger } from "../../../utils/logger";
 
-export default async function doWork() {
-  logger.info("Metadata grabber started", "Metadata Grabber");
-  try {
-    await grabMbid();
-    await updateSongMetadata();
-    await updateAlbumMetadata()
-    await updateArtistMetadata()
-  } catch (err) {
-    logger.error(new TaskException(__filename, "doWork", err))
+@injectable()
+export class MetadataGrabberWorker {
+  public async doWork() {
+    this.logger.info("Metadata grabber started", "Metadata Grabber");
+    try {
+      await this.grabMbid.doTask();
+      await this.updateSongMetadata.doTask();
+      await this.updateAlbumMetadata.doTask()
+      await this.updateArtistMetadata.doTask()
+    } catch (err) {
+      this.logger.error(new TaskException(__filename, "doWork", err))
+    }
   }
+
+  constructor(
+    private updateSongMetadata: UpdateSongMetadataTask,
+    private updateAlbumMetadata: UpdateAlbumMetadataTask,
+    private updateArtistMetadata: UpdateArtistMetadataTask,
+    private grabMbid: GrabMbIDTask,
+    private logger: Logger
+  ) { }
 }

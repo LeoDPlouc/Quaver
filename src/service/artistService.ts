@@ -11,29 +11,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
-import { artistDAO } from "../access/database/artistDAO";
-import { mapAlbum } from "../mappers/albumMapper";
-import { mapArtist, mapArtistDb } from "../mappers/artistMapper";
-import { mapSong } from "../mappers/songMapper";
+import { injectable } from "tsyringe";
+import { MusicBrainzApiAccess } from "../access/api/musicbrainz";
+import { ArtistDAO } from "../access/database/artistDAO";
 import { Album } from "../models/album";
 import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
-import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
+import { AlbumMapper } from "../mappers/albumMapper";
+import { SongMapper } from "../mappers/songMapper";
+import { ArtistMapper } from "../mappers/artistMapper";
+import { Logger } from "../utils/logger";
 
-class ArtistService {
+@injectable()
+export class ArtistService {
   public async getAllArtist(this: ArtistService): Promise<Artist[]> {
-    return await artistDAO
+    return await this.artistDao
       .getAllArtistModel()
-      .then((result) => result.map(mapArtist))
+      .then((result) => result.map(this.artistMapper.toArtist))
       .catch((err) => {
         throw new ServiceException(__filename, "getAllArtist", err);
       });
   }
 
   public async getArtist(this: ArtistService, id: string): Promise<Artist> {
-    let result = await artistDAO.getArtistModel(id).catch((err) => {
+    let result = await this.artistDao.getArtistModel(id).catch((err) => {
       throw new ServiceException(__filename, "getArtist", err);
     });
 
@@ -41,20 +43,20 @@ class ArtistService {
       throw new NotFoundException(__filename, "getArtist", "Artist not found");
     }
 
-    return mapArtist(result);
+    return this.artistMapper.toArtist(result);
   }
 
   public async getSongFromArtist(this: ArtistService, id: string): Promise<Song[]> {
-    return await artistDAO
+    return await this.artistDao
       .getSongModelFromArtist(id)
-      .then((result) => result.map(mapSong))
+      .then((result) => result.map(this.songMapper.toSong))
       .catch((err) => {
         throw new ServiceException(__filename, "getSongFromArtist", err);
       });
   }
 
   public async getAlbumFromArtist(id: string): Promise<Album[]> {
-    let result = await artistDAO.getAlbumModelFromArtist(id).catch((err) => {
+    let result = await this.artistDao.getAlbumModelFromArtist(id).catch((err) => {
       throw new ServiceException(__filename, "getAlbumFromArtist", err);
     });
 
@@ -62,35 +64,35 @@ class ArtistService {
       throw new NotFoundException(__filename, "getAlbumFromArtist", "Artist not found");
     }
 
-    return result.map(mapAlbum);
+    return result.map(this.albumMapper.toAlbum);
   }
 
   public async createArtist(this: ArtistService, artist: Artist): Promise<string> {
-    return await artistDAO.createArtistModel(artist)
+    return await this.artistDao.createArtistModel(artist)
       .catch((err) => {
         throw new ServiceException(__filename, "createArtist", err);
       });
   }
 
   public async findArtistByName(this: ArtistService, name: string): Promise<Artist[]> {
-    return await artistDAO
+    return await this.artistDao
       .findArtistModelByName(name)
-      .then((result) => result.map(mapArtist))
+      .then((result) => result.map(this.artistMapper.toArtist))
       .catch((err) => {
         throw new ServiceException(__filename, "findArtistByName", err);
       });
   }
 
   public async updateArtist(artist: Artist): Promise<void> {
-    return await artistDAO.updateArtistModel(artist)
+    return await this.artistDao.updateArtistModel(artist)
       .catch((err) => {
         throw new ServiceException(__filename, "updateArtist", err);
       });
   }
 
   public async getArtistsByMbidOrCreate(this: ArtistService, mbids: string[]): Promise<Artist[]> {
-    let artists = await artistDAO.findArtistsByMbids(mbids)
-      .then(results => results.map(mapArtist))
+    let artists = await this.artistDao.findArtistsByMbids(mbids)
+      .then(results => results.map(this.artistMapper.toArtist))
       .catch((err) => {
         throw new ServiceException(__filename, "getArtistsByMbidOrCreate", err);
       });
@@ -99,25 +101,32 @@ class ArtistService {
 
     for (let i = 0; i < notFoundMbids.length; i++) {
       let id = await this.createArtist({ mbid: notFoundMbids[i] })
-      logger.info(`Found new artist ${id}`, "Artist Service")
+      this.logger.info(`Found new artist ${id}`, "Artist Service")
       artists.push({ id, mbid: notFoundMbids[i] })
     }
     return artists
   }
 
   public async getArtistForMetadataGrabber(this: ArtistService): Promise<Artist[]> {
-    return await artistDAO.getArtistModelForMetadataGrabber()
-      .then(results => results.map(mapArtist))
+    return await this.artistDao.getArtistModelForMetadataGrabber()
+      .then(results => results.map(this.artistMapper.toArtist))
       .catch(err => {
         throw new ServiceException(__filename, "getArtistForMetadataGrabber", err)
       })
   }
 
   public async fetchArtistMetadata(this: ArtistService, artist: Artist): Promise<ArtistMetadata> {
-    return await musicBrainzApiAccess.fetchArtistMetadata(artist.mbid).catch((err) => {
+    return await this.musicBrainzApiAccess.fetchArtistMetadata(artist.mbid).catch((err) => {
       throw new ServiceException(__filename, "fetchArtistMetadata", err)
     })
   }
-}
 
-export const artistService = new ArtistService();
+  constructor(
+    private musicBrainzApiAccess: MusicBrainzApiAccess,
+    private artistDao: ArtistDAO,
+    private albumMapper: AlbumMapper,
+    private songMapper: SongMapper,
+    private artistMapper: ArtistMapper,
+    private logger: Logger
+  ) { }
+}

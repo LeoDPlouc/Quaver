@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Schema, model } from "mongoose";
+import { injectable } from "tsyringe";
 
 const imageSchema = new Schema<Image>({
   //DEPRECIATED
@@ -37,4 +38,8 @@ const imageSchema = new Schema<Image>({
     type: String,
   },
 });
-export const imageModel = model<Image>("Image", imageSchema);
+
+@injectable()
+export class ImageModel {
+  public readonly model = model<Image>("Image", imageSchema);
+}

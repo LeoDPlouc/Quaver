@@ -11,26 +11,40 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { logger } from "../../../utils/logger";
 import { TaskException } from "../exceptions/taskException";
-import { cleanAlbumCoverId } from "./tasks/cleanAlbumCoverId";
-import { cleanFilesWithoutImage } from "./tasks/cleanFilesWithoutImage";
-import { cleanImagesWithDeadFiles } from "./tasks/cleanImagesWithDeadFiles";
-import { cleanImagesWithoutAlbum } from "./tasks/cleanImagesWithoutAlbum";
-import { cleanImagesWithoutTinyField } from "./tasks/cleanImagesWithoutTinyField";
-import { cleanImageWithoutTinyFile } from "./tasks/cleanImageWithoutTinyFile";
+import { injectable } from "tsyringe"
+import { CleanImagesWithoutAlbumTask } from "./tasks/cleanImagesWithoutAlbum";
+import { CleanAlbumCoverIdTask } from "./tasks/cleanAlbumCoverId";
+import { CleanImageWithoutTinyFileTask } from "./tasks/cleanImageWithoutTinyFile";
+import { CleanImagesWithDeadFilesTask } from "./tasks/cleanImagesWithDeadFiles";
+import { CleanFilesWithoutImageTask } from "./tasks/cleanFilesWithoutImage";
+import { Logger } from "../../../utils/logger";
+import { CleanImagesWithoutTinyFieldTask } from "./tasks/cleanImagesWithoutTinyField";
 
-export default async function doWork() {
-  logger.info("Cover cleaner started", "Cover Cleaner");
+@injectable()
+export class CoverCleanerWorker {
+  public async doWork() {
+    this.logger.info("Cover cleaner started", "Cover Cleaner");
 
-  try {
-    await cleanImagesWithoutAlbum();
-    await cleanImageWithoutTinyFile();
-    await cleanImagesWithDeadFiles();
-    await cleanImagesWithoutTinyField();
-    await cleanFilesWithoutImage();
-    await cleanAlbumCoverId();
-  } catch (err) {
-    logger.error(new TaskException(__filename, "doWork", err));
+    try {
+      await this.cleanImagesWithoutAlbumTask.doTask();
+      await this.cleanImagesWithoutTinyFileTask.doTask();
+      await this.cleanImagesWithDeadFilesTask.doTask();
+      await this.cleanImagesWithoutTinyFieldTask.doTask();
+      await this.cleanFilesWithoutImageTask.doTask();
+      await this.cleanAlbumCoverIdTask.doTask()
+    } catch (err) {
+      this.logger.error(new TaskException(__filename, "doWork", err));
+    }
   }
+
+  constructor(
+    private cleanImagesWithoutAlbumTask: CleanImagesWithoutAlbumTask,
+    private cleanAlbumCoverIdTask: CleanAlbumCoverIdTask,
+    private cleanImagesWithoutTinyFieldTask: CleanImagesWithoutTinyFieldTask,
+    private cleanImagesWithoutTinyFileTask: CleanImageWithoutTinyFileTask,
+    private cleanImagesWithDeadFilesTask: CleanImagesWithDeadFilesTask,
+    private cleanFilesWithoutImageTask: CleanFilesWithoutImageTask,
+    private logger: Logger
+  ) { }
 }

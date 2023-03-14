@@ -11,29 +11,46 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { artistService } from "../../../../service/artistService"
-import { logger } from "../../../../utils/logger"
+import { injectable } from "tsyringe"
+import { ArtistService } from "../../../../service/artistService"
 import { MetadataGrabberException } from "../../exceptions/metadataGrabberException"
-import { TaskException } from "../../exceptions/taskException"
+import { Logger } from "../../../../utils/logger"
 
-export async function updateArtistMetadata() {
-  let artists = await artistService.getArtistForMetadataGrabber()
-    .catch((err) => { throw new MetadataGrabberException(__filename, "grabMbid", err) })
+@injectable()
+export class UpdateArtistMetadataTask {
+  public async doTask() {
+    return await this.artistService.getArtistForMetadataGrabber()
+      .then(async (data) => {
+        for (let i = 0; i < data.length; i++) {
+          if (!data[i].mbid) { continue }
 
-  for (let i = 0; i < artists.length; i++) {
-    try {
-      if (!artists[i].mbid) continue
+          await this.fetchArtistMetadata(data[i])
+            .then(this.updateArtist)
+            .catch(err => {
+              this.logger.error(new MetadataGrabberException(__filename, "updateArtistMetadata", err))
+            })
+        }
+      })
+      .catch((err) => { throw new MetadataGrabberException(__filename, "grabMbid", err) })
 
-      let artist = await artistService.fetchArtistMetadata(artists[i])
-
-      if (artist.name) artists[i].name = artist.name
-
-      artists[i].lastUpdated = Date.now()
-
-      await artistService.updateArtist(artists[i])
-      logger.info(`Updated metadata for artist ${artists[i].id}`, "Metadata Grabber")
-    } catch (err) {
-      logger.error(new MetadataGrabberException(__filename, "updateArtistMetadata", err))
-    }
   }
+
+  private async fetchArtistMetadata(artist: Artist) {
+    let artistMetadata = await this.artistService.fetchArtistMetadata(artist)
+
+    if (artistMetadata.name) { artist.name = artistMetadata.name }
+    artist.lastUpdated = Date.now()
+
+    return artist
+  }
+
+  private async updateArtist(artist: Artist) {
+    await this.artistService.updateArtist(artist)
+    this.logger.info(`Updated metadata for artist ${artist.id}`, "Metadata Grabber")
+  }
+
+  constructor(
+    private artistService: ArtistService,
+    private logger: Logger
+  ) { }
 }

@@ -12,8 +12,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Schema, model, Types } from "mongoose"
-import { Joining } from "../../../models/joining"
 import { SongDb } from "./interfaces/songDb"
+import { injectable } from "tsyringe"
 
 const songSchema = new Schema<SongDb>({
     title: {
@@ -73,4 +73,8 @@ const songSchema = new Schema<SongDb>({
         joinphrase: String
     }]
 })
-export const songModel = model<SongDb>("Song", songSchema)
+
+@injectable()
+export class SongModel {
+    public readonly model = model<SongDb>("Song", songSchema)
+}

@@ -11,28 +11,50 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { albumService } from "../../../../service/albumService";
-import { imageService } from "../../../../service/imageService";
-import { logger } from "../../../../utils/logger";
 import { CoverCleanerException } from "../../exceptions/coverCleanerException";
-import { TaskException } from "../../exceptions/taskException";
+import { injectable } from "tsyringe"
+import { AlbumService } from "../../../../service/albumService";
+import { Album } from "../../../../models/album";
+import { ImageService } from "../../../../service/imageService";
+import { Logger } from "../../../../utils/logger";
 
-export async function cleanImagesWithoutAlbum() {
-    try {
-      var images = await imageService.getAllImages();
-      var albums = await albumService.getAllAlbums();
-    } catch (err) {
-      throw new CoverCleanerException(__filename, "cleanImagesWithoutAlbum", err);
-    }
-  
-    for (let i = 0; i < images.length; i++) {
-      if (!albums.find((a) => String(a.coverV2?.id) == String(images[i].id))) {
-        try {
-          await imageService.deleteImageModel(images[i].id);
-          logger.info(`Deleted image ${images[i].id}`, "Cover Cleaner");
-        } catch (err) {
-          logger.error(new CoverCleanerException(__filename, "cleanImagesWithoutAlbum", err));
+@injectable()
+export class CleanImagesWithoutAlbumTask {
+  public async doTask(this: CleanImagesWithoutAlbumTask) {
+    return this.fetchData()
+      .then(async (data) => {
+        for (let i = 0; i < data.images.length; i++) {
+          if (!data.albums.find((a) => this.hasAlbumThisCover(a, data.images[i]))) {
+            await this.deleteImageModel(data.images[i])
+          }
         }
-      }
+      })
+      .catch(err => { throw new CoverCleanerException(__filename, "doTask", err) })
+  }
+
+  private async fetchData(this: CleanImagesWithoutAlbumTask) {
+    const images = await this.imageService.getAllImages();
+    const albums = await this.albumService.getAllAlbums();
+
+    return { images, albums }
+  }
+
+  private async deleteImageModel(image: Image) {
+    try {
+      await this.imageService.deleteImageModel(image.id);
+      this.logger.info(`Deleted image ${image.id}`, "Cover Cleaner");
+    } catch (err) {
+      this.logger.error(new CoverCleanerException(__filename, "deleteImageModel", err));
     }
   }
+
+  private hasAlbumThisCover(album: Album, cover: Image) {
+    return String(album.coverV2?.id) == String(cover.id)
+  }
+
+  constructor(
+    private albumService: AlbumService,
+    private imageService: ImageService,
+    private logger: Logger
+  ) { }
+}

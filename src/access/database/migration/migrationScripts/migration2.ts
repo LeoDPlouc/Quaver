@@ -12,82 +12,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { IMigration } from "../migration";
-import { albumModel } from "../../models/albumModel";
-import { imageModel } from "../../models/imageModel";
-import { logger } from "../../../../utils/logger";
-import { musicBrainzApiAccess } from "../../../api/musicbrainzApi";
-import { imageFileAccess } from "../../../file/imageFile";
-import { MigrationException } from "../exceptions/MigrationException";
 
 export const migration2: IMigration = {
   //Remove single MB ID and fetch all fiting MB IDs
-  async up(): Promise<void> {
-    try {
-      try {
-        var albums = await albumModel.find();
-      } catch (err) {
-        throw new MigrationException(__filename, "migration2.up", err);
-      }
-
-      for (let i = 0; i < albums.length; i++) {
-        let a = albums[i];
-
-        logger.info(`Migration 2 -> 3 album ${a.id}`, "Migration");
-
-        let mbids = await musicBrainzApiAccess.getMBId({});
-        if (!mbids) {
-          continue;
-        }
-
-        a.mbids = mbids;
-        a.mbid = undefined;
-
-        try {
-          await a.save();
-        } catch (err) {
-          throw new MigrationException(__filename, "migration2.up", err);
-        }
-      }
-    } catch (err) {
-      throw new MigrationException(__filename, "migration2.up", err);
-    }
-  },
+  async up(): Promise<void> { },
 
   //Remove album covers
-  async down(): Promise<void> {
-    try {
-      try {
-        var albums = await albumModel.find();
-      } catch (err) {
-        throw new MigrationException(__filename, "migration2.down", err);
-      }
-
-      for (let i = 0; i < albums.length; i++) {
-        let a = albums[i];
-
-        if (a.cover) {
-          logger.info(`Migration 2 -> 1 album ${a.id}`, "Migration");
-
-          try {
-            var cover = await imageModel.findById(a.cover);
-          } catch (err) {
-            throw new MigrationException(__filename, "migration2.down", err);
-          }
-
-          imageFileAccess.deleteImageFile(cover.path);
-          cover.delete();
-
-          a.cover = undefined;
-
-          try {
-            await a.save();
-          } catch (err) {
-            throw new MigrationException(__filename, "migration2.down", err);
-          }
-        }
-      }
-    } catch (err) {
-      throw new MigrationException(__filename, "migration2.down", err);
-    }
-  },
+  async down(): Promise<void> { },
 };

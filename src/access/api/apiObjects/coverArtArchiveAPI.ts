@@ -1,5 +1,5 @@
 // Quaver is a self-hostable music player and music library manager
-// Copyright (C) 2022  DPlouc
+// Copyright (C) 2023  DPlouc
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -11,10 +11,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IMigration } from "../migration";
+import coverart from "coverart"
+import { injectable } from "tsyringe"
+import { APP_VERSION } from "../../../config/appConfig";
 
-export const migration0: IMigration = {
-  //Add MB ID to albums
-  async up(): Promise<void> { },
-  async down(): Promise<void> { },
-};
+@injectable()
+export class CoverArtArchiveAPI {
+    private caObject = new coverart({
+        useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)`,
+    });
+
+    public release(mbid: string) {
+        return new Promise<any>((resolve, reject) => {
+            this.caObject.release(mbid, { piece: "front", size: "large" }, (err, data) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(data);
+            });
+        });
+    }
+}
+

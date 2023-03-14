@@ -12,12 +12,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import mongoose from "mongoose";
-
 import { MONGO_IP, MONGO_PASSWORD, MONGO_PORT, MONGO_USER } from "../../config/config";
-import { logger } from "../../utils/logger";
 import { DatabaseException } from "./exceptions/DatabaseException";
+import { Logger } from "../../utils/logger";
 
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`;
+
+const logger = new Logger()
 
 export async function connectToDb(source: String) {
   await mongoose

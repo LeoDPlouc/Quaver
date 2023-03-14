@@ -11,45 +11,72 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { albumService } from "../../../../service/albumService";
-import { artistService } from "../../../../service/artistService";
-import { songService } from "../../../../service/songService";
-import { logger } from "../../../../utils/logger";
+import { injectable } from "tsyringe";
+import { SongMetadata } from "../../../../access/api/DTO/songMetadata";
+import { Song } from "../../../../models/song";
+import { AlbumService } from "../../../../service/albumService";
+import { ArtistService } from "../../../../service/artistService";
+import { SongService } from "../../../../service/songService";
 import { MetadataGrabberException } from "../../exceptions/metadataGrabberException";
-import { TaskException } from "../../exceptions/taskException";
+import { Logger } from "../../../../utils/logger";
 
-export async function updateSongMetadata() {
-  let songs = await songService.getSongForMetadataGrabber()
-    .catch((err) => { throw new MetadataGrabberException(__filename, "grabMbid", err) })
-
-  for (let i = 0; i < songs.length; i++) {
-    try {
-      if (!songs[i].mbid) continue
-
-      let song = await songService.fetchSongMetadata(songs[i]);
-
-      if (song.title) songs[i].title = song.title;
-      if (song.artists) songs[i].artists = song.artists;
-      if (song.year) songs[i].year = song.year;
-      if (song.n) songs[i].n = song.n
-      songs[i].joinings = song.joinings
-
-      let albumMbid = song.album.mbid
-      if (albumMbid) {
-        songs[i].albumV2 = await albumService.getAlbumByMbidOrCreate(albumMbid)
-      }
-
-      let artistsMbid = song.artists.map(artist => artist.mbid)
-      if (artistsMbid?.length) {
-        songs[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
-      }
-
-      songs[i].lastUpdated = Date.now();
-
-      await songService.updateSong(songs[i]);
-      logger.info(`Updated metadata for song ${songs[i].id}`, "Metadata Grabber");
-    } catch (err) {
-      logger.error(new MetadataGrabberException(__filename, "updateSongMetadata", err));
-    }
+@injectable()
+export class UpdateSongMetadataTask {
+  public async doTask() {
+    return await this.songService.getSongForMetadataGrabber()
+      .then(async (data) => {
+        for (let i = 0; i < data.length; i++) {
+          if (!data[i].mbid) { continue }
+          await this.fetchSongMetadata(data[i])
+            .then((data) => this.fetchAlbum(data.song, data.songMetadata))
+            .then((data) => this.fetchArtist(data.song, data.songMetadata))
+            .then(this.updateSong)
+            .catch(err => {
+              this.logger.error(new MetadataGrabberException(__filename, "doTask", err));
+            })
+        }
+      })
+      .catch((err) => { throw new MetadataGrabberException(__filename, "doTask", err) })
   }
+
+  private async fetchSongMetadata(song: Song) {
+    let songMetadata = await this.songService.fetchSongMetadata(song);
+
+    if (songMetadata.title) song.title = songMetadata.title;
+    if (songMetadata.artists) song.artists = songMetadata.artists;
+    if (songMetadata.year) song.year = songMetadata.year;
+    if (songMetadata.n) song.n = songMetadata.n
+    song.joinings = songMetadata.joinings
+    song.lastUpdated = Date.now();
+
+    return { song, songMetadata }
+  }
+
+  private async fetchAlbum(song: Song, songMetadata: SongMetadata) {
+    let albumMbid = songMetadata.album.mbid
+    if (albumMbid) {
+      song.albumV2 = await this.albumService.getAlbumByMbidOrCreate(albumMbid)
+    }
+    return { song, songMetadata }
+  }
+
+  private async fetchArtist(song: Song, songMetadata: SongMetadata) {
+    let artistsMbid = songMetadata.artists.map(artist => artist.mbid)
+    if (artistsMbid?.length) {
+      song.artists = await this.artistService.getArtistsByMbidOrCreate(artistsMbid)
+    }
+    return song
+  }
+
+  private async updateSong(song: Song) {
+    await this.songService.updateSong(song);
+    this.logger.info(`Updated metadata for song ${song.id}`, "UpdateSongMetadataTask");
+  }
+
+  constructor(
+    private albumService: AlbumService,
+    private artistService: ArtistService,
+    private songService: SongService,
+    private logger: Logger
+  ) { }
 }

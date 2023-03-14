@@ -11,16 +11,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { logger } from "../../../utils/logger";
 import { TaskException } from "../exceptions/taskException";
-import { updateAlbumCover } from "./tasks/updateAlbumCover";
+import { injectable } from "tsyringe"
+import { UpdateAlbumCoverTask } from "./tasks/updateAlbumCover";
+import { Logger } from "../../../utils/logger";
 
-export default async function doWork() {
-  logger.info("Cover grabber started", "Cover Grabber");
+@injectable()
+export class CoverGrabberWorker {
+  public async doWork() {
+    this.logger.info("Cover grabber started", "Cover Grabber");
 
-  try {
-    await updateAlbumCover()
-  } catch (err) {
-    logger.error(new TaskException(__filename, "doWork", err));
+    try {
+      await this.updateAlbumCover.doTask()
+    } catch (err) {
+      this.logger.error(new TaskException(__filename, "doWork", err));
+    }
   }
+
+  constructor(
+    private updateAlbumCover: UpdateAlbumCoverTask,
+    private logger: Logger
+  ) { }
 }

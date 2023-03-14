@@ -13,10 +13,17 @@
 
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { mapSongDTO } from "../mappers/songMapper";
-import { songService } from "../service/songService";
-import { logger } from "../utils/logger";
+import { SongService } from "../service/songService";
+import { Logger } from "../utils/logger";
 import { ControllerException } from "./exceptions/controllerException";
+import { SongMapper } from "../mappers/songMapper";
+import { container } from "tsyringe";
+
+const songService = container.resolve(SongService)
+
+const songMapper = container.resolve(SongMapper)
+
+const logger = container.resolve(Logger)
 
 export async function getAllSongInfo(req: Request, res: Response) {
   try {
@@ -32,7 +39,7 @@ export async function getAllSongInfo(req: Request, res: Response) {
   }
 
   //Search all songs in the db and clean the output
-  const songs = result.map(mapSongDTO);
+  const songs = result.map(songMapper.toSongDTO);
 
   res.json({
     status: "success",
@@ -68,7 +75,7 @@ export async function getSongInfoById(req: Request, res: Response) {
   }
 
   //Search a song by id and clean the output
-  const song = mapSongDTO(result);
+  const song = songMapper.toSongDTO(result);
 
   res.json({
     status: "success",

@@ -17,9 +17,10 @@ import fp from "fpcalc-async";
 import { parseFile } from "music-metadata";
 import Path from "path";
 import { FileSystemException } from "../../utils/exceptions/fileSystemException";
-import { logger } from "../../utils/logger";
+import { injectable } from "tsyringe";
 
-class SongFileAccess {
+@injectable()
+export class SongFileAccess {
   public async computeAcoustid(this: SongFileAccess, songPath: string): Promise<string> {
     let fingerprint: FpcalcResult<string>;
 
@@ -50,5 +51,3 @@ class SongFileAccess {
     };
   }
 }
-
-export const songFileAccess = new SongFileAccess();

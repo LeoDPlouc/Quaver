@@ -11,21 +11,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { imageService } from "../../../../service/imageService";
-import { logger } from "../../../../utils/logger";
+import { injectable } from "tsyringe";
 import { CoverCleanerException } from "../../exceptions/coverCleanerException";
-import { TaskException } from "../../exceptions/taskException";
+import { ImageService } from "../../../../service/imageService";
 
-export async function cleanImagesWithoutTinyField() {
-    var images = await imageService.getTinyLessImage()
-      .catch((err) => {
+@injectable()
+export class CleanImagesWithoutTinyFieldTask {
+  public async doTask() {
+    return await this.imageService.getTinyLessImage()
+      .then(async data => {
+        for (let i = 0; i < data.length; i++) {
+          await this.imageService.deleteImageModel(data[i].id)
+        }
+      })
+      .catch(err => {
         throw new CoverCleanerException(__filename, "cleanImagesWthoutTinyField", err);
-      });
-  
-    for (let i = 0; i < images.length; i++) {
-      await imageService.deleteImageModel(images[i].id)
-        .catch((err) => {
-          logger.error(new CoverCleanerException(__filename, "cleanImagesWthoutTinyField", err));
-        });
-    }
+      })
   }
+
+  constructor(private imageService: ImageService) { }
+}

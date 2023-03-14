@@ -17,82 +17,92 @@ import { SongDocument } from "../access/database/songDAO"
 import { SongDTO } from "../controllers/DTO/songDTO"
 import { Album } from "../models/album"
 import { Song } from "../models/song"
-import { mapAlbum, mapAlbumDTO } from "./albumMapper"
-import { mapArtist, mapArtistDTO } from "./artistMapper"
+import { injectable } from "tsyringe"
+import { AlbumMapper } from "./albumMapper"
+import { ArtistMapper } from "./artistMapper"
 
-export function mapSong(data: SongDocument): Song {
-    let cleanedData: Song = {
-        id: data._id.toString(),
-        title: data.title,
-        n: data.n,
-        duration: data.duration,
-        like: data.like,
-        artist: data.artist, // DEPRECATED
-        artistId: data.artistId, // DEPRECATED
-        album: data.album, // DEPRECATED
-        albumId: data.albumId, // DEPRECATED
-        path: data.path,
-        acoustid: data.acoustid,
-        year: data.year,
-        format: data.format,
-        albumV2: data.albumV2 ? mapAlbum(<Album & Document<any, any, Album>>data.albumV2) : undefined,
-        artists: data.artists.map(a => mapArtist(<Artist & Document<any, any, Artist>>a)),
-        lastUpdated: data.lastUpdated,
-        mbid: data.mbid,
-        joinings: data.joinings?.map(joining => ({
-            mbid: joining.mbid,
-            joinphrase: joining.joinphrase
-        }))
-    }
-    return cleanedData
-}
+@injectable()
+export class SongMapper {
 
-export function mapSongDTO(data: Song): SongDTO {
-    let cleanedData: SongDTO = {
-        id: data.id,
-        title: data.title,
-        n: data.n,
-        duration: data.duration,
-        like: data.like,
-        artist: data.artist, // DEPRECATED
-        artistId: data.artistId, // DEPRECATED
-        album: data.album, // DEPRECATED
-        albumId: data.albumId, // DEPRECATED
-        artists: data.artists?.map(mapArtistDTO),
-        albumV2: data.albumV2 ? mapAlbumDTO(data.albumV2) : undefined,
-        year: data.year,
-        format: data.format,
-        joinings: data.joinings?.map(joining => ({
-            mbid: joining.mbid,
-            joinphrase: joining.joinphrase
-        }))
-    }
-    return cleanedData
-}
-
-export function mapSongDb(data: Song): SongDb {
-    let cleanedData: SongDb = {
-        path: data.path,
-        acoustid: data.acoustid,
-        album: data.album, // DEPRECATED
-        albumId: data.albumId, // DEPRECATED
-        albumV2: data.albumV2 ? new Types.ObjectId(data.albumV2.id) : undefined,
-        artist: data.artist, // DEPRECATED
-        artistId: data.artistId, // DEPRECATED
-        artists: data.artists?.map(a => new Types.ObjectId(a.id)),
-        duration: data.duration,
-        format: data.format,
-        lastUpdated: data.lastUpdated,
-        like: data.like,
-        mbid: data.mbid,
-        n: data.n,
-        title: data.title,
-        year: data.year,
-        joinings: data.joinings?.map(joining => ({
-            mbid: joining.mbid,
-            joinphrase: joining.joinphrase
-        }))
+    public toSong(data: SongDocument): Song {
+        let cleanedData: Song = {
+            id: data._id.toString(),
+            title: data.title,
+            n: data.n,
+            duration: data.duration,
+            like: data.like,
+            artist: data.artist, // DEPRECATED
+            artistId: data.artistId, // DEPRECATED
+            album: data.album, // DEPRECATED
+            albumId: data.albumId, // DEPRECATED
+            path: data.path,
+            acoustid: data.acoustid,
+            year: data.year,
+            format: data.format,
+            albumV2: data.albumV2 ? this.albumMapper.toAlbum(<Album & Document<any, any, Album>>data.albumV2) : undefined,
+            artists: data.artists.map(a => this.artistMapper.toArtist(<Artist & Document<any, any, Artist>>a)),
+            lastUpdated: data.lastUpdated,
+            mbid: data.mbid,
+            joinings: data.joinings?.map(joining => ({
+                mbid: joining.mbid,
+                joinphrase: joining.joinphrase
+            }))
+        }
+        return cleanedData
     }
 
-    return cleanedData
+    public toSongDTO(data: Song): SongDTO {
+        let cleanedData: SongDTO = {
+            id: data.id,
+            title: data.title,
+            n: data.n,
+            duration: data.duration,
+            like: data.like,
+            artist: data.artist, // DEPRECATED
+            artistId: data.artistId, // DEPRECATED
+            album: data.album, // DEPRECATED
+            albumId: data.albumId, // DEPRECATED
+            artists: data.artists?.map(this.artistMapper.toArtistDTO),
+            albumV2: data.albumV2 ? this.albumMapper.toAlbumDTO(data.albumV2) : undefined,
+            year: data.year,
+            format: data.format,
+            joinings: data.joinings?.map(joining => ({
+                mbid: joining.mbid,
+                joinphrase: joining.joinphrase
+            }))
+        }
+        return cleanedData
+    }
+
+    public toSongDb(data: Song): SongDb {
+        let cleanedData: SongDb = {
+            path: data.path,
+            acoustid: data.acoustid,
+            album: data.album, // DEPRECATED
+            albumId: data.albumId, // DEPRECATED
+            albumV2: data.albumV2 ? new Types.ObjectId(data.albumV2.id) : undefined,
+            artist: data.artist, // DEPRECATED
+            artistId: data.artistId, // DEPRECATED
+            artists: data.artists?.map(a => new Types.ObjectId(a.id)),
+            duration: data.duration,
+            format: data.format,
+            lastUpdated: data.lastUpdated,
+            like: data.like,
+            mbid: data.mbid,
+            n: data.n,
+            title: data.title,
+            year: data.year,
+            joinings: data.joinings?.map(joining => ({
+                mbid: joining.mbid,
+                joinphrase: joining.joinphrase
+            }))
+        }
+
+        return cleanedData
+    }
+
+    constructor(
+        private albumMapper: AlbumMapper,
+        private artistMapper: ArtistMapper
+    ) { }
 }

@@ -11,14 +11,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { mapImage } from "../mappers/imageMapper";
+import { ImageMapper } from "../mappers/imageMapper";
 import Jimp from "jimp";
-import { imageDAO } from "../access/database/imageDAO";
-import { imageFileAccess } from "../access/file/imageFile";
 import { imageFileData } from "../access/api/DTO/ImageFileData";
 import { ServiceException } from "./exceptions/serviceException";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ImageProcessingException } from "./exceptions/imageProcessingException";
+import { ImageDAO } from "../access/database/imageDAO";
+import { injectable } from "tsyringe";
+import { ImageFileAccess } from "../access/file/imageFile";
 
 export interface resizedImage {
   tiny: imageFileData;
@@ -28,18 +29,19 @@ export interface resizedImage {
   verylarge?: imageFileData;
 }
 
-class ImageService {
+@injectable()
+export class ImageService {
   public async getAllImages(this: ImageService): Promise<Image[]> {
-    return await imageDAO
+    return await this.imageDAO
       .getAllImagesModels()
-      .then((result) => result.map(mapImage))
+      .then((result) => result.map(this.imageMapper.toImage))
       .catch((err) => {
         throw new ServiceException(__filename, "getAllImages", err);
       });
   }
 
   public async getImage(this: ImageService, id: string): Promise<Image> {
-    let result = await imageDAO.getImageModel(id).catch((err) => {
+    let result = await this.imageDAO.getImageModel(id).catch((err) => {
       throw new ServiceException(__filename, "getImage", err);
     });
 
@@ -47,7 +49,7 @@ class ImageService {
       throw new NotFoundException(__filename, "getImage", "Image not found");
     }
 
-    return mapImage(result);
+    return this.imageMapper.toImage(result);
   }
 
   public async saveImageFileToDisk(this: ImageService, fileData: imageFileData): Promise<string> {
@@ -55,13 +57,14 @@ class ImageService {
       return;
     }
 
-    return await imageFileAccess.saveImageFileToDisk(fileData.data, fileData.extension).catch((err) => {
-      throw new ServiceException(__filename, "saveImageFileToDisk", err);
-    });
+    return await this.imageFileAccess
+      .saveImageFileToDisk(fileData.data, fileData.extension).catch((err) => {
+        throw new ServiceException(__filename, "saveImageFileToDisk", err);
+      });
   }
 
   public async createImage(this: ImageService, image: Image): Promise<string> {
-    return await imageDAO.createImageModel(image).catch((err) => {
+    return await this.imageDAO.createImageModel(image).catch((err) => {
       throw new ServiceException(__filename, "createImage", err);
     });
   }
@@ -115,34 +118,35 @@ class ImageService {
   }
 
   public async deleteImageModel(this: ImageService, id: string): Promise<void> {
-    await imageDAO.deleteImageModel(id).catch((err) => {
+    await this.imageDAO.deleteImageModel(id).catch((err) => {
       throw new ServiceException(__filename, "deleteImageModel", err);
     });
   }
 
   public async deleteImageFile(this: ImageService, path: string): Promise<void> {
-    await imageFileAccess.deleteImageFile(path).catch((err) => {
-      throw new ServiceException(__filename, "deleteImageFile", err);
-    });
+    await this.imageFileAccess
+      .deleteImageFile(path).catch((err) => {
+        throw new ServiceException(__filename, "deleteImageFile", err);
+      });
   }
 
   public async deleteAllImageFiles(this: ImageService, image: Image): Promise<void> {
     try {
-      await imageFileAccess.deleteImageFile(image?.path);
-      await imageFileAccess.deleteImageFile(image?.tiny);
-      await imageFileAccess.deleteImageFile(image?.small);
-      await imageFileAccess.deleteImageFile(image?.medium);
-      await imageFileAccess.deleteImageFile(image?.large);
-      await imageFileAccess.deleteImageFile(image?.verylarge);
+      await this.imageFileAccess.deleteImageFile(image?.path);
+      await this.imageFileAccess.deleteImageFile(image?.tiny);
+      await this.imageFileAccess.deleteImageFile(image?.small);
+      await this.imageFileAccess.deleteImageFile(image?.medium);
+      await this.imageFileAccess.deleteImageFile(image?.large);
+      await this.imageFileAccess.deleteImageFile(image?.verylarge);
     } catch (err) {
       throw new ServiceException(__filename, "deleteAllImageFiles", err);
     }
   }
 
   public async getTinyLessImage(this: ImageService): Promise<Image[]> {
-    return await imageDAO
+    return await this.imageDAO
       .getTinyLessImageModel()
-      .then((result) => result.map(mapImage))
+      .then((result) => result.map(this.imageMapper.toImage))
       .catch((err) => {
         throw new ServiceException(__filename, "getTinyLessImage", err);
       });
@@ -158,6 +162,10 @@ class ImageService {
         throw new ImageProcessingException(__filename, "resizeImage", err);
       });
   }
-}
 
-export const imageService = new ImageService();
+  constructor(
+    private imageDAO: ImageDAO,
+    private imageFileAccess: ImageFileAccess,
+    private imageMapper: ImageMapper
+  ) { }
+}

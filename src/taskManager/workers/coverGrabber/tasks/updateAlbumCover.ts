@@ -11,52 +11,74 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { albumService } from "../../../../service/albumService";
-import { imageService } from "../../../../service/imageService";
-import { logger } from "../../../../utils/logger";
+import { AlbumService } from "../../../../service/albumService";
 import { CoverGrabberException } from "../../exceptions/coverGrabberException";
-import { TaskException } from "../../exceptions/taskException";
+import { injectable } from "tsyringe"
+import { imageFileData } from "../../../../access/api/DTO/ImageFileData";
+import { Album } from "../../../../models/album";
+import { ImageService } from "../../../../service/imageService";
+import { Logger } from "../../../../utils/logger";
 
-export async function updateAlbumCover() {
-    let albums = await albumService.getAlbumToCoverGrab()
-        .catch(err => { throw new CoverGrabberException(__filename, "updateAlbumCover", err) });
+@injectable()
+export class UpdateAlbumCoverTask {
+    public doTask() {
+        return this.albumService.getAlbumToCoverGrab()
+            .then(async (data) => {
+                for (let i = 0; i < data.length; i++) {
+                    await this.albumService.fetchAlbumCover(data[i])
+                        .then(this.resizeCover)
+                        .then((img) => this.createCover(img, data[i]))
+                        .catch((err) => {
+                            throw new CoverGrabberException(__filename, "doTask", err);
+                        })
+                }
+            })
+            .catch(err => {
+                throw new CoverGrabberException(__filename, "doTask", err)
+            })
+    }
 
-    for (let i = 0; i < albums.length; i++) {
-        try {
-            let coverData = await albumService.fetchAlbumCover(albums[i]);
-            if (!coverData) return;
+    private async resizeCover(coverData: imageFileData): Promise<Image> {
+        if (!coverData) { return }
 
-            let resizes = await imageService.makeResizing(coverData);
+        let resizes = await this.imageService.makeResizing(coverData);
 
-            let tinyPath = await imageService.saveImageFileToDisk(resizes.tiny);
-            if (resizes.small) {
-                var smallPath = await imageService.saveImageFileToDisk(resizes.small);
-            }
-            if (resizes.medium) {
-                var mediumPath = await imageService.saveImageFileToDisk(resizes.medium);
-            }
-            if (resizes.large) {
-                var largePath = await imageService.saveImageFileToDisk(resizes.large);
-            }
-            if (resizes.verylarge) {
-                var verylargePath = await imageService.saveImageFileToDisk(resizes.verylarge);
-            }
+        let tinyPath = await this.imageService.saveImageFileToDisk(resizes.tiny);
+        if (resizes.small) {
+            var smallPath = await this.imageService.saveImageFileToDisk(resizes.small);
+        }
+        if (resizes.medium) {
+            var mediumPath = await this.imageService.saveImageFileToDisk(resizes.medium);
+        }
+        if (resizes.large) {
+            var largePath = await this.imageService.saveImageFileToDisk(resizes.large);
+        }
+        if (resizes.verylarge) {
+            var verylargePath = await this.imageService.saveImageFileToDisk(resizes.verylarge);
+        }
 
-            let id = await imageService.createImage({
-                path: tinyPath,
-                tiny: tinyPath,
-                large: largePath,
-                small: smallPath,
-                medium: mediumPath,
-                verylarge: verylargePath,
-            });
-
-            albums[i].coverV2 = await imageService.getImage(id)
-            albums[i].lastCoverUpdate = Date.now();
-            albumService.updateAlbum(albums[i]);
-            logger.info(`Updated cover of album ${albums[i].id}`, "Cover Grabber");
-        } catch (err) {
-            throw new CoverGrabberException(__filename, "updateAlbumCover", err);
+        return {
+            path: tinyPath,
+            tiny: tinyPath,
+            large: largePath,
+            small: smallPath,
+            medium: mediumPath,
+            verylarge: verylargePath,
         }
     }
+
+    private async createCover(cover: Image, album: Album) {
+        let id = await this.imageService.createImage(cover);
+
+        album.coverV2 = await this.imageService.getImage(id)
+        album.lastCoverUpdate = Date.now();
+        this.albumService.updateAlbum(album);
+        this.logger.info(`Updated cover of album ${album.id}`, "Cover Grabber");
+    }
+
+    constructor(
+        private albumService: AlbumService,
+        private imageService: ImageService,
+        private logger: Logger
+    ) { }
 }

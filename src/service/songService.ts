@@ -11,97 +11,110 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { injectable } from "tsyringe";
 import { SongMetadata } from "../access/api/DTO/songMetadata";
-import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
-import { songDAO } from "../access/database/songDAO";
-import { mapSong } from "../mappers/songMapper";
+import { MusicBrainzApiAccess } from "../access/api/musicbrainz";
+import { SongMapper } from "../mappers/songMapper";
 import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
+import { SongDAO } from "../access/database/songDAO";
 
-class SongService {
+@injectable()
+export class SongService {
   public async getAllSong(this: SongService): Promise<Song[]> {
-    return await songDAO
+    return await this.songDAO
       .getAllSongModel()
-      .then((result) => result.map(mapSong))
+      .then((result) => result.map(this.songMapper.toSong))
       .catch((err) => {
         throw new ServiceException(__filename, "getAllSong", err);
       });
   }
 
   public async getSong(this: SongService, id: string): Promise<Song> {
-    let result = await songDAO.getSongModel(id).catch((err) => {
-      throw new ServiceException(__filename, "getSong", err);
-    });
+    let result = await this.songDAO
+      .getSongModel(id).catch((err) => {
+        throw new ServiceException(__filename, "getSong", err);
+      });
 
     if (!result) {
       throw new NotFoundException(__filename, "getSong", "Song not found");
     }
 
-    return mapSong(result);
+    return this.songMapper.toSong(result);
   }
 
   public async updateSong(this: SongService, song: Song): Promise<void> {
-    await songDAO.updateSongModel(song)
+    await this.songDAO
+      .updateSongModel(song)
       .catch((err) => {
         throw new ServiceException(__filename, "updateSong", err);
       });
   }
 
   public async createSong(this: SongService, song: Song): Promise<string> {
-    return await songDAO.createSongModel(song)
+    return await this.songDAO
+      .createSongModel(song)
       .catch((err) => {
         throw new ServiceException(__filename, "createSong", err);
       });
   }
 
   public async findSongByPath(this: SongService, path: string): Promise<Song> {
-    let result = await songDAO.findSongModelByPath(path).catch((err) => {
-      throw new ServiceException(__filename, "findSongByPath", err);
-    });
+    let result = await this.songDAO
+      .findSongModelByPath(path).catch((err) => {
+        throw new ServiceException(__filename, "findSongByPath", err);
+      });
 
     if (!result) {
       throw new NotFoundException(__filename, "findSongByPath", "Song not found");
     }
 
-    return mapSong(result);
+    return this.songMapper.toSong(result);
   }
 
   public async getPathsFromAllSong(this: SongService): Promise<string[]> {
-    return await songDAO.getPathsFromAllSong().catch((err) => {
-      throw new ServiceException(__filename, "getPathsFromAllSong", err);
-    });
+    return await this.songDAO
+      .getPathsFromAllSong().catch((err) => {
+        throw new ServiceException(__filename, "getPathsFromAllSong", err);
+      });
   }
 
   public async fetchSongMBId(this: SongService, song: SongData): Promise<string> {
-    return await musicBrainzApiAccess.fetchSongMBId(song).catch(err => {
-      throw new ServiceException(__filename, "fetchSongMBId", err)
-    })
+    return await this.musicBrainzApiAccess
+      .fetchSongMBId(song).catch(err => {
+        throw new ServiceException(__filename, "fetchSongMBId", err)
+      })
   }
 
   public async getMbidlessSong(this: SongService): Promise<Song[]> {
-    return await songDAO
+    return await this.songDAO
       .getMbidlessSongModel()
-      .then((result) => result.map(mapSong))
+      .then((result) => result.map(this.songMapper.toSong))
       .catch((err) => {
         throw new ServiceException(__filename, "getMbidlessSong", err);
       });
   }
 
   public async getSongForMetadataGrabber(this: SongService): Promise<Song[]> {
-    return await songDAO.getSongModelForMetadataGrabber()
-      .then((result) => result.map(mapSong))
+    return await this.songDAO
+      .getSongModelForMetadataGrabber()
+      .then((result) => result.map(this.songMapper.toSong))
       .catch((err) => {
         throw new ServiceException(__filename, "getSongForMetadataGrabber", err);
       });
   }
 
   public async fetchSongMetadata(this: SongService, song: Song): Promise<SongMetadata> {
-    return await musicBrainzApiAccess.fetchSongMetadata(song.mbid)
+    return await this.musicBrainzApiAccess.fetchSongMetadata(song.mbid)
       .catch(err => {
         throw new ServiceException(__filename, "fetchSongMetadata", err)
       })
   }
-}
 
-export const songService = new SongService();
+  constructor(
+    private musicBrainzApiAccess: MusicBrainzApiAccess,
+    private songDAO: SongDAO,
+    private songMapper: SongMapper
+  ) { }
+}

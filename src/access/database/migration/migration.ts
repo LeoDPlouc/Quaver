@@ -13,7 +13,6 @@
 
 import { Document } from "mongoose";
 import { DB_VERSION } from "../../../config/appConfig";
-import { logger } from "../../../utils/logger";
 import { dbInfoModel } from "../models/dbInfoModel";
 import { MigrationException } from "./exceptions/MigrationException";
 import { migration0 } from "./migrationScripts/migration0";
@@ -54,9 +53,6 @@ export async function Migrate(): Promise<void> {
 
     let db_ver = info.version;
     let app_ver = DB_VERSION;
-
-    logger.info(`Database schema version : ${db_ver}`, "Migration");
-    logger.info(`Application schema version : ${app_ver}`, "Migration");
 
     //Compare db version with app version and apply migration
     if (db_ver > app_ver) {

@@ -56,7 +56,7 @@ BackEnd:
 BackEnd:
 - Cover are now declined in different sizes when fetch
 - Automatic cover updates
-- Turned DAO/Access/Service into singleton class
+- Turned DAO/Access/Service into injectable class
 - Added cover cleaner cleaning dead files and dead images
 
 FrontEnd:

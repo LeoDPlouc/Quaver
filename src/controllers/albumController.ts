@@ -13,11 +13,19 @@
 
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { mapAlbumDTO } from "../mappers/albumMapper";
-import { mapSongDTO } from "../mappers/songMapper";
-import { albumService } from "../service/albumService";
-import { logger } from "../utils/logger";
+import { AlbumService } from "../service/albumService";
 import { ControllerException } from "./exceptions/controllerException";
+import { AlbumMapper } from "../mappers/albumMapper";
+import { SongMapper } from "../mappers/songMapper";
+import { Logger } from "../utils/logger";
+import { container } from "tsyringe";
+
+const albumService = container.resolve(AlbumService)
+
+const albumMapper = container.resolve(AlbumMapper)
+const songMapper = container.resolve(SongMapper)
+
+const logger = container.resolve(Logger)
 
 export async function getAllAlbum(req: Request, res: Response) {
   try {
@@ -34,7 +42,7 @@ export async function getAllAlbum(req: Request, res: Response) {
   }
 
   //Search all albums in the db and clean the output
-  const albums = result.map(mapAlbumDTO);
+  const albums = result.map(albumMapper.toAlbumDTO);
 
   res.json({
     status: "success",
@@ -71,7 +79,7 @@ export async function getAlbumById(req: Request, res: Response) {
     return;
   }
 
-  const album = mapAlbumDTO(result);
+  const album = albumMapper.toAlbumDTO(result);
 
   res.json({
     status: "success",
@@ -106,7 +114,7 @@ export async function getSongFromAlbumById(req: Request, res: Response) {
   }
 
   //Search songs by albumid in the db and clean the output
-  const songs = result.map(mapSongDTO);
+  const songs = result.map(songMapper.toSongDTO);
 
   res.json({
     status: "success",

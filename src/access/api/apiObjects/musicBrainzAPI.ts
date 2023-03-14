@@ -1,5 +1,5 @@
 // Quaver is a self-hostable music player and music library manager
-// Copyright (C) 2022  DPlouc
+// Copyright (C) 2023  DPlouc
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -11,10 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { IMigration } from "../migration";
+import { MusicBrainzApi as mbApi } from "musicbrainz-ts";
+import { injectable } from "tsyringe";
+import { APP_CONTACT_INFO, APP_NAME, APP_VERSION } from "../../../config/appConfig";
 
-export const migration0: IMigration = {
-  //Add MB ID to albums
-  async up(): Promise<void> { },
-  async down(): Promise<void> { },
-};
+@injectable()
+export class MusicBrainzAPI {
+    public readonly api = new mbApi(APP_NAME, APP_VERSION, APP_CONTACT_INFO)
+}

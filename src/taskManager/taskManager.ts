@@ -11,13 +11,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import "reflect-metadata"
 import { Worker } from "worker_threads";
 import { connectToDb } from "../access/database/utils";
-import songCollector from "./workers/songCollector/songCollector";
-import metadataGrabber from "./workers/metadataGrabber/metadataGrabber";
-import coverGrabber from "./workers/coverGrabber/coverGrabber";
-import coverCleaner from "./workers/coverCleaner/coverCleaner";
 import { TASK_MANAGER_PERIOD } from "../config/appConfig";
+import { CoverCleanerWorker } from "./workers/coverCleaner/coverCleaner";
+import { CoverGrabberWorker } from "./workers/coverGrabber/coverGrabber";
+import { MetadataGrabberWorker } from "./workers/metadataGrabber/metadataGrabber";
+import { SongCollectorWorker } from "./workers/songCollector/songCollector";
+import { container } from "tsyringe";
 
 function getWorker(path: string) {
   return new Worker(path, { env: { ...process.env, IS_PROC: "true" } });
@@ -28,12 +30,13 @@ export function runTaskManager() {
 }
 
 async function runTasks() {
-  await connectToDb("Task Manager").then(async () => {
-    await songCollector();
-    await metadataGrabber();
-    await coverGrabber();
-    await coverCleaner();
-  });
+  await connectToDb("Task Manager")
+    .then(async () => {
+      await container.resolve(SongCollectorWorker).doWork();
+      await container.resolve(MetadataGrabberWorker).doWork();
+      await container.resolve(CoverGrabberWorker).doWork()
+      await container.resolve(CoverCleanerWorker).doWork();
+    });
 }
 
 if (process.env.IS_PROC) {

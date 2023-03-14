@@ -12,70 +12,71 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Request } from "express";
-import { createLogger, format, level, transports } from "winston";
+import { createLogger, format, transports } from "winston";
 import { DEBUG_LVL } from "../config/config";
-import { fileService } from "../service/fileService";
 import { Exception } from "./Exception";
+import { FileService } from "../service/fileService";
+import { container, injectable } from "tsyringe";
 
-let loggerStd = createLogger({
-  transports: [new transports.Console()],
-  format: format.combine(
-    format.colorize(),
-    format.timestamp(),
-    format.printf(({ timestamp, level, message }) => {
-      return `[${timestamp}] ${level}: ${message}`;
-    })
-  ),
-});
+@injectable()
+export class Logger {
 
-let loggerDebug = createLogger({
-  transports: [new transports.Console({ level: "debug" })],
-  format: format.combine(
-    format.colorize(),
-    format.timestamp(),
-    format.printf(({ timestamp, level, message }) => {
-      return `[${timestamp}] ${level}: ${message}`;
-    })
-  ),
-});
+  private loggerStd = createLogger({
+    transports: [new transports.Console()],
+    format: format.combine(
+      format.colorize(),
+      format.timestamp(),
+      format.printf(({ timestamp, level, message }) => {
+        return `[${timestamp}] ${level}: ${message}`;
+      })
+    ),
+  });
 
-let loggerFile = createLogger({
-  transports: [new transports.File({ dirname: fileService.getLogsPath(), filename: "quaver.log", maxsize: 1_000_000 })],
-  format: format.combine(
-    format.timestamp(),
-    format.printf(({ timestamp, level, message }) => {
-      return `[${timestamp}] ${level}: ${message}`;
-    })
-  ),
-});
+  private loggerDebug = createLogger({
+    transports: [new transports.Console({ level: "debug" })],
+    format: format.combine(
+      format.colorize(),
+      format.timestamp(),
+      format.printf(({ timestamp, level, message }) => {
+        return `[${timestamp}] ${level}: ${message}`;
+      })
+    ),
+  });
 
-class Logger {
+  private loggerFile = createLogger({
+    transports: [new transports.File({ dirname: container.resolve(FileService).getLogsPath(), filename: "quaver.log", maxsize: 1_000_000 })],
+    format: format.combine(
+      format.timestamp(),
+      format.printf(({ timestamp, level, message }) => {
+        return `[${timestamp}] ${level}: ${message}`;
+      })
+    ),
+  });
+
   public error(this: Logger, exception: Exception) {
-    loggerStd.error(`${exception.toString()}`);
-    loggerFile.error(`${exception.toString()}`);
+    this.loggerStd.error(`${exception.toString()}`);
+    this.loggerFile.error(`${exception.toString()}`);
   }
 
   public info(this: Logger, info: String, source: String) {
-    loggerStd.info(`[${source}] : ${info}`);
-    loggerFile.info(`[${source}] : ${info}`);
+    this.loggerStd.info(`[${source}] : ${info}`);
+    this.loggerFile.info(`[${source}] : ${info}`);
   }
 
   public logRequest(this: Logger, req: Request) {
-    loggerStd.info(`${req.ip} ${req.url}`);
-    loggerFile.info(`${req.ip} ${req.url}`);
+    this.loggerStd.info(`${req.ip} ${req.url}`);
+    this.loggerFile.info(`${req.ip} ${req.url}`);
   }
 
   public debug(this: Logger, debugLvl: number, info: String, source: String) {
     if (debugLvl <= DEBUG_LVL && DEBUG_LVL > 0 && debugLvl > 0) {
-      loggerDebug.debug(`[${source}] ${info}`);
+      this.loggerDebug.debug(`[${source}] ${info}`);
     }
   }
 
   public debugError(this: Logger, debugLvl: number, exception: Exception) {
     if (debugLvl <= DEBUG_LVL && DEBUG_LVL > 0 && debugLvl > 0) {
-      loggerDebug.debug(`[ERROR] ${exception.toString()}`);
+      this.loggerDebug.debug(`[ERROR] ${exception.toString()}`);
     }
   }
 }
-
-export const logger = new Logger()

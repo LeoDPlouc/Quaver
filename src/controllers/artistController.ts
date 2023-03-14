@@ -13,12 +13,21 @@
 
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { mapArtistDTO } from "../mappers/artistMapper";
-import { mapSongDTO } from "../mappers/songMapper";
-import { mapAlbumDTO } from "../mappers/albumMapper";
-import { logger } from "../utils/logger";
-import { artistService } from "../service/artistService";
 import { ControllerException } from "./exceptions/controllerException";
+import { ArtistService } from "../service/artistService";
+import { AlbumMapper } from "../mappers/albumMapper";
+import { SongMapper } from "../mappers/songMapper";
+import { ArtistMapper } from "../mappers/artistMapper";
+import { Logger } from "../utils/logger";
+import { container } from "tsyringe";
+
+const artistService = container.resolve(ArtistService)
+
+const albumMapper = container.resolve(AlbumMapper)
+const songMapper = container.resolve(SongMapper)
+const artistMapper = container.resolve(ArtistMapper)
+
+const logger = container.resolve(Logger)
 
 export async function getAllArtist(req: Request, res: Response) {
   try {
@@ -34,7 +43,7 @@ export async function getAllArtist(req: Request, res: Response) {
   }
 
   //Search all artists in the db and clean the output
-  const artists = result.map(mapArtistDTO);
+  const artists = result.map(artistMapper.toArtistDTO);
 
   res.json({
     status: "success",
@@ -70,7 +79,7 @@ export async function getArtistById(req: Request, res: Response) {
   }
 
   //Search an artist by id and clean the output
-  const artist = mapArtistDTO(result);
+  const artist = artistMapper.toArtistDTO(result);
 
   res.json({
     status: "success",
@@ -105,7 +114,7 @@ export async function getSongFromArtistById(req: Request, res: Response) {
   }
 
   //Search songs by artistId and clean the output
-  const songs = result.map(mapSongDTO);
+  const songs = result.map(songMapper.toSongDTO);
 
   res.json({
     status: "success",
@@ -141,7 +150,7 @@ export async function getAlbumFromArtistById(req: Request, res: Response) {
   }
 
   //Search albums by artistId and clean the output
-  const albums = result.map(mapAlbumDTO);
+  const albums = result.map(albumMapper.toAlbumDTO);
 
   res.json({
     status: "success",

@@ -11,37 +11,61 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { albumService } from "../../../../service/albumService"
-import { artistService } from "../../../../service/artistService"
-import { logger } from "../../../../utils/logger"
+import { injectable } from "tsyringe"
+import { AlbumMetadata } from "../../../../access/api/DTO/albumMetadata"
+import { Album } from "../../../../models/album"
+import { AlbumService } from "../../../../service/albumService"
+import { ArtistService } from "../../../../service/artistService"
 import { MetadataGrabberException } from "../../exceptions/metadataGrabberException"
-import { TaskException } from "../../exceptions/taskException"
+import { Logger } from "../../../../utils/logger"
 
-export async function updateAlbumMetadata() {
-  let albums = await albumService.getAlbumForMetadataGrabber()
-    .catch((err) => { throw new MetadataGrabberException(__filename, "grabMbid", err) })
+@injectable()
+export class UpdateAlbumMetadataTask {
+  public async doTask() {
+    return await this.albumService.getAlbumForMetadataGrabber()
+      .then(async data => {
+        for (let i = 0; i < data.length; i++) {
+          if (!data[i].mbid) { continue }
 
-  for (let i = 0; i < albums.length; i++) {
-    try {
-      if (!albums[i].mbid) continue
-
-      let album = await albumService.fetchAlbumMetadata(albums[i])
-      if (album.artists) albums[i].artists = album.artists
-      if (album.title) albums[i].title = album.title
-      if (album.year) albums[i].year = album.year
-      albums[i].joinings = album.joinings
-
-      let artistsMbid = album.artists.map(artist => artist.mbid)
-      if (artistsMbid?.length) {
-        albums[i].artists = await artistService.getArtistsByMbidOrCreate(artistsMbid)
-      }
-
-      albums[i].lastUpdated = Date.now()
-
-      await albumService.updateAlbum(albums[i])
-      logger.info(`Updated metadata for album ${albums[i].id}`, "Metadata Grabber")
-    } catch (err) {
-      logger.error(new MetadataGrabberException(__filename, "updateAlbumMetadata", err))
-    }
+          await this.fetchAlbumMetadata(data[i])
+            .then((data) => this.fetchArtist(data.album, data.albumMetadata))
+            .then(this.updateAlbum)
+            .catch(err => {
+              this.logger.error(new MetadataGrabberException(__filename, "doTask", err))
+            })
+        }
+      })
+      .catch((err) => { throw new MetadataGrabberException(__filename, "doTask", err) })
   }
+
+  private async fetchAlbumMetadata(album: Album) {
+    let albumMetadata = await this.albumService.fetchAlbumMetadata(album)
+    if (albumMetadata.artists) album.artists = albumMetadata.artists
+    if (albumMetadata.title) album.title = albumMetadata.title
+    if (albumMetadata.year) album.year = albumMetadata.year
+    album.joinings = album.joinings
+    album.lastUpdated = Date.now()
+
+    return { album, albumMetadata }
+  }
+
+  private async fetchArtist(album: Album, albumMetadata: AlbumMetadata) {
+    let artistsMbid = albumMetadata.artists.map(artist => artist.mbid)
+    if (artistsMbid?.length) {
+      album.artists = await this.artistService.getArtistsByMbidOrCreate(artistsMbid)
+    }
+
+    return album
+  }
+
+  private async updateAlbum(album: Album) {
+    await this.albumService.updateAlbum(album)
+    this.logger.info(`Updated metadata for album ${album.id}`, "Metadata Grabber")
+  }
+
+  constructor(
+    private albumService: AlbumService,
+    private artistService: ArtistService,
+    private logger: Logger
+    ) { }
 }

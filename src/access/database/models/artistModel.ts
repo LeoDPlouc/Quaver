@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Schema, model } from "mongoose"
+import { injectable } from "tsyringe"
 import { ArtistDb } from "./interfaces/artistDb"
 
 const artistSchema = new Schema<ArtistDb>({
@@ -36,4 +37,7 @@ const artistSchema = new Schema<ArtistDb>({
     }
 })
 
-export const artistModel = model<ArtistDb>("Artist", artistSchema)
+@injectable()
+export class ArtistModel {
+    public readonly model = model<ArtistDb>("Artist", artistSchema)
+}

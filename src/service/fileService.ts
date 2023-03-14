@@ -14,14 +14,16 @@
 import fs from "fs/promises";
 import path from "path";
 import mm from "mime-types";
-import { logger } from "../utils/logger";
 import { DATA_PATH } from "../config/config";
 import { FileSystemException } from "../utils/exceptions/fileSystemException";
 import { ServiceException } from "./exceptions/serviceException";
 import { MimeLookupException } from "./exceptions/MimeLookupException";
-import { songFileAccess } from "../access/file/songFile";
+import { injectable, delay, inject } from "tsyringe";
+import { SongFileAccess } from "../access/file/songFile";
+import { Logger } from "../utils/logger";
 
-class FileService {
+@injectable()
+export class FileService {
   public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
     let allPaths: string[] = [];
 
@@ -36,7 +38,7 @@ class FileService {
         try {
           (await this.getAllFiles(fullPath)).forEach((p) => allPaths.push(p));
         } catch (err) {
-          logger.debugError(1, new ServiceException(__filename, "getAllFiles", err));
+          this.logger.debugError(1, new ServiceException(__filename, "getAllFiles", err));
           continue;
         }
       }
@@ -74,9 +76,10 @@ class FileService {
   }
 
   public async getMetadataFromFile(this: FileService, songPath: string): Promise<SongData> {
-    return await songFileAccess.getMetadataFromFile(songPath).catch((err) => {
-      throw new ServiceException(__filename, "getMetadataFromFile", err);
-    });
+    return await this.songFileAccess
+      .getMetadataFromFile(songPath).catch((err) => {
+        throw new ServiceException(__filename, "getMetadataFromFile", err);
+      });
   }
 
   public async checkDataDirectores(this: FileService): Promise<void> {
@@ -84,18 +87,21 @@ class FileService {
       let logsDir = this.getLogsPath()
       if (!(await fs.access(logsDir).then(_ => true).catch(_ => false))) {
         await fs.mkdir(logsDir, { recursive: true })
-        logger.info("Created Log directory", "File Service")
+        this.logger.info("Created Log directory", "File Service")
       }
 
       let imageDir = this.getImagesPath()
       if (!(await fs.access(imageDir).then(_ => true).catch(_ => false))) {
         await fs.mkdir(imageDir, { recursive: true })
-        logger.info("Created Images directory", "File Service")
+        this.logger.info("Created Images directory", "File Service")
       }
     } catch (err) {
       throw new ServiceException(__filename, "checkDataDirectores", err)
     }
   }
-}
 
-export const fileService = new FileService();
+  constructor(
+    private songFileAccess: SongFileAccess,
+    private logger: Logger
+  ) { }
+}

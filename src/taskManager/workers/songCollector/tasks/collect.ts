@@ -11,35 +11,55 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { injectable } from "tsyringe";
 import { MUSIC_PATH } from "../../../../config/config";
 import { Song } from "../../../../models/song";
-import { fileService } from "../../../../service/fileService";
-import { songService } from "../../../../service/songService";
-import { logger } from "../../../../utils/logger";
+import { SongService } from "../../../../service/songService";
 import { SongCollectorException } from "../../exceptions/songCollectorException";
-import { TaskException } from "../../exceptions/taskException";
+import { FileService } from "../../../../service/fileService";
+import { Logger } from "../../../../utils/logger";
 
-export async function collect() {
-  try {
-    var songPaths = await songService.getPathsFromAllSong()
-    var paths = await fileService.getAllFiles(MUSIC_PATH);
-  } catch (err) {
-    throw new SongCollectorException(__filename, "collect", err);
+@injectable()
+export class CollectTask {
+  public async doTask() {
+    return await this.fetchData()
+      .then(data => {
+        for (let i = 0; i < data.paths.length; i++) {
+          if (!this.fileService.isMusicFile(data.paths[i])) { continue }; //Only consider audio files
+          if (data.songPaths.find((p) => p == data.paths[i])) { continue }; //Pass if song already exists
+
+          this.fetchMetadata(data.paths[i])
+            .then(this.createSong)
+            .catch(err => {
+              this.logger.error(new SongCollectorException(__filename, "doTask", err));
+            })
+        }
+      })
+      .catch((err) => { throw new SongCollectorException(__filename, "doTask", err) })
   }
 
-  for (let i = 0; i < paths.length; i++) {
-    try {
-      if (!fileService.isMusicFile(paths[i])) continue; //Only consider audio files
+  private async fetchData() {
+    let songPaths = await this.songService.getPathsFromAllSong()
+    let paths = await this.fileService.getAllFiles(MUSIC_PATH);
 
-      if (songPaths.find((p) => p == paths[i])) continue; //Pass if song already exists
-
-      let songData = await fileService.getMetadataFromFile(paths[i]);
-      let song: Song = { path: paths[i], duration: songData.duration, year: songData.year, title: songData.title }
-
-      await songService.createSong(song);
-      logger.info(`Found new song ${song.path}`, "Song Collector");
-    } catch (err) {
-      logger.error(new SongCollectorException(__filename, "collect", err));
-    }
+    return { songPaths, paths }
   }
+
+  private async fetchMetadata(path: string) {
+    let songData = await this.fileService.getMetadataFromFile(path);
+    let song: Song = { path: path, duration: songData.duration, year: songData.year, title: songData.title }
+
+    return song
+  }
+
+  private async createSong(song: Song) {
+    await this.songService.createSong(song);
+    this.logger.info(`Found new song ${song.path}`, "Song Collector");
+  }
+
+  constructor(
+    private songService: SongService,
+    private fileService: FileService,
+    private logger: Logger
+  ) { }
 }

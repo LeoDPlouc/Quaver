@@ -11,29 +11,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import "reflect-metadata"
 import mongoose from "mongoose";
 import { APP_PORT, DEBUG_LVL, } from "./config/config";
 import { runTaskManager } from "./taskManager/taskManager";
 import { Migrate } from "./access/database/migration/migration";
-import { logger } from "./utils/logger";
 import app from "./app";
 import { connectToDb } from "./access/database/utils";
 import { AppException } from "./utils/exceptions/appException";
-import { songService } from "./service/songService";
-import { fileService } from "./service/fileService";
+import { FileService } from "./service/fileService";
+import { Logger } from "./utils/logger";
+import { container } from "tsyringe";
 
-//Declare the objects stored in session
+//Declare the objects stored in session - DEPRECATED
 declare module "express-session" {
   interface SessionData {
     user: User & mongoose.Document<any, any, User>;
   }
 }
 
+const logger = container.resolve(Logger)
+
 logger.debug(1, `Debug level: ${DEBUG_LVL}`, "App")
 
 //Connect to the db
 connectToDb("App").then(async () => {
-  await fileService.checkDataDirectores()
+  await container.resolve(FileService).checkDataDirectores()
 
   //Apply database migration
   await Migrate().catch((err) => {

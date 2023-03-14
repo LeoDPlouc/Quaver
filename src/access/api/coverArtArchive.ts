@@ -11,32 +11,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { APP_VERSION } from "../../config/appConfig";
-import coverart from "coverart";
 import { imageFileData } from "./DTO/ImageFileData";
 import { CoverArtArchiveException } from "./exceptions/CovertArtArchiveException";
 import { CoverArtNotFoundException } from "./exceptions/CoverArtNotFoundException";
+import { CoverArtArchiveAPI } from "./apiObjects/coverArtArchiveAPI";
+import { injectable } from "tsyringe";
 
-//DEPRECIATED Ne plus exporter lors du nettoyage des dépréciés, déplacer dans la class
-export const caApi = new coverart({
-  useragent: `Quaver/${APP_VERSION} (https://github.com/LeoDPlouc/Quaver)`,
-});
-
-class CoverArtArchiveAccess {
+@injectable()
+export class CoverArtArchiveAccess {
   public async fetchAlbumCover(mbid: string): Promise<imageFileData> {
     //Fetch Cover art
-    let p = new Promise<any>((resolve, reject) => {
-      caApi.release(mbid, { piece: "front", size: "large" }, (err, data) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(data);
-      });
-    });
-
-    let { image, extension } = await p
+    let { image, extension } = await this.coverArtArchiveAPI.release(mbid)
       .catch(err => {
-        handleException(err, "fetchAlbumCover")
+        this.handleException(err, "fetchAlbumCover")
       });
 
     if (!image) {
@@ -44,16 +31,17 @@ class CoverArtArchiveAccess {
     }
     return { data: image, extension };
   }
-}
 
-function handleException(err: any, funcName: string): void {
-  let strErr = JSON.stringify(err)
 
-  if (strErr.match(/404/).length) {
-    throw new CoverArtNotFoundException(__filename, funcName, strErr)
-  } else {
-    throw new CoverArtArchiveException(__filename, funcName, JSON.stringify(err))
+  private handleException(err: any, funcName: string): void {
+    let strErr = JSON.stringify(err)
+
+    if (strErr.match(/404/).length) {
+      throw new CoverArtNotFoundException(__filename, funcName, strErr)
+    } else {
+      throw new CoverArtArchiveException(__filename, funcName, JSON.stringify(err))
+    }
   }
-}
 
-export const coverArtArchiveAccess = new CoverArtArchiveAccess();
+  constructor(private coverArtArchiveAPI: CoverArtArchiveAPI) { }
+}

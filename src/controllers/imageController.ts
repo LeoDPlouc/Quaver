@@ -13,11 +13,18 @@
 
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { mapImageDTO } from "../mappers/imageMapper";
-import { logger } from "../utils/logger";
 import { ImageSize } from "../models/imageSize";
-import { imageService } from "../service/imageService";
 import { ControllerException } from "./exceptions/controllerException";
+import { ImageService } from "../service/imageService";
+import { ImageMapper } from "../mappers/imageMapper";
+import { Logger } from "../utils/logger";
+import { container } from "tsyringe";
+
+const imageService = container.resolve(ImageService)
+
+const imageMapper = new ImageMapper()
+
+const logger = new Logger()
 
 export async function getAllImageInfo(req: Request, res: Response) {
   try {
@@ -33,7 +40,7 @@ export async function getAllImageInfo(req: Request, res: Response) {
   }
 
   //Search all images in the db and clean the output
-  const images = result.map(mapImageDTO);
+  const images = result.map(imageMapper.toImageDTO);
 
   res.json({
     status: "success",
@@ -68,7 +75,7 @@ export async function getImageInfoById(req: Request, res: Response) {
   }
 
   //Search an image by id and clean the output
-  const image = mapImageDTO(result);
+  const image = imageMapper.toImageDTO(result);
 
   res.json({
     status: "success",

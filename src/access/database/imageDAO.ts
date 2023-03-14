@@ -13,25 +13,29 @@
 
 import { Document } from "mongoose";
 import { DAOException } from "./exceptions/DAOException";
-import { imageModel } from "./models/imageModel";
+import { injectable } from "tsyringe";
+import { ImageModel } from "./models/imageModel";
 
 export type ImageDocument = Image & Document<any, any, Image>;
 
-class ImageDAO {
+@injectable()
+export class ImageDAO {
   public async getAllImagesModels(this: ImageDAO): Promise<ImageDocument[]> {
-    return await imageModel.find().catch((err) => {
-      throw new DAOException(__filename, "getAllImagesModels", err);
-    });
+    return await this.imageModel.model
+      .find().catch((err) => {
+        throw new DAOException(__filename, "getAllImagesModels", err);
+      });
   }
 
   public async getImageModel(this: ImageDAO, id: string): Promise<ImageDocument> {
-    return await imageModel.findById(id).catch((err) => {
-      throw new DAOException(__filename, "getImageModel", err);
-    });
+    return await this.imageModel.model
+      .findById(id).catch((err) => {
+        throw new DAOException(__filename, "getImageModel", err);
+      });
   }
 
   public async createImageModel(this: ImageDAO, image: Image): Promise<string> {
-    return await imageModel
+    return await this.imageModel.model
       .create(image)
       .then((i) => i.id)
       .catch((err) => {
@@ -40,16 +44,18 @@ class ImageDAO {
   }
 
   public async deleteImageModel(this: ImageDAO, id: string): Promise<void> {
-    await imageModel.findByIdAndDelete(id).catch((err) => {
-      throw new DAOException(__filename, "deleteImageModel", err);
-    });
+    await this.imageModel.model
+      .findByIdAndDelete(id).catch((err) => {
+        throw new DAOException(__filename, "deleteImageModel", err);
+      });
   }
 
   public async getTinyLessImageModel(this: ImageDAO): Promise<ImageDocument[]> {
-    return await imageModel.find({ tiny: null }).catch((err) => {
-      throw new DAOException(__filename, "getTinyLessImageModel", err);
-    });
+    return await this.imageModel.model
+      .find({ tiny: null }).catch((err) => {
+        throw new DAOException(__filename, "getTinyLessImageModel", err);
+      });
   }
-}
 
-export const imageDAO = new ImageDAO();
+  constructor(private imageModel: ImageModel) { }
+}

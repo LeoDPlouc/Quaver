@@ -11,16 +11,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { logger } from "../../../utils/logger";
+import { injectable } from "tsyringe";
 import { TaskException } from "../exceptions/taskException";
-import { collect } from "./tasks/collect";
+import { CollectTask } from "./tasks/collect";
+import { Logger } from "../../../utils/logger";
 
-export default async function doWork() {
-  logger.info("Song collection Started", "Song Collector");
+@injectable()
+export class SongCollectorWorker {
+  public async doWork() {
+    this.logger.info("Song collection Started", "Song Collector");
 
-  try {
-    await collect();
-  } catch (err) {
-    logger.error(new TaskException(__filename, "doWork", err));
+    try {
+      await this.collect.doTask();
+    } catch (err) {
+      this.logger.error(new TaskException(__filename, "doWork", err));
+    }
   }
+
+  constructor(
+    private collect: CollectTask,
+    private logger: Logger
+  ) { }
 }

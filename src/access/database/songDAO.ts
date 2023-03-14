@@ -13,17 +13,20 @@
 
 import { Document, Types } from "mongoose";
 import { UPDATE_METADATA_PERIOD } from "../../config/appConfig";
-import { mapSongDb } from "../../mappers/songMapper";
 import { Song } from "../../models/song";
 import { DAOException } from "./exceptions/DAOException";
 import { SongDb } from "./models/interfaces/songDb";
-import { songModel } from "./models/songModel";
+import { injectable } from "tsyringe";
+import { SongModel } from "./models/songModel";
+import { SongMapper } from "../../mappers/songMapper";
 
 export type SongDocument = Omit<Omit<Document<unknown, any, SongDb> & SongDb & { _id: Types.ObjectId; }, "albumV2"> & Pick<Song, "albumV2">, "artists"> & Pick<Song, "artists">;
 
-class SongDAO {
+@injectable()
+export class SongDAO {
   public async getAllSongModel(this: SongDAO): Promise<SongDocument[]> {
-    return await songModel.find()
+    return await this.songModel.model
+      .find()
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
@@ -32,7 +35,8 @@ class SongDAO {
   }
 
   public async getSongModel(this: SongDAO, id: string): Promise<SongDocument> {
-    return await songModel.findById(id)
+    return await this.songModel.model
+      .findById(id)
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
@@ -41,15 +45,16 @@ class SongDAO {
   }
 
   public async updateSongModel(this: SongDAO, song: Song): Promise<void> {
-    await songModel.findByIdAndUpdate(song.id, mapSongDb(song))
+    await this.songModel.model
+      .findByIdAndUpdate(song.id, this.songMapper.toSongDb(song))
       .catch((err) => {
         throw new DAOException(__filename, "updateSongModel", err);
       });
   }
 
   public async createSongModel(this: SongDAO, song: Song): Promise<string> {
-    return await songModel
-      .create(mapSongDb(song))
+    return await this.songModel.model
+      .create(this.songMapper.toSongDb(song))
       .then((s) => s.id)
       .catch((err) => {
         throw new DAOException(__filename, "createSongModel", err);
@@ -57,7 +62,7 @@ class SongDAO {
   }
 
   public async findSongModelByPath(this: SongDAO, path: string): Promise<SongDocument> {
-    return await songModel
+    return await this.songModel.model
       .find({ path })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
@@ -68,7 +73,7 @@ class SongDAO {
   }
 
   public async getPathsFromAllSong(this: SongDAO): Promise<string[]> {
-    return await songModel
+    return await this.songModel.model
       .find({}, { path: 1 })
       .then((s) => s.map((s) => s.path))
       .catch((err) => {
@@ -77,9 +82,10 @@ class SongDAO {
   }
 
   public async getMbidlessSongModel(this: SongDAO): Promise<SongDocument[]> {
-    return await songModel.find({
-      mbid: { $exists: false }
-    })
+    return await this.songModel.model
+      .find({
+        mbid: { $exists: false }
+      })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
@@ -88,7 +94,7 @@ class SongDAO {
   }
 
   public async getSongModelForMetadataGrabber(this: SongDAO): Promise<SongDocument[]> {
-    return await songModel
+    return await this.songModel.model
       .find({
         $or: [
           { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
@@ -101,6 +107,9 @@ class SongDAO {
         throw new DAOException(__filename, "getSongModelForMetadataGrabber", err);
       });
   }
-}
 
-export const songDAO = new SongDAO();
+  constructor(
+    private songModel: SongModel,
+    private songMapper: SongMapper
+  ) { }
+}

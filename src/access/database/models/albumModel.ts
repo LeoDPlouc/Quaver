@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Schema, model } from "mongoose";
+import { injectable } from "tsyringe";
 import { AlbumDb } from "./interfaces/albumDb";
 
 const albumSchema = new Schema<AlbumDb>({
@@ -51,9 +52,14 @@ const albumSchema = new Schema<AlbumDb>({
     type: Number,
   },
   joinings: [{
-      mbid: String,
-      joinphrase: String
+    mbid: String,
+    joinphrase: String
   }]
 });
 
-export const albumModel = model<AlbumDb>("Album", albumSchema);
+@injectable()
+export class AlbumModel {
+  public readonly model = model<AlbumDb>("Album", albumSchema);
+}
+
+

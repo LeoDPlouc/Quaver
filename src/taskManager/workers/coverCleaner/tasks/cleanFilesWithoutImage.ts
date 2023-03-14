@@ -11,32 +11,51 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { fileService } from "../../../../service/fileService";
-import { imageService } from "../../../../service/imageService";
-import { logger } from "../../../../utils/logger";
+import { injectable } from "tsyringe";
 import { CoverCleanerException } from "../../exceptions/coverCleanerException";
-import { TaskException } from "../../exceptions/taskException";
+import { ImageService } from "../../../../service/imageService";
+import { FileService } from "../../../../service/fileService";
+import { Logger } from "../../../../utils/logger";
 
-export async function cleanFilesWithoutImage() {
-    try {
-      var coverFiles = await imageService
-        .getAllImages()
-        .then((result) => result.map((i) => [i.large, i.medium, i.path, i.small, i.tiny, i.verylarge]))
-        .then((result) => result.reduce((tab1, tab2) => [...tab1, ...tab2], []))
-        .then((result) => result.filter((p) => p));
-      var files = await fileService.getAllFiles(fileService.getImagesPath());
-    } catch (err) {
-      logger.error(new CoverCleanerException(__filename, "cleanFilesWithoutImage", err));
-    }
-  
-    for (let i = 0; i < files.length; i++) {
-      if (!coverFiles.find((p) => p == files[i])) {
-        try {
-          await imageService.deleteImageFile(files[i]);
-          logger.info(`Deleted cover ${files[i]}`, "Cover Cleaner");
-        } catch (err) {
-          logger.error(new CoverCleanerException(__filename, "cleanFilesWithoutImage", err));
+@injectable()
+export class CleanFilesWithoutImageTask {
+  public async doTask() {
+    return await this.getData()
+      .then(async data => {
+        for (let i = 0; i < data.files.length; i++) {
+          if (!this.hasFileImage(data.coverFiles, data.files[i])) {
+            await this.deleteImageFile(data.files[i])
+          }
         }
-      }
-    }
+      })
+      .catch(err => {
+        this.logger.error(new CoverCleanerException(__filename, "cleanFilesWithoutImage", err));
+      })
   }
+
+  private async getData() {
+    let coverFiles = await this.imageService
+      .getAllImages()
+      .then((result) => result.map((i) => [i.large, i.medium, i.path, i.small, i.tiny, i.verylarge]))
+      .then((result) => result.reduce((tab1, tab2) => [...tab1, ...tab2], []))
+      .then((result) => result.filter((p) => p));
+    let files = await this.fileService.getAllFiles(this.fileService.getImagesPath());
+
+    return { coverFiles, files }
+  }
+
+  private hasFileImage(coverFiles: string[], imageFile: string) {
+    return coverFiles.find((p) => p == imageFile)
+  }
+
+  private async deleteImageFile(imageFile: string) {
+    await this.imageService.deleteImageFile(imageFile);
+    this.logger.info(`Deleted cover ${imageFile}`, "Cover Cleaner");
+  }
+
+  constructor(
+    private imageService: ImageService,
+    private fileService: FileService,
+    private logger: Logger
+  ) { }
+}

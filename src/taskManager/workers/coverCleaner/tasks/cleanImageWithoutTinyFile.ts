@@ -11,28 +11,47 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { fileService } from "../../../../service/fileService";
-import { imageService } from "../../../../service/imageService";
-import { logger } from "../../../../utils/logger";
+import { injectable } from "tsyringe";
 import { CoverCleanerException } from "../../exceptions/coverCleanerException";
-import { TaskException } from "../../exceptions/taskException";
+import { ImageService } from "../../../../service/imageService";
+import { FileService } from "../../../../service/fileService";
+import { Logger } from "../../../../utils/logger";
 
-export async function cleanImageWithoutTinyFile() {
-    try {
-      var images = await imageService.getAllImages();
-      var files = await fileService.getAllFiles(fileService.getImagesPath());
-    } catch (err) {
-      logger.error(new CoverCleanerException(__filename, "cleanImageWithoutTinyFile", err));
-    }
-  
-    for (let i = 0; i < images.length; i++) {
-      if (!files.find((f) => f == images[i].tiny)) {
-        try {
-          imageService.deleteImageModel(images[i].id);
-          logger.info(`Deleted cover ${files[i]}`, "Cover Cleaner");
-        } catch (err) {
-          logger.error(new CoverCleanerException(__filename, "cleanImageWithoutTinyFile", err));
+@injectable()
+export class CleanImageWithoutTinyFileTask {
+  public async doTask() {
+    return await this.getData()
+      .then(async data => {
+        for (let i = 0; i < data.images.length; i++) {
+          if (!this.isTinyImageInFiles(data.files, data.images[i])) {
+            await this.deleteImage(data.images[i], data.files[i])
+          }
         }
-      }
-    }
+      })
+      .catch(err => {
+        this.logger.error(new CoverCleanerException(__filename, "cleanImageWithoutTinyFile", err));
+      })
   }
+
+  private async getData() {
+    let images = await this.imageService.getAllImages();
+    let files = await this.fileService.getAllFiles(this.fileService.getImagesPath());
+
+    return { images, files }
+  }
+
+  private isTinyImageInFiles(files: string[], image: Image) {
+    return Boolean(files.find((f) => f == image.tiny))
+  }
+
+  private async deleteImage(image: Image, file: string) {
+    await this.imageService.deleteImageModel(image.id);
+    this.logger.info(`Deleted cover ${file}`, "Cover Cleaner");
+  }
+
+  constructor(
+    private imageService: ImageService,
+    private fileService: FileService,
+    private logger: Logger
+  ) { }
+}

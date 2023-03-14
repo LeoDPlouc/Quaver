@@ -14,14 +14,16 @@
 import { v4 } from "uuid";
 import path from "path";
 import fs from "fs/promises";
-import { fileService } from "../../service/fileService";
 import { FileSystemException } from "../../utils/exceptions/fileSystemException";
+import { injectable } from "tsyringe";
+import { FileService } from "../../service/fileService";
 
-class ImageFileAccess {
+@injectable()
+export class ImageFileAccess {
   public async saveImageFileToDisk(this: ImageFileAccess, data: string, extension: string): Promise<string> {
     //Create an UUID for the name of the file
     let filename = v4() + extension;
-    let p = path.resolve(fileService.getImagesPath(), filename);
+    let p = path.resolve(this.fileService.getImagesPath(), filename);
 
     await fs.writeFile(p, data, { encoding: "binary" }).catch((err) => {
       throw new FileSystemException(__filename, "saveImageFileToDisk", err);
@@ -35,6 +37,6 @@ class ImageFileAccess {
       throw new FileSystemException(__filename, "deleteImageFile", err);
     });
   }
-}
 
-export const imageFileAccess = new ImageFileAccess();
+  constructor(private fileService: FileService) { }
+}

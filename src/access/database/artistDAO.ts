@@ -12,23 +12,25 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose";
+import { injectable } from "tsyringe";
 import { UPDATE_METADATA_PERIOD } from "../../config/appConfig";
-import { mapAlbumDb } from "../../mappers/albumMapper";
-import { mapArtistDb } from "../../mappers/artistMapper";
 import { Album } from "../../models/album";
 import { Song } from "../../models/song";
 import { AlbumDocument } from "./albumDAO";
 import { DAOException } from "./exceptions/DAOException";
-import { albumModel } from "./models/albumModel";
-import { artistModel } from "./models/artistModel";
-import { songModel } from "./models/songModel";
+import { AlbumModel } from "./models/albumModel";
+import { ArtistModel } from "./models/artistModel";
 import { SongDocument } from "./songDAO";
+import { SongModel } from "./models/songModel";
+import { ArtistMapper } from "../../mappers/artistMapper";
 
 export type ArtistDocument = Artist & Document<any, any, Artist>;
 
-class ArtistDAO {
+@injectable()
+export class ArtistDAO {
   public async getAllArtistModel(this: ArtistDAO): Promise<ArtistDocument[]> {
-    return await artistModel.find()
+    return await this.artistModel.model
+      .find()
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "getAllArtistModel", err);
@@ -36,7 +38,8 @@ class ArtistDAO {
   }
 
   public async getArtistModel(this: ArtistDAO, id: string): Promise<ArtistDocument> {
-    return await artistModel.findById(id)
+    return await this.artistModel.model
+      .findById(id)
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "getArtistModel", err);
@@ -44,7 +47,8 @@ class ArtistDAO {
   }
 
   public async getSongModelFromArtist(this: ArtistDAO, id: string): Promise<SongDocument[]> {
-    return await songModel.find({ artists: id })
+    return await this.songModel.model
+      .find({ artists: id })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
@@ -53,7 +57,8 @@ class ArtistDAO {
   }
 
   public async getAlbumModelFromArtist(this: ArtistDAO, id: string): Promise<AlbumDocument[]> {
-    return await albumModel.find({ artists: id })
+    return await this.albumModel.model
+      .find({ artists: id })
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2").catch((err) => {
         throw new DAOException(__filename, "getAlbumModelFromArtist", err);
@@ -61,8 +66,8 @@ class ArtistDAO {
   }
 
   public async createArtistModel(this: ArtistDAO, artist: Artist): Promise<string> {
-    return await artistModel
-      .create(mapArtistDb(artist))
+    return await this.artistModel.model
+      .create(this.artistMapper.toArtistDb(artist))
       .then((a) => a.id)
       .catch((err) => {
         throw new DAOException(__filename, "createArtistModel", err);
@@ -70,7 +75,8 @@ class ArtistDAO {
   }
 
   public async findArtistModelByName(this: ArtistDAO, name: string): Promise<ArtistDocument[]> {
-    return await artistModel.find({ name: name })
+    return await this.artistModel.model
+      .find({ name: name })
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "findArtistModelByName", err);
@@ -78,15 +84,17 @@ class ArtistDAO {
   }
 
   public async updateArtistModel(this: ArtistDAO, artist: Artist): Promise<void> {
-    await artistModel.findByIdAndUpdate(artist.id, mapArtistDb(artist)).catch((err) => {
-      throw new DAOException(__filename, "updateArtistModel", err);
-    });
+    await this.artistModel.model
+      .findByIdAndUpdate(artist.id, this.artistMapper.toArtistDb(artist)).catch((err) => {
+        throw new DAOException(__filename, "updateArtistModel", err);
+      });
   }
 
   public async findArtistsByMbids(this: ArtistDAO, mbids: string[]): Promise<ArtistDocument[]> {
-    return await artistModel.find({
-      mbid: { $in: mbids }
-    })
+    return await this.artistModel.model
+      .find({
+        mbid: { $in: mbids }
+      })
       .populate<Pick<Artist, "coverV2">>("coverV2")
       .catch((err) => {
         throw new DAOException(__filename, "findArtistsByMbids", err)
@@ -94,7 +102,7 @@ class ArtistDAO {
   }
 
   public async getArtistModelForMetadataGrabber(this: ArtistDAO): Promise<ArtistDocument[]> {
-    return await artistModel
+    return await this.artistModel.model
       .find({
         $or: [
           { lastUpdated: null },
@@ -106,6 +114,11 @@ class ArtistDAO {
         throw new DAOException(__filename, "getArtistModelForMetadataGrabber", err)
       })
   }
-}
 
-export const artistDAO = new ArtistDAO();
+  constructor(
+    private albumModel: AlbumModel,
+    private artistModel: ArtistModel,
+    private songModel: SongModel,
+    private artistMapper: ArtistMapper
+  ) { }
+}

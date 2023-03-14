@@ -11,21 +11,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document, Types } from "mongoose";
+import { Document } from "mongoose";
+import { injectable } from "tsyringe";
 import { UPDATE_COVER_PERIOD, UPDATE_METADATA_PERIOD } from "../../config/appConfig";
-import { mapAlbumDb } from "../../mappers/albumMapper";
 import { Album } from "../../models/album";
 import { Song } from "../../models/song";
 import { DAOException } from "./exceptions/DAOException";
-import { albumModel } from "./models/albumModel";
-import { songModel } from "./models/songModel";
+import { AlbumModel } from "./models/albumModel";
 import { SongDocument } from "./songDAO";
+import { SongModel } from "./models/songModel";
+import { AlbumMapper } from "../../mappers/albumMapper";
 
 export type AlbumDocument = Album & Document<any, any, Album>;
 
-class AlbumDAO {
+@injectable()
+export class AlbumDAO {
   public async getAllAlbumModel(this: AlbumDAO): Promise<AlbumDocument[]> {
-    return await albumModel.find()
+    return await this.albumModel.model
+      .find()
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
@@ -34,7 +37,8 @@ class AlbumDAO {
   }
 
   public async getAlbumModel(this: AlbumDAO, id: string): Promise<AlbumDocument> {
-    return await albumModel.findById(id)
+    return await this.albumModel.model
+      .findById(id)
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
@@ -43,7 +47,8 @@ class AlbumDAO {
   }
 
   public async getSongModelFromAlbum(this: AlbumDAO, id: string): Promise<SongDocument[]> {
-    return await songModel.find({ albumV2: id })
+    return await this.songModel.model
+      .find({ albumV2: id })
       .populate<Pick<Song, "albumV2">>("albumV2")
       .populate<Pick<Song, "artists">>("artists")
       .catch((err) => {
@@ -52,8 +57,8 @@ class AlbumDAO {
   }
 
   public async createAlbumModel(this: AlbumDAO, album: Album): Promise<string> {
-    return await albumModel
-      .create(mapAlbumDb(album))
+    return await this.albumModel.model
+      .create(this.albumMapper.toAlbumDb(album))
       .then((a) => a.id)
       .catch((err) => {
         throw new DAOException(__filename, "createAlbumModel", err);
@@ -64,7 +69,8 @@ class AlbumDAO {
     var query: Album = { title: albumTitle };
     if (artistName) query.artist = artistName;
 
-    return await albumModel.find(query)
+    return await this.albumModel.model
+      .find(query)
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
@@ -73,13 +79,14 @@ class AlbumDAO {
   }
 
   public async updateAlbumModel(this: AlbumDAO, album: Album): Promise<void> {
-    await albumModel.findByIdAndUpdate(album.id, mapAlbumDb(album)).catch((err) => {
-      throw new DAOException(__filename, "updateAlbumModel", err);
-    });
+    await this.albumModel.model
+      .findByIdAndUpdate(album.id, this.albumMapper.toAlbumDb(album)).catch((err) => {
+        throw new DAOException(__filename, "updateAlbumModel", err);
+      });
   }
 
   public async getAlbumModelToUpdate(this: AlbumDAO): Promise<AlbumDocument[]> {
-    return await albumModel
+    return await this.albumModel.model
       .find({
         $or: [
           { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
@@ -95,7 +102,7 @@ class AlbumDAO {
   }
 
   public async getAlbumModelToCoverGrab(this: AlbumDAO): Promise<AlbumDocument[]> {
-    return await albumModel
+    return await this.albumModel.model
       .find({
         $or: [
           { coverV2: { $eq: null } },
@@ -111,7 +118,8 @@ class AlbumDAO {
   }
 
   public async findAlbumsByMbid(this: AlbumDAO, mbid: string): Promise<AlbumDocument[]> {
-    return await albumModel.find({ mbid: mbid })
+    return await this.albumModel.model
+      .find({ mbid: mbid })
       .populate<Pick<Album, "artists">>("artists")
       .populate<Pick<Album, "coverV2">>("coverV2")
       .catch((err) => {
@@ -120,7 +128,7 @@ class AlbumDAO {
   }
 
   public async getAlbumModelForMetadataGrabber(this: AlbumDAO): Promise<AlbumDocument[]> {
-    return await albumModel
+    return await this.albumModel.model
       .find({
         $or: [
           { lastUpdated: null },
@@ -133,6 +141,11 @@ class AlbumDAO {
         throw new DAOException(__filename, "getAlbumModelForMetadataGrabber", err)
       })
   }
+
+  constructor(
+    private albumModel: AlbumModel,
+    private songModel: SongModel,
+    private albumMapper: AlbumMapper
+  ) { }
 }
 
-export const albumDAO = new AlbumDAO();

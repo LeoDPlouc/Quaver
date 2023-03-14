@@ -11,42 +11,48 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Document, Schema, Types } from "mongoose"
+import { Document, Types } from "mongoose"
 import { ArtistDb } from "../access/database/models/interfaces/artistDb"
-import { logger } from "../utils/logger"
-import { mapImage, mapImageDTO } from "./imageMapper"
+import { injectable } from "tsyringe"
+import { ImageMapper } from "./imageMapper"
 
-export function mapArtist(data: Artist & Document<any, any, Artist>): Artist {
-    let cleanedData: Artist = {
-        id: data._id,
-        name: data.name,
-        cover: data.cover, // DEPRECATED
-        coverV2: data.coverV2 ? mapImage(<Image & Document<any, any, Image>>data.coverV2) : undefined,
-        mbid: data.mbid,
-        lastUpdated: data.lastUpdated,
-        createdAt: data.createdAt
-    }
-    return cleanedData
-}
+@injectable()
+export class ArtistMapper {
 
-export function mapArtistDTO(data: Artist): ArtistDTO {
-    let cleanedData: ArtistDTO = {
-        id: data.id,
-        name: data.name,
-        cover: data.cover, // DEPRECATED
-        coverV2: data.coverV2 ? mapImageDTO(data.coverV2) : undefined
+    public toArtist(data: Artist & Document<any, any, Artist>): Artist {
+        let cleanedData: Artist = {
+            id: data._id,
+            name: data.name,
+            cover: data.cover, // DEPRECATED
+            coverV2: data.coverV2 ? this.imageMapper.toImage(<Image & Document<any, any, Image>>data.coverV2) : undefined,
+            mbid: data.mbid,
+            lastUpdated: data.lastUpdated,
+            createdAt: data.createdAt
+        }
+        return cleanedData
     }
-    return cleanedData
-}
 
-export function mapArtistDb(data: Artist): ArtistDb {
-    let cleanedData: ArtistDb = {
-        cover: data.cover, // DEPRECATED
-        coverV2: data.coverV2 ? new Types.ObjectId(data.coverV2.id) : undefined,
-        mbid: data.mbid,
-        name: data.name,
-        lastUpdated: data.lastUpdated,
-        createdAt: data.createdAt
+    public toArtistDTO(data: Artist): ArtistDTO {
+        let cleanedData: ArtistDTO = {
+            id: data.id,
+            name: data.name,
+            cover: data.cover, // DEPRECATED
+            coverV2: data.coverV2 ? this.imageMapper.toImageDTO(data.coverV2) : undefined
+        }
+        return cleanedData
     }
-    return cleanedData
+
+    public toArtistDb(data: Artist): ArtistDb {
+        let cleanedData: ArtistDb = {
+            cover: data.cover, // DEPRECATED
+            coverV2: data.coverV2 ? new Types.ObjectId(data.coverV2.id) : undefined,
+            mbid: data.mbid,
+            name: data.name,
+            lastUpdated: data.lastUpdated,
+            createdAt: data.createdAt
+        }
+        return cleanedData
+    }
+
+    constructor(private imageMapper: ImageMapper) { }
 }

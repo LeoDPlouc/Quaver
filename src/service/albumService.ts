@@ -11,31 +11,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { coverArtArchiveAccess } from "../access/api/coverArtArchive";
 import { AlbumMetadata } from "../access/api/DTO/albumMetadata";
 import { imageFileData } from "../access/api/DTO/ImageFileData";
-import { musicBrainzApiAccess } from "../access/api/musicbrainzApi";
-import { albumDAO } from "../access/database/albumDAO";
-import { mapAlbum, mapAlbumDb } from "../mappers/albumMapper";
-import { mapSong } from "../mappers/songMapper";
 import { Album } from "../models/album";
 import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
-import { logger } from "../utils/logger";
 import { ServiceException } from "./exceptions/serviceException";
+import { injectable } from "tsyringe"
+import { CoverArtArchiveAccess } from "../access/api/coverArtArchive";
+import { MusicBrainzApiAccess } from "../access/api/musicbrainz";
+import { AlbumDAO } from "../access/database/albumDAO";
+import { AlbumMapper } from "../mappers/albumMapper";
+import { SongMapper } from "../mappers/songMapper";
+import { Logger } from "../utils/logger";
 
-class AlbumService {
+@injectable()
+export class AlbumService {
   public async getAllAlbums(this: AlbumService): Promise<Album[]> {
-    return await albumDAO
+    return await this.albumDao
       .getAllAlbumModel()
-      .then((result) => result.map(mapAlbum))
+      .then((result) => result.map(this.albumMapper.toAlbum))
       .catch((err) => {
         throw new ServiceException(__filename, "getAllAlbums", err);
       });
   }
 
   public async getAlbum(this: AlbumService, id: string): Promise<Album> {
-    let result = await albumDAO.getAlbumModel(id).catch((err) => {
+    let result = await this.albumDao.getAlbumModel(id).catch((err) => {
       throw new ServiceException(__filename, "getAlbum", err);
     });
 
@@ -43,11 +45,11 @@ class AlbumService {
       throw new NotFoundException(__filename, "getAlbum", "Album not found");
     }
 
-    return mapAlbum(result);
+    return this.albumMapper.toAlbum(result);
   }
 
   public async getSongFromAlbum(this: AlbumService, id: string): Promise<Song[]> {
-    var result = await albumDAO.getSongModelFromAlbum(id).catch((err) => {
+    var result = await this.albumDao.getSongModelFromAlbum(id).catch((err) => {
       throw new ServiceException(__filename, "getAlbumSongs", err);
     });
 
@@ -55,69 +57,63 @@ class AlbumService {
       throw new NotFoundException(__filename, "getSongFromAlbum", "Album not found");
     }
 
-    return result.map(mapSong);
+    return result.map(this.songMapper.toSong);
   }
 
   public async createAlbum(this: AlbumService, album: Album): Promise<string> {
-    return await albumDAO.createAlbumModel(album)
+    return await this.albumDao.createAlbumModel(album)
       .catch((err) => {
         throw new ServiceException(__filename, "createAlbum", err);
       });
   }
 
   public async findAlbumByName(this: AlbumService, albumTitle: string, artistName?: string): Promise<Album[]> {
-    return await albumDAO
+    return await this.albumDao
       .findAlbumModelByName(albumTitle, artistName)
-      .then((result) => result.map(mapAlbum))
+      .then((result) => result.map(this.albumMapper.toAlbum))
       .catch((err) => {
         throw new ServiceException(__filename, "findAlbumByName", err);
       });
   }
 
   public async updateAlbum(this: AlbumService, album: Album): Promise<void> {
-    await albumDAO.updateAlbumModel(album)
+    await this.albumDao.updateAlbumModel(album)
       .catch((err) => {
         throw new ServiceException(__filename, "updateAlbum", err);
       });
   }
 
   public async getAlbumToCoverGrab(this: AlbumService): Promise<Album[]> {
-    return await albumDAO
+    return await this.albumDao
       .getAlbumModelToCoverGrab()
-      .then((result) => result.map(mapAlbum))
+      .then((result) => result.map(this.albumMapper.toAlbum))
       .catch((err) => {
         throw new ServiceException(__filename, "getAlbumToCoverGrab", err);
       });
   }
 
-  public async getAlbumMbid(this: AlbumService, album: Album): Promise<string[]> {
-    return await musicBrainzApiAccess.getMBId(album).catch((err) => {
-      throw new ServiceException(__filename, "getAlbumMbid", err);
-    });
-  }
-
   public async fetchAlbumMetadata(this: AlbumService, album: Album): Promise<AlbumMetadata> {
-    return await musicBrainzApiAccess.fetchAlbumMetadata(album.mbid).catch((err) => {
+    return await this.musicBrainzApiAccess.fetchAlbumMetadata(album.mbid).catch((err) => {
       throw new ServiceException(__filename, "fetchAlbumMetadata", err)
     });
   }
 
   public async getAlbumToUpdate(this: AlbumService): Promise<Album[]> {
-    return await albumDAO.getAlbumModelToUpdate().catch((err) => {
+    return await this.albumDao.getAlbumModelToUpdate().catch((err) => {
       throw new ServiceException(__filename, "getAlbumToUpdate", err);
     });
   }
 
   public async fetchAlbumCover(this: AlbumService, album: Album): Promise<imageFileData> {
-    return await coverArtArchiveAccess.fetchAlbumCover(album.mbid)
+    return await this.coverArtArchiveAccess.fetchAlbumCover(album.mbid)
       .catch(err => {
         throw new ServiceException(__filename, "fetchAlbumCover", err)
       })
   }
 
   public async getAlbumByMbidOrCreate(this: AlbumService, mbid: string): Promise<Album> {
-    let albums = await albumDAO.findAlbumsByMbid(mbid)
-      .then(results => results.map(mapAlbum))
+    let albums = await this.albumDao.findAlbumsByMbid(mbid)
+      .then(results => results.map(this.albumMapper.toAlbum))
       .catch((err) => {
         throw new ServiceException(__filename, "findAlbumsByMbid", err);
       });
@@ -126,18 +122,25 @@ class AlbumService {
       return albums[0]
     } else {
       let id = await this.createAlbum({ mbid })
-      logger.info(`Found new album ${id}`, "Album Service")
+      this.logger.info(`Found new album ${id}`, "Album Service")
       return { id, mbid }
     }
   }
 
   public async getAlbumForMetadataGrabber(this: AlbumService): Promise<Album[]> {
-    return await albumDAO.getAlbumModelForMetadataGrabber()
-      .then(results => results.map(mapAlbum))
+    return await this.albumDao.getAlbumModelForMetadataGrabber()
+      .then(results => results.map(this.albumMapper.toAlbum))
       .catch(err => {
         throw new ServiceException(__filename, "getAlbumForMetadataGrabber", err)
       })
   }
-}
 
-export const albumService = new AlbumService();
+  constructor(
+    private coverArtArchiveAccess: CoverArtArchiveAccess,
+    private musicBrainzApiAccess: MusicBrainzApiAccess,
+    private albumDao: AlbumDAO,
+    private albumMapper: AlbumMapper,
+    private songMapper: SongMapper,
+    private logger: Logger
+  ) { }
+}

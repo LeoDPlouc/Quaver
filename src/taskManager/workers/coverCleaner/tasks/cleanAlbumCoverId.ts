@@ -11,29 +11,54 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { albumService } from "../../../../service/albumService";
-import { imageService } from "../../../../service/imageService";
-import { logger } from "../../../../utils/logger";
+import { Album } from "../../../../models/album";
+import { AlbumService } from "../../../../service/albumService";
+import { ImageService } from "../../../../service/imageService";
+import { Logger } from "../../../../utils/logger";
 import { CoverCleanerException } from "../../exceptions/coverCleanerException";
-import { TaskException } from "../../exceptions/taskException";
+import { injectable } from "tsyringe"
 
-export async function cleanAlbumCoverId() {
-    try {
-      var images = await imageService.getAllImages();
-      var albums = await albumService.getAllAlbums();
-    } catch (err) {
-      throw new CoverCleanerException(__filename, "cleanAlbumCoverId", err);
-    }
-  
-    try {
-      for (let i = 0; i < albums.length; i++) {
-        if (albums[i].coverV2 && !images.find((im) => String(im.id) == String(albums[i].coverV2.id))) {
-          albums[i].coverV2 = null;
-          await albumService.updateAlbum(albums[i]);
-          logger.info(`Clean cover id for ${albums[i].id}`, "Cover Cleaner");
+@injectable()
+export class CleanAlbumCoverIdTask {
+  public async doTask() {
+    return this.fetchData()
+      .then(async (data) => {
+        for (let i = 0; i < data.albums.length; i++) {
+          if (data.albums[i].coverV2 && !data.images.find(img => this.isImageThisAlbumCover(img, data.albums[i]))) {
+            await this.cleanAlbumCoverId(data.albums[i])
+          }
         }
-      }
+      })
+      .catch(err => {
+        throw new CoverCleanerException(__filename, "doTask", err);
+      })
+  }
+
+  private async fetchData() {
+    const images = await this.imageService.getAllImages();
+    const albums = await this.albumService.getAllAlbums();
+
+    return { images, albums }
+  }
+
+  private async cleanAlbumCoverId(album: Album) {
+    try {
+      album.coverV2 = null;
+      await this.albumService.updateAlbum(album);
+      this.logger.info(`Clean cover id for ${album.id}`, "Cover Cleaner");
     } catch (err) {
-      logger.error(new CoverCleanerException(__filename, "cleanAlbumCoverId", err));
+      this.logger.error(new CoverCleanerException(__filename, "cleanAlbumCoverId", err));
     }
   }
+
+  private isImageThisAlbumCover(image: Image, album: Album): boolean {
+    return String(image.id) == String(album.coverV2.id)
+  }
+
+
+  constructor(
+    private albumService: AlbumService,
+    private imageService: ImageService,
+    private logger: Logger
+  ) { }
+}

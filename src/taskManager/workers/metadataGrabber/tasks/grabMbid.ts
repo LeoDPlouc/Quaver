@@ -11,29 +11,51 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { fileService } from "../../../../service/fileService";
-import { songService } from "../../../../service/songService";
-import { logger } from "../../../../utils/logger";
+import { injectable } from "tsyringe";
+import { Song } from "../../../../models/song";
+import { SongService } from "../../../../service/songService";
+import { NotFoundException } from "../../../../utils/exceptions/notFoundException";
 import { MetadataGrabberException } from "../../exceptions/metadataGrabberException";
-import { TaskException } from "../../exceptions/taskException";
+import { FileService } from "../../../../service/fileService";
+import { Logger } from "../../../../utils/logger";
 
-export async function grabMbid() {
-    let songs = await songService.getMbidlessSong()
-    .catch((err) => {throw new MetadataGrabberException(__filename, "grabMbid", err)});
-  
-    for (let i = 0; i < songs.length; i++) {
-      try {
-        let songData = await fileService.getMetadataFromFile(songs[i].path)
-        let mbid = await songService.fetchSongMBId(songData);
-        if (!mbid) continue; //Pass if no Mbid have been found
-  
-        songs[i].mbid = mbid;
-        await songService.updateSong(songs[i]);
-  
-        logger.info(`Found Mbid for song ${songs[i].id}`, "Metadata Grabber");
-      } catch (err) {
-        logger.error(new MetadataGrabberException(__filename, "grabMbid", err));
-        logger.debug(1, `SongData : ${JSON.stringify(songs[i])}`, "metadataGrabber")
-      }
-    }
+@injectable()
+export class GrabMbIDTask {
+  public async doTask() {
+    return await this.songService.getMbidlessSong()
+      .then(async (data) => {
+        for (let i = 0; i < data.length; i++) {
+          await this.fetchBaseMetadata(data[i])
+            .then(this.updateSong)
+            .catch(err => {
+              this.logger.error(new MetadataGrabberException(__filename, "grabMbid", err));
+              this.logger.debug(1, `SongData : ${JSON.stringify(data[i])}`, "metadataGrabber")
+            })
+        }
+      })
+      .catch((err) => { throw new MetadataGrabberException(__filename, "grabMbid", err) });
   }
+
+  private async fetchBaseMetadata(song: Song) {
+    let songMetadata = await this.fileService.getMetadataFromFile(song.path)
+    let mbid = await this.songService.fetchSongMBId(songMetadata);
+    if (!mbid) {
+      throw new NotFoundException(__filename, "fetchBaseMetadata", "No MbID have been found")
+    }
+
+    return { song, songMetadata, mbid }
+  }
+
+  private async updateSong(data: { song: Song, songMetadata: SongData, mbid: string }) {
+    data.song.mbid = data.mbid;
+    await this.songService.updateSong(data.song);
+
+    this.logger.info(`Found Mbid for song ${data.song.id}`, "Metadata Grabber");
+  }
+
+  constructor(
+    private songService: SongService,
+    private fileService: FileService,
+    private logger: Logger
+  ) { }
+}

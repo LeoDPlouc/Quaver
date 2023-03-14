@@ -11,33 +11,50 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { fileService } from "../../../../service/fileService";
-import { imageService } from "../../../../service/imageService";
-import { logger } from "../../../../utils/logger";
+import { injectable } from "tsyringe";
 import { CoverCleanerException } from "../../exceptions/coverCleanerException";
-import { TaskException } from "../../exceptions/taskException";
+import { ImageService } from "../../../../service/imageService";
+import { FileService } from "../../../../service/fileService";
+import { Logger } from "../../../../utils/logger";
 
-export async function cleanImagesWithDeadFiles() {
-    try {
-      var images = await imageService.getAllImages();
-      var files = await fileService.getAllFiles(fileService.getImagesPath());
-    } catch (err) {
-      throw new CoverCleanerException(__filename, "cleanImagesWithDeadFiles", err);
-    }
-  
-    try {
-      for (let i = 0; i < images.length; i++) {
-        let isDead = ![images[i].large, images[i].medium, images[i].small, images[i].verylarge]
-          .filter((i) => !!i)
-          .map((i) => !!files.find((f) => f == i))
-          .reduce((prev, cur) => prev && cur, true);
-  
-        if (isDead) {
-          imageService.deleteImageModel(images[i].id);
-          logger.info(`Deleted image ${images[i].id}`, "Cover Cleaner");
+@injectable()
+export class CleanImagesWithDeadFilesTask {
+  public async doTask() {
+    return await this.fetchData()
+      .then(async data => {
+        for (let i = 0; i < data.images.length; i++) {
+          if (this.isImageFileDead(data.images[i], data.files)) {
+            await this.deleteFile(data.images[i])
+          }
         }
-      }
-    } catch (err) {
-      logger.error(new CoverCleanerException(__filename, "cleanImagesWithDeadFiles", err));
-    }
+      })
+      .catch((err) => {
+        throw new CoverCleanerException(__filename, "cleanImagesWithDeadFiles", err);
+      })
   }
+
+  private async fetchData() {
+    let images = await this.imageService.getAllImages();
+    let files = await this.fileService.getAllFiles(this.fileService.getImagesPath());
+
+    return { images, files }
+  }
+
+  private isImageFileDead(image: Image, files: string[]) {
+    return ![image.large, image.medium, image.small, image.verylarge]
+      .filter((i) => !!i)
+      .map((i) => !!files.find((f) => f == i))
+      .reduce((prev, cur) => prev && cur, true);
+  }
+
+  private async deleteFile(image: Image) {
+    this.imageService.deleteImageModel(image.id);
+    this.logger.info(`Deleted image ${image.id}`, "Cover Cleaner");
+  }
+
+  constructor(
+    private imageService: ImageService,
+    private fileService: FileService,
+    private logger: Logger
+  ) { }
+}

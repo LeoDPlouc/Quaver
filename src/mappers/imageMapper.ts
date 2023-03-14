@@ -12,23 +12,28 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose"
+import { injectable } from "tsyringe"
 
-export function mapImage(data: Image & Document<any, any, Image>): Image {
-    let cleanedData: Image = {
-        id: data._id,
-        path: data.path,
-        tiny: data.tiny,
-        small: data.small,
-        medium: data.medium,
-        large: data.large,
-        verylarge: data.verylarge
-    }
-    return cleanedData
-}
+@injectable()
+export class ImageMapper {
 
-export function mapImageDTO(data: Image): ImageDTO {
-    let cleanedData: ImageDTO = {
-        id: data.id
+    public toImage(data: Image & Document<any, any, Image>): Image {
+        let cleanedData: Image = {
+            id: data._id,
+            path: data.path,
+            tiny: data.tiny,
+            small: data.small,
+            medium: data.medium,
+            large: data.large,
+            verylarge: data.verylarge
+        }
+        return cleanedData
     }
-    return cleanedData
+
+    public toImageDTO(data: Image): ImageDTO {
+        let cleanedData: ImageDTO = {
+            id: data.id
+        }
+        return cleanedData
+    }
 }

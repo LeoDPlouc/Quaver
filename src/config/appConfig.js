@@ -13,7 +13,11 @@
 
 module.exports = {
     DB_VERSION: 4,
+
+    APP_NAME: "Quaver",
     APP_VERSION: "0.6.3-beta",
+    APP_CONTACT_INFO: "https://github.com/LeoDPlouc/Quaver",
+    
     UPDATE_METADATA_PERIOD: 1000 * 60 * 60 * 24 * 365,
     UPDATE_COVER_PERIOD: 1000 * 60 * 60 * 24 * 30 * 150,
     TASK_MANAGER_PERIOD: 1000 * 60
