@@ -25,7 +25,7 @@ export class SongService {
   public async getAllSong(this: SongService): Promise<Song[]> {
     return await this.songDAO
       .getAllSongModel()
-      .then((result) => result.map(this.songMapper.toSong))
+      .then((result) => result.map(data => this.songMapper.toSong(data)))
       .catch((err) => {
         throw new ServiceException(__filename, "getAllSong", err);
       });

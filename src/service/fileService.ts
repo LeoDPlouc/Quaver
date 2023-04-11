@@ -14,13 +14,13 @@
 import fs from "fs/promises";
 import path from "path";
 import mm from "mime-types";
-import { DATA_PATH } from "../config/config";
 import { FileSystemException } from "../utils/exceptions/fileSystemException";
 import { ServiceException } from "./exceptions/serviceException";
 import { MimeLookupException } from "./exceptions/MimeLookupException";
 import { injectable, delay, inject } from "tsyringe";
 import { SongFileAccess } from "../access/file/songFile";
 import { Logger } from "../utils/logger";
+import { PathService } from "./pathService";
 
 @injectable()
 export class FileService {
@@ -59,22 +59,6 @@ export class FileService {
     }
   }
 
-  public getImagesPath(this: FileService) {
-    try {
-      return path.join(DATA_PATH, "images")
-    } catch (err) {
-      throw new FileSystemException(__filename, "getImagesPath", err)
-    }
-  }
-
-  public getLogsPath(this: FileService) {
-    try {
-      return path.join(DATA_PATH, "logs")
-    } catch (err) {
-      throw new FileSystemException(__filename, "getImagesPath", err)
-    }
-  }
-
   public async getMetadataFromFile(this: FileService, songPath: string): Promise<SongData> {
     return await this.songFileAccess
       .getMetadataFromFile(songPath).catch((err) => {
@@ -84,13 +68,13 @@ export class FileService {
 
   public async checkDataDirectores(this: FileService): Promise<void> {
     try {
-      let logsDir = this.getLogsPath()
+      let logsDir = this.pathService.getLogsPath()
       if (!(await fs.access(logsDir).then(_ => true).catch(_ => false))) {
         await fs.mkdir(logsDir, { recursive: true })
         this.logger.info("Created Log directory", "File Service")
       }
 
-      let imageDir = this.getImagesPath()
+      let imageDir = this.pathService.getImagesPath()
       if (!(await fs.access(imageDir).then(_ => true).catch(_ => false))) {
         await fs.mkdir(imageDir, { recursive: true })
         this.logger.info("Created Images directory", "File Service")
@@ -102,6 +86,7 @@ export class FileService {
 
   constructor(
     private songFileAccess: SongFileAccess,
-    private logger: Logger
+    private logger: Logger,
+    private pathService: PathService
   ) { }
 }

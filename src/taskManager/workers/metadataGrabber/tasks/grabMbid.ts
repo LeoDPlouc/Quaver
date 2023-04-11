@@ -26,7 +26,7 @@ export class GrabMbIDTask {
       .then(async (data) => {
         for (let i = 0; i < data.length; i++) {
           await this.fetchBaseMetadata(data[i])
-            .then(this.updateSong)
+            .then(data => this.updateSong(data))
             .catch(err => {
               this.logger.error(new MetadataGrabberException(__filename, "grabMbid", err));
               this.logger.debug(1, `SongData : ${JSON.stringify(data[i])}`, "metadataGrabber")

@@ -30,7 +30,7 @@ export class AlbumService {
   public async getAllAlbums(this: AlbumService): Promise<Album[]> {
     return await this.albumDao
       .getAllAlbumModel()
-      .then((result) => result.map(this.albumMapper.toAlbum))
+      .then((result) => result.map(data => this.albumMapper.toAlbum(data)))
       .catch((err) => {
         throw new ServiceException(__filename, "getAllAlbums", err);
       });
@@ -57,7 +57,7 @@ export class AlbumService {
       throw new NotFoundException(__filename, "getSongFromAlbum", "Album not found");
     }
 
-    return result.map(this.songMapper.toSong);
+    return result.map(data => this.songMapper.toSong(data));
   }
 
   public async createAlbum(this: AlbumService, album: Album): Promise<string> {
@@ -70,7 +70,7 @@ export class AlbumService {
   public async findAlbumByName(this: AlbumService, albumTitle: string, artistName?: string): Promise<Album[]> {
     return await this.albumDao
       .findAlbumModelByName(albumTitle, artistName)
-      .then((result) => result.map(this.albumMapper.toAlbum))
+      .then((result) => result.map(data => this.albumMapper.toAlbum(data)))
       .catch((err) => {
         throw new ServiceException(__filename, "findAlbumByName", err);
       });
@@ -86,7 +86,7 @@ export class AlbumService {
   public async getAlbumToCoverGrab(this: AlbumService): Promise<Album[]> {
     return await this.albumDao
       .getAlbumModelToCoverGrab()
-      .then((result) => result.map(this.albumMapper.toAlbum))
+      .then((result) => result.map(data => this.albumMapper.toAlbum(data)))
       .catch((err) => {
         throw new ServiceException(__filename, "getAlbumToCoverGrab", err);
       });

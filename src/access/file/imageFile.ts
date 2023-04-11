@@ -17,13 +17,14 @@ import fs from "fs/promises";
 import { FileSystemException } from "../../utils/exceptions/fileSystemException";
 import { injectable } from "tsyringe";
 import { FileService } from "../../service/fileService";
+import { PathService } from "../../service/pathService";
 
 @injectable()
 export class ImageFileAccess {
   public async saveImageFileToDisk(this: ImageFileAccess, data: string, extension: string): Promise<string> {
     //Create an UUID for the name of the file
     let filename = v4() + extension;
-    let p = path.resolve(this.fileService.getImagesPath(), filename);
+    let p = path.resolve(this.pathService.getImagesPath(), filename);
 
     await fs.writeFile(p, data, { encoding: "binary" }).catch((err) => {
       throw new FileSystemException(__filename, "saveImageFileToDisk", err);
@@ -38,5 +39,5 @@ export class ImageFileAccess {
     });
   }
 
-  constructor(private fileService: FileService) { }
+  constructor(private pathService: PathService) { }
 }

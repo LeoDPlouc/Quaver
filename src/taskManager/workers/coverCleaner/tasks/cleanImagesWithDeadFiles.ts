@@ -16,6 +16,7 @@ import { CoverCleanerException } from "../../exceptions/coverCleanerException";
 import { ImageService } from "../../../../service/imageService";
 import { FileService } from "../../../../service/fileService";
 import { Logger } from "../../../../utils/logger";
+import { PathService } from "../../../../service/pathService";
 
 @injectable()
 export class CleanImagesWithDeadFilesTask {
@@ -35,7 +36,7 @@ export class CleanImagesWithDeadFilesTask {
 
   private async fetchData() {
     let images = await this.imageService.getAllImages();
-    let files = await this.fileService.getAllFiles(this.fileService.getImagesPath());
+    let files = await this.fileService.getAllFiles(this.pathService.getImagesPath());
 
     return { images, files }
   }
@@ -55,6 +56,7 @@ export class CleanImagesWithDeadFilesTask {
   constructor(
     private imageService: ImageService,
     private fileService: FileService,
-    private logger: Logger
+    private logger: Logger,
+    private pathService: PathService
   ) { }
 }

@@ -25,7 +25,7 @@ export class UpdateArtistMetadataTask {
           if (!data[i].mbid) { continue }
 
           await this.fetchArtistMetadata(data[i])
-            .then(this.updateArtist)
+            .then(data => this.updateArtist(data))
             .catch(err => {
               this.logger.error(new MetadataGrabberException(__filename, "updateArtistMetadata", err))
             })

@@ -42,7 +42,7 @@ export async function getAllAlbum(req: Request, res: Response) {
   }
 
   //Search all albums in the db and clean the output
-  const albums = result.map(albumMapper.toAlbumDTO);
+  const albums = result.map(data => albumMapper.toAlbumDTO(data));
 
   res.json({
     status: "success",
@@ -114,7 +114,7 @@ export async function getSongFromAlbumById(req: Request, res: Response) {
   }
 
   //Search songs by albumid in the db and clean the output
-  const songs = result.map(songMapper.toSongDTO);
+  const songs = result.map(data => songMapper.toSongDTO(data));
 
   res.json({
     status: "success",

@@ -49,7 +49,7 @@ export class ArtistService {
   public async getSongFromArtist(this: ArtistService, id: string): Promise<Song[]> {
     return await this.artistDao
       .getSongModelFromArtist(id)
-      .then((result) => result.map(this.songMapper.toSong))
+      .then((result) => result.map(data => this.songMapper.toSong(data)))
       .catch((err) => {
         throw new ServiceException(__filename, "getSongFromArtist", err);
       });
@@ -64,7 +64,7 @@ export class ArtistService {
       throw new NotFoundException(__filename, "getAlbumFromArtist", "Artist not found");
     }
 
-    return result.map(this.albumMapper.toAlbum);
+    return result.map(data => this.albumMapper.toAlbum(data));
   }
 
   public async createArtist(this: ArtistService, artist: Artist): Promise<string> {

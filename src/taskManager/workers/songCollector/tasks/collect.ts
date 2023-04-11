@@ -14,22 +14,22 @@
 import { injectable } from "tsyringe";
 import { MUSIC_PATH } from "../../../../config/config";
 import { Song } from "../../../../models/song";
-import { SongService } from "../../../../service/songService";
 import { SongCollectorException } from "../../exceptions/songCollectorException";
 import { FileService } from "../../../../service/fileService";
 import { Logger } from "../../../../utils/logger";
+import { SongService } from "../../../../service/songService";
 
 @injectable()
 export class CollectTask {
   public async doTask() {
     return await this.fetchData()
-      .then(data => {
+      .then(async (data) => {
         for (let i = 0; i < data.paths.length; i++) {
           if (!this.fileService.isMusicFile(data.paths[i])) { continue }; //Only consider audio files
           if (data.songPaths.find((p) => p == data.paths[i])) { continue }; //Pass if song already exists
 
-          this.fetchMetadata(data.paths[i])
-            .then(this.createSong)
+          await this.fetchMetadata(data.paths[i])
+            .then(data => this.createSong(data))
             .catch(err => {
               this.logger.error(new SongCollectorException(__filename, "doTask", err));
             })

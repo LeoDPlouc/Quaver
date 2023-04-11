@@ -39,7 +39,7 @@ export async function getAllSongInfo(req: Request, res: Response) {
   }
 
   //Search all songs in the db and clean the output
-  const songs = result.map(songMapper.toSongDTO);
+  const songs = result.map(data => songMapper.toSongDTO(data));
 
   res.json({
     status: "success",

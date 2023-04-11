@@ -30,7 +30,7 @@ export class UpdateSongMetadataTask {
           await this.fetchSongMetadata(data[i])
             .then((data) => this.fetchAlbum(data.song, data.songMetadata))
             .then((data) => this.fetchArtist(data.song, data.songMetadata))
-            .then(this.updateSong)
+            .then(data => this.updateSong(data))
             .catch(err => {
               this.logger.error(new MetadataGrabberException(__filename, "doTask", err));
             })

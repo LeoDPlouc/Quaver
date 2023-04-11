@@ -114,7 +114,7 @@ export async function getSongFromArtistById(req: Request, res: Response) {
   }
 
   //Search songs by artistId and clean the output
-  const songs = result.map(songMapper.toSongDTO);
+  const songs = result.map(data => songMapper.toSongDTO(data));
 
   res.json({
     status: "success",
@@ -150,7 +150,7 @@ export async function getAlbumFromArtistById(req: Request, res: Response) {
   }
 
   //Search albums by artistId and clean the output
-  const albums = result.map(albumMapper.toAlbumDTO);
+  const albums = result.map(data => albumMapper.toAlbumDTO(data));
 
   res.json({
     status: "success",

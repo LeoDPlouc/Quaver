@@ -26,7 +26,7 @@ export class UpdateAlbumCoverTask {
             .then(async (data) => {
                 for (let i = 0; i < data.length; i++) {
                     await this.albumService.fetchAlbumCover(data[i])
-                        .then(this.resizeCover)
+                        .then(data => this.resizeCover(data))
                         .then((img) => this.createCover(img, data[i]))
                         .catch((err) => {
                             throw new CoverGrabberException(__filename, "doTask", err);

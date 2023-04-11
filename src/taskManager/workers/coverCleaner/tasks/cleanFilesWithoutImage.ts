@@ -16,6 +16,7 @@ import { CoverCleanerException } from "../../exceptions/coverCleanerException";
 import { ImageService } from "../../../../service/imageService";
 import { FileService } from "../../../../service/fileService";
 import { Logger } from "../../../../utils/logger";
+import { PathService } from "../../../../service/pathService";
 
 @injectable()
 export class CleanFilesWithoutImageTask {
@@ -39,7 +40,7 @@ export class CleanFilesWithoutImageTask {
       .then((result) => result.map((i) => [i.large, i.medium, i.path, i.small, i.tiny, i.verylarge]))
       .then((result) => result.reduce((tab1, tab2) => [...tab1, ...tab2], []))
       .then((result) => result.filter((p) => p));
-    let files = await this.fileService.getAllFiles(this.fileService.getImagesPath());
+    let files = await this.fileService.getAllFiles(this.pathService.getImagesPath());
 
     return { coverFiles, files }
   }
@@ -56,6 +57,7 @@ export class CleanFilesWithoutImageTask {
   constructor(
     private imageService: ImageService,
     private fileService: FileService,
-    private logger: Logger
+    private logger: Logger,
+    private pathService: PathService
   ) { }
 }
