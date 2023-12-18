@@ -18,6 +18,7 @@ import { imageFileData } from "../../../../access/api/DTO/ImageFileData";
 import { Album } from "../../../../models/album";
 import { ImageService } from "../../../../service/imageService";
 import { Logger } from "../../../../utils/logger";
+import { Image } from "../../../../models/image";
 
 @injectable()
 export class UpdateAlbumCoverTask {

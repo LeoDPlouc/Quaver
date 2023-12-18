@@ -15,6 +15,8 @@ import { Document, Types } from "mongoose"
 import { ArtistDb } from "../access/database/models/interfaces/artistDb"
 import { injectable } from "tsyringe"
 import { ImageMapper } from "./imageMapper"
+import { Artist } from "../models/artist"
+import { Image } from "../models/image"
 
 @injectable()
 export class ArtistMapper {

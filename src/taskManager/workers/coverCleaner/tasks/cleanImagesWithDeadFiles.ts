@@ -17,6 +17,7 @@ import { ImageService } from "../../../../service/imageService";
 import { FileService } from "../../../../service/fileService";
 import { Logger } from "../../../../utils/logger";
 import { PathService } from "../../../../service/pathService";
+import { Image } from "../../../../models/image";
 
 @injectable()
 export class CleanImagesWithDeadFilesTask {

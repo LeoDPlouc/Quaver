@@ -14,6 +14,7 @@
 import { Exception } from "../../../utils/Exception";
 
 export class DAOException extends Exception{
+    
     public getType(): string {
         return "DAO Exception"
     }

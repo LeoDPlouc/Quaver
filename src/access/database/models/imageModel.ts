@@ -11,8 +11,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose";
+import { FilterQuery, Schema, model } from "mongoose";
 import { injectable } from "tsyringe";
+import { Image } from "../../../models/image";
 
 const imageSchema = new Schema<Image>({
   //DEPRECIATED
@@ -39,7 +40,36 @@ const imageSchema = new Schema<Image>({
   },
 });
 
+
+const imageModel = model<Image>("Image", imageSchema)
+
 @injectable()
 export class ImageModel {
-  public readonly model = model<Image>("Image", imageSchema);
+
+  public get model() { return imageModel }
+
+  public find(query?: FilterQuery<Image>) {
+    return imageModel.find(query || {})
+  }
+
+  public findById(id: string) {
+    return imageModel.findById(id)
+  }
+
+  public create(album: Image) {
+    return imageModel.create(album)
+  }
+
+  public findByIdAndUpdate(id: string, album: Image) {
+    return imageModel.findByIdAndUpdate(id, album)
+  }
+
+  public deleteMany(query?: FilterQuery<Image>) {
+    return imageModel.deleteMany(query || {})
+  }
+
+  public findByIdAndDelete(id: string) {
+    return imageModel.findByIdAndDelete(id)
+  }
 }
+

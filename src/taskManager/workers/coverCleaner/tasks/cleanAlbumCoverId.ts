@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Album } from "../../../../models/album";
+import { Image } from "../../../../models/image";
 import { AlbumService } from "../../../../service/albumService";
 import { ImageService } from "../../../../service/imageService";
 import { Logger } from "../../../../utils/logger";

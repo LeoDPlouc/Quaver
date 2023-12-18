@@ -18,6 +18,8 @@ import { Album } from "../models/album"
 import { injectable } from "tsyringe"
 import { ArtistMapper } from "./artistMapper"
 import { ImageMapper } from "./imageMapper"
+import { Artist } from "../models/artist"
+import { Image } from "../models/image"
 
 @injectable()
 export class AlbumMapper {

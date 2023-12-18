@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Album } from "../../../models/album"
+import { Artist } from "../../../models/artist"
 import { Joining } from "../../../models/joining"
 
 export interface SongMetadata {

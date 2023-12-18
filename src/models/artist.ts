@@ -11,7 +11,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-interface Artist {
+import { Image } from "./image"
+
+export interface Artist {
     id?: string,
     name?: string
     cover?: string // DEPRECATED

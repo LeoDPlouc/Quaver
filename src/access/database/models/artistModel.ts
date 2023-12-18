@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose"
+import { FilterQuery, Schema, model } from "mongoose"
 import { injectable } from "tsyringe"
 import { ArtistDb } from "./interfaces/artistDb"
 
@@ -37,7 +37,29 @@ const artistSchema = new Schema<ArtistDb>({
     }
 })
 
+const artistModel = model<ArtistDb>("Artist", artistSchema)
+
 @injectable()
 export class ArtistModel {
-    public readonly model = model<ArtistDb>("Artist", artistSchema)
+    public get model() { return artistModel }
+
+    public find(query?: FilterQuery<ArtistDb>) {
+        return artistModel.find(query || {})
+    }
+
+    public findById(id: string) {
+        return artistModel.findById(id)
+    }
+
+    public create(artist: ArtistDb) {
+        return artistModel.create(artist)
+    }
+
+    public findByIdAndUpdate(id: string, artist: ArtistDb) {
+        return artistModel.findByIdAndUpdate(id, artist)
+    }
+
+    public deleteMany(query?: FilterQuery<ArtistDb>) {
+        return artistModel.deleteMany(query || {})
+    }
 }

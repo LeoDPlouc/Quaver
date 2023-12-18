@@ -12,6 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Album } from "./album"
+import { Artist } from "./artist"
 import { Joining } from "./joining"
 
 export interface Song {

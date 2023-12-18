@@ -13,6 +13,7 @@
 
 import { Document } from "mongoose"
 import { injectable } from "tsyringe"
+import { Image } from "../models/image"
 
 @injectable()
 export class ImageMapper {

@@ -20,6 +20,7 @@ import { ImageProcessingException } from "./exceptions/imageProcessingException"
 import { ImageDAO } from "../access/database/imageDAO";
 import { injectable } from "tsyringe";
 import { ImageFileAccess } from "../access/file/imageFile";
+import { Image } from "../models/image";
 
 export interface resizedImage {
   tiny: imageFileData;

@@ -15,6 +15,7 @@ import { injectable } from "tsyringe"
 import { ArtistService } from "../../../../service/artistService"
 import { MetadataGrabberException } from "../../exceptions/metadataGrabberException"
 import { Logger } from "../../../../utils/logger"
+import { Artist } from "../../../../models/artist"
 
 @injectable()
 export class UpdateArtistMetadataTask {

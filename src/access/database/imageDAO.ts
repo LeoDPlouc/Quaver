@@ -15,46 +15,51 @@ import { Document } from "mongoose";
 import { DAOException } from "./exceptions/DAOException";
 import { injectable } from "tsyringe";
 import { ImageModel } from "./models/imageModel";
+import { Image } from "../../models/image";
 
 export type ImageDocument = Image & Document<any, any, Image>;
 
 @injectable()
 export class ImageDAO {
   public async getAllImagesModels(this: ImageDAO): Promise<ImageDocument[]> {
-    return await this.imageModel.model
-      .find().catch((err) => {
-        throw new DAOException(__filename, "getAllImagesModels", err);
-      });
+    try {
+      return await this.imageModel.find()
+    } catch (err) {
+      throw new DAOException(__filename, "getAllImagesModels", err);
+    }
   }
 
   public async getImageModel(this: ImageDAO, id: string): Promise<ImageDocument> {
-    return await this.imageModel.model
-      .findById(id).catch((err) => {
-        throw new DAOException(__filename, "getImageModel", err);
-      });
+    try {
+      return await this.imageModel.findById(id)
+    } catch (err) {
+      throw new DAOException(__filename, "getImageModel", err);
+    }
   }
 
   public async createImageModel(this: ImageDAO, image: Image): Promise<string> {
-    return await this.imageModel.model
-      .create(image)
-      .then((i) => i.id)
-      .catch((err) => {
-        throw new DAOException(__filename, "createImageModel", err);
-      });
+    try {
+      return await this.imageModel.create(image)
+        .then((i) => i.id)
+    } catch (err) {
+      throw new DAOException(__filename, "createImageModel", err);
+    }
   }
 
   public async deleteImageModel(this: ImageDAO, id: string): Promise<void> {
-    await this.imageModel.model
-      .findByIdAndDelete(id).catch((err) => {
-        throw new DAOException(__filename, "deleteImageModel", err);
-      });
+    try {
+      await this.imageModel.findByIdAndDelete(id)
+    } catch (err) {
+      throw new DAOException(__filename, "deleteImageModel", err);
+    }
   }
 
   public async getTinyLessImageModel(this: ImageDAO): Promise<ImageDocument[]> {
-    return await this.imageModel.model
-      .find({ tiny: null }).catch((err) => {
-        throw new DAOException(__filename, "getTinyLessImageModel", err);
-      });
+    try {
+      return await this.imageModel.find({ tiny: null })
+    } catch (err) {
+      throw new DAOException(__filename, "getTinyLessImageModel", err);
+    }
   }
 
   constructor(private imageModel: ImageModel) { }

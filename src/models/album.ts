@@ -11,6 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Artist } from "./artist";
+import { Image } from "./image";
 import { Joining } from "./joining";
 
 export interface Album {

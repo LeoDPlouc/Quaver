@@ -20,6 +20,7 @@ import { Song } from "../models/song"
 import { injectable } from "tsyringe"
 import { AlbumMapper } from "./albumMapper"
 import { ArtistMapper } from "./artistMapper"
+import { Artist } from "../models/artist"
 
 @injectable()
 export class SongMapper {

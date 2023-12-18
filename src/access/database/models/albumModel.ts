@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model } from "mongoose";
+import { FilterQuery, Schema, model } from "mongoose";
 import { injectable } from "tsyringe";
 import { AlbumDb } from "./interfaces/albumDb";
 
@@ -57,9 +57,31 @@ const albumSchema = new Schema<AlbumDb>({
   }]
 });
 
+const albumModel = model<AlbumDb>("Album", albumSchema)
+
 @injectable()
 export class AlbumModel {
-  public readonly model = model<AlbumDb>("Album", albumSchema);
-}
 
+  public get model() { return albumModel }
+
+  public find(query?: FilterQuery<AlbumDb>) {
+    return albumModel.find(query || {})
+  }
+
+  public findById(id: string) {
+    return albumModel.findById(id)
+  }
+
+  public create(album: AlbumDb) {
+    return albumModel.create(album)
+  }
+
+  public findByIdAndUpdate(id: string, album: AlbumDb) {
+    return albumModel.findByIdAndUpdate(id, album)
+  }
+
+  public deleteMany(query?: FilterQuery<AlbumDb>) {
+    return albumModel.deleteMany(query || {})
+  }
+}
 

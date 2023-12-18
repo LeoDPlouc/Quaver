@@ -22,6 +22,7 @@ import { AlbumMapper } from "../mappers/albumMapper";
 import { SongMapper } from "../mappers/songMapper";
 import { ArtistMapper } from "../mappers/artistMapper";
 import { Logger } from "../utils/logger";
+import { Artist } from "../models/artist";
 
 @injectable()
 export class ArtistService {

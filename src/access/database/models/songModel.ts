@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Schema, model, Types } from "mongoose"
+import { Schema, model, Types, FilterQuery, ProjectionType } from "mongoose"
 import { SongDb } from "./interfaces/songDb"
 import { injectable } from "tsyringe"
 
@@ -74,7 +74,30 @@ const songSchema = new Schema<SongDb>({
     }]
 })
 
+const songModel = model<SongDb>("Song", songSchema)
+
 @injectable()
 export class SongModel {
-    public readonly model = model<SongDb>("Song", songSchema)
+
+    public get model() { return songModel }
+
+    public find(query?: FilterQuery<SongDb>, projection?: ProjectionType<SongDb>) {
+        return songModel.find(query || {}, projection || {})
+    }
+
+    public findById(id: string) {
+        return songModel.findById(id)
+    }
+
+    public create(album: SongDb) {
+        return songModel.create(album)
+    }
+
+    public findByIdAndUpdate(id: string, song: SongDb) {
+        return songModel.findByIdAndUpdate(id, song)
+    }
+
+    public deleteMany(query?: FilterQuery<SongDb>) {
+        return songModel.deleteMany(query || {})
+    }
 }

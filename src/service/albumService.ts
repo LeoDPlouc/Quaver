@@ -98,12 +98,6 @@ export class AlbumService {
     });
   }
 
-  public async getAlbumToUpdate(this: AlbumService): Promise<Album[]> {
-    return await this.albumDao.getAlbumModelToUpdate().catch((err) => {
-      throw new ServiceException(__filename, "getAlbumToUpdate", err);
-    });
-  }
-
   public async fetchAlbumCover(this: AlbumService, album: Album): Promise<imageFileData> {
     return await this.coverArtArchiveAccess.fetchAlbumCover(album.mbid)
       .catch(err => {

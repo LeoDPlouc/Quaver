@@ -23,96 +23,99 @@ import { ArtistModel } from "./models/artistModel";
 import { SongDocument } from "./songDAO";
 import { SongModel } from "./models/songModel";
 import { ArtistMapper } from "../../mappers/artistMapper";
+import { Artist } from "../../models/artist";
 
 export type ArtistDocument = Artist & Document<any, any, Artist>;
 
 @injectable()
 export class ArtistDAO {
   public async getAllArtistModel(this: ArtistDAO): Promise<ArtistDocument[]> {
-    return await this.artistModel.model
-      .find()
-      .populate<Pick<Artist, "coverV2">>("coverV2")
-      .catch((err) => {
-        throw new DAOException(__filename, "getAllArtistModel", err);
-      });
+    try {
+      return await this.artistModel.find()
+        .populate<Pick<Artist, "coverV2">>("coverV2")
+    } catch (err) {
+      throw new DAOException(__filename, "getAllArtistModel", err);
+    }
   }
 
   public async getArtistModel(this: ArtistDAO, id: string): Promise<ArtistDocument> {
-    return await this.artistModel.model
-      .findById(id)
-      .populate<Pick<Artist, "coverV2">>("coverV2")
-      .catch((err) => {
-        throw new DAOException(__filename, "getArtistModel", err);
-      });
+    try {
+      return await this.artistModel.findById(id)
+        .populate<Pick<Artist, "coverV2">>("coverV2")
+    } catch (err) {
+      throw new DAOException(__filename, "getArtistModel", err);
+    }
   }
 
   public async getSongModelFromArtist(this: ArtistDAO, id: string): Promise<SongDocument[]> {
-    return await this.songModel.model
-      .find({ artists: id })
-      .populate<Pick<Song, "albumV2">>("albumV2")
-      .populate<Pick<Song, "artists">>("artists")
-      .catch((err) => {
-        throw new DAOException(__filename, "getSongModelFromArtist", err);
-      });
+    try {
+      return await this.songModel.find({ artists: id })
+        .populate<Pick<Song, "albumV2">>("albumV2")
+        .populate<Pick<Song, "artists">>("artists")
+    } catch (err) {
+      throw new DAOException(__filename, "getSongModelFromArtist", err);
+    }
   }
 
   public async getAlbumModelFromArtist(this: ArtistDAO, id: string): Promise<AlbumDocument[]> {
-    return await this.albumModel.model
-      .find({ artists: id })
-      .populate<Pick<Album, "artists">>("artists")
-      .populate<Pick<Album, "coverV2">>("coverV2").catch((err) => {
-        throw new DAOException(__filename, "getAlbumModelFromArtist", err);
-      });
+    try {
+      return await this.albumModel.find({ artists: id })
+        .populate<Pick<Album, "artists">>("artists")
+        .populate<Pick<Album, "coverV2">>("coverV2")
+    } catch (err) {
+      throw new DAOException(__filename, "getAlbumModelFromArtist", err);
+    }
   }
 
   public async createArtistModel(this: ArtistDAO, artist: Artist): Promise<string> {
-    return await this.artistModel.model
-      .create(this.artistMapper.toArtistDb(artist))
-      .then((a) => a.id)
-      .catch((err) => {
-        throw new DAOException(__filename, "createArtistModel", err);
-      });
+    try {
+      return await this.artistModel.create(this.artistMapper.toArtistDb(artist))
+        .then((a) => a.id)
+    } catch (err) {
+      throw new DAOException(__filename, "createArtistModel", err);
+    }
   }
 
   public async findArtistModelByName(this: ArtistDAO, name: string): Promise<ArtistDocument[]> {
-    return await this.artistModel.model
-      .find({ name: name })
-      .populate<Pick<Artist, "coverV2">>("coverV2")
-      .catch((err) => {
-        throw new DAOException(__filename, "findArtistModelByName", err);
-      });
+    try {
+      return await this.artistModel.find({ name: name })
+        .populate<Pick<Artist, "coverV2">>("coverV2")
+    } catch (err) {
+      throw new DAOException(__filename, "findArtistModelByName", err);
+    }
   }
 
   public async updateArtistModel(this: ArtistDAO, artist: Artist): Promise<void> {
-    await this.artistModel.model
-      .findByIdAndUpdate(artist.id, this.artistMapper.toArtistDb(artist)).catch((err) => {
-        throw new DAOException(__filename, "updateArtistModel", err);
-      });
+    try {
+      await this.artistModel.findByIdAndUpdate(artist.id, this.artistMapper.toArtistDb(artist))
+    } catch (err) {
+      throw new DAOException(__filename, "updateArtistModel", err);
+    }
   }
 
   public async findArtistsByMbids(this: ArtistDAO, mbids: string[]): Promise<ArtistDocument[]> {
-    return await this.artistModel.model
-      .find({
+    try {
+      return await this.artistModel.find({
         mbid: { $in: mbids }
       })
-      .populate<Pick<Artist, "coverV2">>("coverV2")
-      .catch((err) => {
-        throw new DAOException(__filename, "findArtistsByMbids", err)
-      })
+        .populate<Pick<Artist, "coverV2">>("coverV2")
+    } catch (err) {
+      throw new DAOException(__filename, "findArtistsByMbids", err)
+    }
   }
 
   public async getArtistModelForMetadataGrabber(this: ArtistDAO): Promise<ArtistDocument[]> {
-    return await this.artistModel.model
-      .find({
+    try {
+      return await this.artistModel.find({
         $or: [
           { lastUpdated: null },
           { lastUpdated: { $lt: Date.now() - UPDATE_METADATA_PERIOD } },
         ],
       })
-      .populate<Pick<Artist, "coverV2">>("coverV2")
-      .catch(err => {
-        throw new DAOException(__filename, "getArtistModelForMetadataGrabber", err)
-      })
+        .populate<Pick<Artist, "coverV2">>("coverV2")
+    } catch (err) {
+      throw new DAOException(__filename, "getArtistModelForMetadataGrabber", err)
+    }
   }
 
   constructor(
