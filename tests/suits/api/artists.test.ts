@@ -12,20 +12,27 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import request from "supertest";
-import { cleanDatabase, createDatabase } from "./util";
-import app from "../src/app";
+import { cleanDatabase } from "../../util";
+import app from '../../../src/app'
+import { container } from "tsyringe";
+import { ArtistModel } from "../../../src/access/database/models/artistModel";
+import { getCleanArtistDb } from "../../testData/artistTestData";
+import { SongModel } from "../../../src/access/database/models/songModel";
+import { getCleanSong, getCleanSongDb } from "../../testData/songTestData";
+import { AlbumModel } from "../../../src/access/database/models/albumModel";
+import { getCleanAlbumDb } from "../../testData/albumTestData";
 
 describe("Artist", () => {
-  beforeAll(createDatabase);
-  afterAll(cleanDatabase);
-
-  var id;
 
   describe("Get /artist/", () => {
-    it("Should return all artists", async () => {
-      var res = await request(app).get("/api/artist").expect(200);
+    beforeEach(cleanDatabase);
 
-      id = res.body.data.artists[0].id;
+    it("Should return all artists", async () => {
+      const artistModel = container.resolve(ArtistModel)
+
+      artistModel.create(getCleanArtistDb())
+
+      const res = await request(app).get("/api/artist").expect(200);
 
       expect(res.body.statusCode).toBe(0);
       expect(res.body.results).toBe(1);
@@ -33,36 +40,55 @@ describe("Artist", () => {
   });
 
   describe("Get /artist/:id", () => {
+    beforeEach(cleanDatabase);
+
     it("Should return one artist", async () => {
-      var res = await request(app).get(`/api/artist/${id}`).expect(200);
+      const artistModel = container.resolve(ArtistModel)
+
+      const id = (await artistModel.create(getCleanArtistDb())).id
+
+      const res = await request(app).get(`/api/artist/${id}`).expect(200);
 
       expect(res.body.statusCode).toBe(0);
       expect(res.body.data.artist).toBeDefined();
     });
 
     it("Should fail with id undefined", async () => {
-      var res = await request(app).get("/api/artist/undefined").expect(200);
+      const res = await request(app).get("/api/artist/undefined").expect(200);
 
       expect(res.body.statusCode).toBe(2);
     });
 
     it("Should fail with null id", async () => {
-      var res = await request(app).get("/api/artist/null").expect(200);
+      const res = await request(app).get("/api/artist/null").expect(200);
 
       expect(res.body.statusCode).toBe(2);
     });
   });
 
   describe("Get /artist/:id/songs", () => {
+    beforeEach(cleanDatabase);
+
     it("Should return artist's songs", async () => {
-      var res = await request(app).get(`/api/artist/${id}/songs`).expect(200);
+      const artistModel = container.resolve(ArtistModel)
+      const songModel = container.resolve(SongModel)
+
+      const id = (await artistModel.create(getCleanArtistDb())).id
+      await songModel.create({
+        ...getCleanSongDb(),
+        artists: id
+      })
+
+      const res = await request(app).get(`/api/artist/${id}/songs`).expect(200);
+
+      console.log(res.body)
 
       expect(res.body.statusCode).toBe(0);
-      expect(res.body.results).toBe(5);
+      expect(res.body.results).toBe(1);
     });
 
     it("Should fail with id undefined", async () => {
-      var res = await request(app)
+      const res = await request(app)
         .get("/api/artist/undefined/songs")
         .expect(200);
 
@@ -70,22 +96,33 @@ describe("Artist", () => {
     });
 
     it("Should fail with null id", async () => {
-      var res = await request(app).get("/api/artist/null/songs").expect(200);
+      const res = await request(app).get("/api/artist/null/songs").expect(200);
 
       expect(res.body.statusCode).toBe(2);
     });
   });
 
   describe("Get /artist/:id/albums", () => {
+    beforeEach(cleanDatabase);
+
     it("Should return artist's albums", async () => {
-      var res = await request(app).get(`/api/artist/${id}/albums`).expect(200);
+      const artistModel = container.resolve(ArtistModel)
+      const albumModel = container.resolve(AlbumModel)
+
+      const id = (await artistModel.create(getCleanArtistDb())).id
+      await albumModel.create({
+        ...getCleanAlbumDb(),
+        artists: id
+      })
+
+      const res = await request(app).get(`/api/artist/${id}/albums`).expect(200);
 
       expect(res.body.statusCode).toBe(0);
       expect(res.body.results).toBe(1);
     });
 
     it("Should fail with id undefined", async () => {
-      var res = await request(app)
+      const res = await request(app)
         .get("/api/artist/undefined/albums")
         .expect(200);
 
@@ -93,7 +130,7 @@ describe("Artist", () => {
     });
 
     it("Should fail with null id", async () => {
-      var res = await request(app).get("/api/artist/null/albums").expect(200);
+      const res = await request(app).get("/api/artist/null/albums").expect(200);
 
       expect(res.body.statusCode).toBe(2);
     });
