@@ -11,51 +11,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { container } from "tsyringe"
 import { connectToDb } from "../src/access/database/utils"
 import mongoose from "mongoose"
-import { artistModel } from "../src/access/database/models/artistModel"
-import { albumModel } from "../src/access/database/models/albumModel"
-import { songModel } from "../src/access/database/models/songModel"
-import { imageModel } from "../src/access/database/models/imageModel"
+import { ArtistModel } from "../src/access/database/models/artistModel"
+import { SongModel } from "../src/access/database/models/songModel"
+import { ImageModel } from "../src/access/database/models/imageModel"
+import { AlbumModel } from "../src/access/database/models/albumModel"
 
-export async function createDatabase() {
-    await connectToDb("Test")
+const artistModel = container.resolve(ArtistModel)
+const albumModel = container.resolve(AlbumModel)
+const songModel = container.resolve(SongModel)
+const imageModel = container.resolve(ImageModel)
 
-    var artist = await new artistModel({ name: "Nirvana" }).save()
-    var album = await new albumModel({ artist: "Nirvana", artistId: artist.id, title: "Nevermind", year: 1991 }).save()
-    await new songModel({ album: "Nevermind", albumId: album.id, artist: "Nirvana", artistId: artist.id, n: 1, like: 0, path: "/dev/zero", title: "Smells Like Teen Spirit", year: 1991 }).save()
-    await new songModel({ album: "Nevermind", albumId: album.id, artist: "Nirvana", artistId: artist.id, n: 3, like: 0, path: "/dev/zero", title: "Come as You Are", year: 1991 }).save()
-    await new songModel({ album: "Nevermind", albumId: album.id, artist: "Nirvana", artistId: artist.id, n: 2, like: 0, path: "/dev/zero", title: "In Bloom", year: 1991 }).save()
-    await new songModel({ album: "Nevermind", albumId: album.id, artist: "Nirvana", artistId: artist.id, n: 4, like: 0, path: "/dev/zero", title: "Breed", year: 1991 }).save()
-    await new songModel({ album: "Nevermind", albumId: album.id, artist: "Nirvana", artistId: artist.id, n: 5, like: 0, path: "/dev/zero", title: "Lithium", year: 1991 }).save()
-    await new imageModel({ path: "/dev/zero" }).save()
+export async function cleanTestEnvironnement() {
+    jest.clearAllMocks()
+    jest.clearAllTimers()
+    jest.resetAllMocks()
+    jest.restoreAllMocks()
+    jest.useRealTimers()
 }
 
 export async function cleanDatabase() {
-    await artistModel.deleteMany()
-    await albumModel.deleteMany()
-    await songModel.deleteMany()
-    await imageModel.deleteMany()
-
     await mongoose.disconnect()
-}
+    await connectToDb("Test")
 
-export async function getOneSong() {
-    var songs = await songModel.find()
-    return songs[0]
-}
-
-export async function getOneAlbum() {
-    var albums = await albumModel.find()
-    return albums[0]
-}
-
-export async function getOneArtist() {
-    var artists = await artistModel.find()
-    return artists[0]
-}
-
-export async function getOneImage() {
-    var images = await imageModel.find()
-    return images[0]
+    await artistModel.model.deleteMany()
+    await albumModel.deleteMany()
+    await songModel.model.deleteMany()
+    await imageModel.model.deleteMany()
 }
