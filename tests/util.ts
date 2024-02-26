@@ -12,17 +12,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { container } from "tsyringe"
-import { connectToDb } from "../src/access/database/utils"
+import { connectToDb } from "../src/DAO/utils"
 import mongoose from "mongoose"
-import { ArtistModel } from "../src/access/database/models/artistModel"
-import { SongModel } from "../src/access/database/models/songModel"
-import { ImageModel } from "../src/access/database/models/imageModel"
-import { AlbumModel } from "../src/access/database/models/albumModel"
+import { AlbumModel } from "../src/DAO/models/albumModel"
+import { SongModel } from "../src/DAO/models/songModel"
+import { ArtistModel } from "../src/DAO/models/artistModel"
+import { ImageModel } from "../src/DAO/models/imageModel"
+import { LoggerMock } from "./mock/utils/logger.mock"
+import { LoggerToken } from "../src/utils/interfaces/logger.inter"
 
-const artistModel = container.resolve(ArtistModel)
-const albumModel = container.resolve(AlbumModel)
-const songModel = container.resolve(SongModel)
-const imageModel = container.resolve(ImageModel)
+const artistModel = container.resolve<ArtistModel>(ArtistModel)
+const albumModel = container.resolve<AlbumModel>(AlbumModel)
+const songModel = container.resolve<SongModel>(SongModel)
+const imageModel = container.resolve<ImageModel>(ImageModel)
 
 export async function cleanTestEnvironnement() {
     jest.clearAllMocks()
@@ -43,5 +45,5 @@ export async function cleanDatabase() {
 }
 
 export function injectMockLogger() {
-    container.register()
+    container.register(LoggerToken, LoggerMock);
 }

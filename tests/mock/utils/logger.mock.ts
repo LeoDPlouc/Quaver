@@ -15,15 +15,14 @@ import { Request } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import { Exception } from "../../../src/utils/Exception";
-import { Logger } from "../../../src/utils/logger";
+import { Logger } from "../../../src/utils/interfaces/logger.inter";
 
-class LoggerMock implements Logger {
-    
+export class LoggerMock implements Logger {
 
-    public error(this: Logger, exception: Exception): void {}
-    public info(this: Logger, info: String, source: String): void {}
-    public logRequest(this: Logger, req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): void {}
-    public debug(this: Logger, debugLvl: number, info: String, source: String): void {}
-    public debugError(this: Logger, debugLvl: number, exception: Exception): void {}
-    
+    public error(this: Logger, exception: Exception): void { }
+    public info(this: Logger, info: String, source: String): void { }
+    public logRequest(this: Logger, req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): void { }
+    public debug(this: Logger, debugLvl: number, info: String, source: String): void { }
+    public debugError(this: Logger, debugLvl: number, exception: Exception): void { }
+
 }

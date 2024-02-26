@@ -16,8 +16,8 @@ import { createLogger, format, transports } from "winston";
 import { DEBUG_LVL } from "../config/config";
 import { Exception } from "./Exception";
 import { container, injectable, registry } from "tsyringe";
-import { PathService } from "../service/pathService";
 import { Logger, LoggerToken } from "./interfaces/logger.inter";
+import { PathService, PathServiceToken } from "../service/interfaces/pathService.inter";
 
 @injectable()
 @registry([{
@@ -49,7 +49,7 @@ export class LoggerImpl implements Logger {
   });
 
   private loggerFile = createLogger({
-    transports: [new transports.File({ dirname: container.resolve(PathService).getLogsPath(), filename: "quaver.log", maxsize: 1_000_000 })],
+    transports: [new transports.File({ dirname: container.resolve<PathService>(PathServiceToken).getLogsPath(), filename: "quaver.log", maxsize: 1_000_000 })],
     format: format.combine(
       format.timestamp(),
       format.printf(({ timestamp, level, message }) => {

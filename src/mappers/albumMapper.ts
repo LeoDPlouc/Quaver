@@ -96,3 +96,5 @@ export class AlbumMapperImpl implements AlbumMapper {
         @inject(ImageMapperToken) private imageMapper: ImageMapper
     ) { }
 }
+
+export { AlbumMapper }
