@@ -18,110 +18,114 @@ import { ControllerException } from "./exceptions/controllerException";
 import { AlbumMapper } from "../mappers/albumMapper";
 import { SongMapper } from "../mappers/songMapper";
 import { Logger } from "../utils/logger";
-import { container } from "tsyringe";
+import { injectable } from "tsyringe";
 
-const albumService = container.resolve(AlbumService)
+@injectable()
+export class AlbumController {
 
-const albumMapper = container.resolve(AlbumMapper)
-const songMapper = container.resolve(SongMapper)
+  constructor(
+    private albumService: AlbumService,
+    private albumMapper: AlbumMapper,
+    private songMapper: SongMapper,
+    private logger: Logger
+  ) { }
 
-const logger = container.resolve(Logger)
+  public async getAllAlbum(req: Request, res: Response) {
+    try {
+      var result = await this.albumService.getAllAlbums();
+    } catch (err) {
+      this.logger.error(new ControllerException(__filename, "getAllAlbum", err));
 
-export async function getAllAlbum(req: Request, res: Response) {
-  try {
-    var result = await albumService.getAllAlbums();
-  } catch (err) {
-    logger.error(new ControllerException(__filename, "getAllAlbum", err));
+      res.json({
+        status: "fail",
+        statusCode: 1,
+        errorMessage: "Server error",
+      });
+      return;
+    }
 
-    res.json({
-      status: "fail",
-      statusCode: 1,
-      errorMessage: "Server error",
-    });
-    return;
-  }
-
-  //Search all albums in the db and clean the output
-  const albums = result.map(data => albumMapper.toAlbumDTO(data));
-
-  res.json({
-    status: "success",
-    statusCode: 0,
-    results: albums.length,
-    data: {
-      albums,
-    },
-  });
-}
-
-export async function getAlbumById(req: Request, res: Response) {
-  let err = validationResult(req);
-  if (!err.isEmpty()) {
-    res.json({
-      status: "fail",
-      statusCode: 2,
-      errorMessage: "Invalid request",
-    });
-    return;
-  }
-
-  //Search an album by id and clean the output
-  try {
-    var result = await albumService.getAlbum(req.params.id);
-  } catch (err) {
-    logger.error(new ControllerException(__filename, "getAlbumById", err));
+    //Search all albums in the db and clean the output
+    const albums = result.map(data => this.albumMapper.toAlbumDTO(data));
 
     res.json({
-      status: "fail",
-      statusCode: 1,
-      errorMessage: "Server error",
+      status: "success",
+      statusCode: 0,
+      results: albums.length,
+      data: {
+        albums,
+      },
     });
-    return;
   }
 
-  const album = albumMapper.toAlbumDTO(result);
+  public async getAlbumById(req: Request, res: Response) {
+    let err = validationResult(req);
+    if (!err.isEmpty()) {
+      res.json({
+        status: "fail",
+        statusCode: 2,
+        errorMessage: "Invalid request",
+      });
+      return;
+    }
 
-  res.json({
-    status: "success",
-    statusCode: 0,
-    data: {
-      album,
-    },
-  });
-}
+    //Search an album by id and clean the output
+    try {
+      var result = await this.albumService.getAlbum(req.params.id);
+    } catch (err) {
+      this.logger.error(new ControllerException(__filename, "getAlbumById", err));
 
-export async function getSongFromAlbumById(req: Request, res: Response) {
-  let err = validationResult(req);
-  if (!err.isEmpty()) {
+      res.json({
+        status: "fail",
+        statusCode: 1,
+        errorMessage: "Server error",
+      });
+      return;
+    }
+
+    const album = this.albumMapper.toAlbumDTO(result);
+
     res.json({
-      status: "fail",
-      statusCode: 2,
-      errorMessage: "Invalid request",
+      status: "success",
+      statusCode: 0,
+      data: {
+        album,
+      },
     });
-    return;
   }
 
-  try {
-    var result = await albumService.getSongFromAlbum(req.params.id);
-  } catch (err) {
-    logger.error(new ControllerException(__filename, "getSongFromAlbumById", err));
+  public async getSongFromAlbumById(req: Request, res: Response) {
+    let err = validationResult(req);
+    if (!err.isEmpty()) {
+      res.json({
+        status: "fail",
+        statusCode: 2,
+        errorMessage: "Invalid request",
+      });
+      return;
+    }
+
+    try {
+      var result = await this.albumService.getSongFromAlbum(req.params.id);
+    } catch (err) {
+      this.logger.error(new ControllerException(__filename, "getSongFromAlbumById", err));
+      res.json({
+        status: "fail",
+        statusCode: 1,
+        errorMessage: "Server error",
+      });
+      return;
+    }
+
+    //Search songs by albumid in the db and clean the output
+    const songs = result.map(data => this.songMapper.toSongDTO(data));
+
     res.json({
-      status: "fail",
-      statusCode: 1,
-      errorMessage: "Server error",
+      status: "success",
+      results: songs.length,
+      statusCode: 0,
+      data: {
+        songs: songs,
+      },
     });
-    return;
   }
-
-  //Search songs by albumid in the db and clean the output
-  const songs = result.map(data => songMapper.toSongDTO(data));
-
-  res.json({
-    status: "success",
-    results: songs.length,
-    statusCode: 0,
-    data: {
-      songs: songs,
-    },
-  });
 }

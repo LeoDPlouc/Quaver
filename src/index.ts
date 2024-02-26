@@ -15,13 +15,12 @@ import "reflect-metadata"
 import mongoose from "mongoose";
 import { APP_PORT, DEBUG_LVL, } from "./config/config";
 import { runTaskManager } from "./taskManager/taskManager";
-import { Migrate } from "./access/database/migration/migration";
 import app from "./app";
-import { connectToDb } from "./access/database/utils";
 import { AppException } from "./utils/exceptions/appException";
 import { FileService } from "./service/fileService";
 import { Logger } from "./utils/logger";
 import { container } from "tsyringe";
+import { connectToDb } from "./DAO/utils";
 
 //Declare the objects stored in session - DEPRECATED
 declare module "express-session" {
@@ -37,12 +36,6 @@ logger.debug(1, `Debug level: ${DEBUG_LVL}`, "App")
 //Connect to the db
 connectToDb("App").then(async () => {
   await container.resolve(FileService).checkDataDirectores()
-
-  //Apply database migration
-  await Migrate().catch((err) => {
-    logger.error(new AppException(__filename, "main", err));
-    process.exit(1);
-  });
 
   //Start collection of the songs
   runTaskManager();

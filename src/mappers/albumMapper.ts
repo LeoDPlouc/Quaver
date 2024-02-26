@@ -12,17 +12,22 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document, Types } from "mongoose"
-import { AlbumDb } from "../access/database/models/interfaces/albumDb"
 import { AlbumDTO } from "../controllers/DTO/albumDTO"
 import { Album } from "../models/album"
-import { injectable } from "tsyringe"
-import { ArtistMapper } from "./artistMapper"
-import { ImageMapper } from "./imageMapper"
+import { inject, injectable, registry } from "tsyringe"
 import { Artist } from "../models/artist"
 import { Image } from "../models/image"
+import { AlbumDb } from "../DAO/models/interfaces/albumDb"
+import { AlbumMapper, AlbumMapperToken } from "./interfaces/albumMapper.inter"
+import { ArtistMapper, ArtistMapperToken } from "./interfaces/artistMapper.inter"
+import { ImageMapper, ImageMapperToken } from "./interfaces/imageMapper.inter"
 
 @injectable()
-export class AlbumMapper {
+@registry([{
+    token: AlbumMapperToken,
+    useClass: AlbumMapperImpl
+}])
+export class AlbumMapperImpl implements AlbumMapper {
 
     public toAlbum(data: Album & Document<any, any, Album>): Album {
         let cleanedData: Album = {
@@ -87,7 +92,7 @@ export class AlbumMapper {
     }
 
     constructor(
-        private artistMapper: ArtistMapper,
-        private imageMapper: ImageMapper
+        @inject(ArtistMapperToken) private artistMapper: ArtistMapper,
+        @inject(ImageMapperToken) private imageMapper: ImageMapper
     ) { }
 }

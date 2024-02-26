@@ -1,5 +1,5 @@
 // Quaver is a self-hostable music player and music library manager
-// Copyright (C) 2022  DPlouc
+// Copyright (C) 2024  DPlouc
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -16,15 +16,15 @@ import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
 import { inject, injectable, registry } from "tsyringe"
+import { AlbumMapper } from "../mappers/albumMapper";
+import { SongMapper } from "../mappers/songMapper";
+import { Logger } from "../utils/logger";
 import { AlbumMetadata } from "./DTO/albumMetadata";
 import { imageFileData } from "./DTO/ImageFileData";
-import { AlbumDAO, AlbumDAOToken } from "../DAO/interfaces/albumDAO.inter";
-import { MusicBrainzApiService, MusicBrainzApiServiceToken } from "./interfaces/musicBrainzServiceService.inter";
+import { AlbumDAO } from "../DAO/interfaces/albumDAO.inter";
+import { MusicBrainzApiService } from "./interfaces/musicBrainzServiceService.inter";
 import { CoverArtArchiveService, CoverArtArchiveServiceToken } from "./interfaces/coverArtArchiveService.inter";
 import { AlbumService, AlbumServiceToken } from "./interfaces/albumService.inter";
-import { AlbumMapper, AlbumMapperToken } from "../mappers/interfaces/albumMapper.inter";
-import { SongMapper, SongMapperToken } from "../mappers/interfaces/songMapper.inter";
-import { Logger, LoggerToken } from "../utils/interfaces/logger.inter";
 
 @injectable()
 @registry([{
@@ -136,10 +136,10 @@ export class AlbumServiceImpl implements AlbumService {
 
   constructor(
     @inject(CoverArtArchiveServiceToken) private coverArtArchiveService: CoverArtArchiveService,
-    @inject(MusicBrainzApiServiceToken) private musicBrainzApiService: MusicBrainzApiService,
-    @inject(AlbumDAOToken) private albumDao: AlbumDAO,
-    @inject(AlbumMapperToken) private albumMapper: AlbumMapper,
-    @inject(SongMapperToken) private songMapper: SongMapper,
-    @inject(LoggerToken) private logger: Logger
+    private musicBrainzApiService: MusicBrainzApiService,
+    private albumDao: AlbumDAO,
+    private albumMapper: AlbumMapper,
+    private songMapper: SongMapper,
+    private logger: Logger
   ) { }
 }

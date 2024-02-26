@@ -11,18 +11,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { injectable } from "tsyringe";
-import { SongMetadata } from "../access/api/DTO/songMetadata";
-import { MusicBrainzApiAccess } from "../access/api/musicbrainz";
-import { SongMapper } from "../mappers/songMapper";
+import { injectable, registry } from "tsyringe";
 import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
-import { SongDAO } from "../access/database/songDAO";
+import { SongMetadata } from "./DTO/songMetadata";
+import { MusicBrainzApiService, MusicBrainzApiServiceToken } from "./interfaces/musicBrainzServiceService.inter";
+import { SongDAO, SongDAOToken } from "../DAO/interfaces/songDAO.inter";
+import { SongService, SongServiceToken } from "./interfaces/songService.inter";
+import { inject } from "vue";
+import { SongMapper, SongMapperToken } from "../mappers/interfaces/songMapper.inter";
 
 @injectable()
-export class SongService {
-  public async getAllSong(this: SongService): Promise<Song[]> {
+@registry([{
+  token: SongServiceToken,
+  useClass: SongServiceImpl
+}])
+export class SongServiceImpl implements SongService {
+  public async getAllSong(): Promise<Song[]> {
     return await this.songDAO
       .getAllSongModel()
       .then((result) => result.map(data => this.songMapper.toSong(data)))
@@ -31,7 +37,7 @@ export class SongService {
       });
   }
 
-  public async getSong(this: SongService, id: string): Promise<Song> {
+  public async getSong(id: string): Promise<Song> {
     let result = await this.songDAO
       .getSongModel(id).catch((err) => {
         throw new ServiceException(__filename, "getSong", err);
@@ -44,7 +50,7 @@ export class SongService {
     return this.songMapper.toSong(result);
   }
 
-  public async updateSong(this: SongService, song: Song): Promise<void> {
+  public async updateSong(song: Song): Promise<void> {
     await this.songDAO
       .updateSongModel(song)
       .catch((err) => {
@@ -52,7 +58,7 @@ export class SongService {
       });
   }
 
-  public async createSong(this: SongService, song: Song): Promise<string> {
+  public async createSong(song: Song): Promise<string> {
     return await this.songDAO
       .createSongModel(song)
       .catch((err) => {
@@ -60,7 +66,7 @@ export class SongService {
       });
   }
 
-  public async findSongByPath(this: SongService, path: string): Promise<Song> {
+  public async findSongByPath(path: string): Promise<Song> {
     let result = await this.songDAO
       .findSongModelByPath(path).catch((err) => {
         throw new ServiceException(__filename, "findSongByPath", err);
@@ -73,21 +79,21 @@ export class SongService {
     return this.songMapper.toSong(result);
   }
 
-  public async getPathsFromAllSong(this: SongService): Promise<string[]> {
+  public async getPathsFromAllSong(): Promise<string[]> {
     return await this.songDAO
       .getPathsFromAllSong().catch((err) => {
         throw new ServiceException(__filename, "getPathsFromAllSong", err);
       });
   }
 
-  public async fetchSongMBId(this: SongService, song: SongData): Promise<string> {
+  public async fetchSongMBId(song: SongData): Promise<string> {
     return await this.musicBrainzApiAccess
       .fetchSongMBId(song).catch(err => {
         throw new ServiceException(__filename, "fetchSongMBId", err)
       })
   }
 
-  public async getMbidlessSong(this: SongService): Promise<Song[]> {
+  public async getMbidlessSong(): Promise<Song[]> {
     return await this.songDAO
       .getMbidlessSongModel()
       .then((result) => result.map(this.songMapper.toSong))
@@ -96,7 +102,7 @@ export class SongService {
       });
   }
 
-  public async getSongForMetadataGrabber(this: SongService): Promise<Song[]> {
+  public async getSongForMetadataGrabber(): Promise<Song[]> {
     return await this.songDAO
       .getSongModelForMetadataGrabber()
       .then((result) => result.map(this.songMapper.toSong))
@@ -105,7 +111,7 @@ export class SongService {
       });
   }
 
-  public async fetchSongMetadata(this: SongService, song: Song): Promise<SongMetadata> {
+  public async fetchSongMetadata(song: Song): Promise<SongMetadata> {
     return await this.musicBrainzApiAccess.fetchSongMetadata(song.mbid)
       .catch(err => {
         throw new ServiceException(__filename, "fetchSongMetadata", err)
@@ -113,8 +119,8 @@ export class SongService {
   }
 
   constructor(
-    private musicBrainzApiAccess: MusicBrainzApiAccess,
-    private songDAO: SongDAO,
-    private songMapper: SongMapper
+    @inject(MusicBrainzApiServiceToken) private musicBrainzApiAccess: MusicBrainzApiService,
+    @inject(SongDAOToken) private songDAO: SongDAO,
+    @inject(SongMapperToken) private songMapper: SongMapper
   ) { }
 }

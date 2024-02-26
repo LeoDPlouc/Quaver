@@ -11,22 +11,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { injectable } from "tsyringe";
-import { MusicBrainzApiAccess } from "../access/api/musicbrainz";
-import { ArtistDAO } from "../access/database/artistDAO";
+import { inject, injectable, registry } from "tsyringe";
 import { Album } from "../models/album";
 import { Song } from "../models/song";
 import { NotFoundException } from "../utils/exceptions/notFoundException";
 import { ServiceException } from "./exceptions/serviceException";
-import { AlbumMapper } from "../mappers/albumMapper";
-import { SongMapper } from "../mappers/songMapper";
-import { ArtistMapper } from "../mappers/artistMapper";
-import { Logger } from "../utils/logger";
 import { Artist } from "../models/artist";
+import { MusicBrainzApiService, MusicBrainzApiServiceToken } from "./interfaces/musicBrainzServiceService.inter";
+import { ArtistDAO, ArtistDAOToken } from "../DAO/interfaces/artistDAO.inter";
+import { ArtistService, ArtistServiceToken } from "./interfaces/artistService.inter";
+import { AlbumMapper, AlbumMapperToken } from "../mappers/interfaces/albumMapper.inter";
+import { SongMapper, SongMapperToken } from "../mappers/interfaces/songMapper.inter";
+import { ArtistMapper, ArtistMapperToken } from "../mappers/interfaces/artistMapper.inter";
+import { Logger, LoggerToken } from "../utils/interfaces/logger.inter";
 
 @injectable()
-export class ArtistService {
-  public async getAllArtist(this: ArtistService): Promise<Artist[]> {
+@registry([{
+  token: ArtistServiceToken,
+  useClass: ArtistServiceImpl
+}])
+export class ArtistServiceImpl implements ArtistService {
+  public async getAllArtist(): Promise<Artist[]> {
     return await this.artistDao
       .getAllArtistModel()
       .then((result) => result.map(this.artistMapper.toArtist))
@@ -35,7 +40,7 @@ export class ArtistService {
       });
   }
 
-  public async getArtist(this: ArtistService, id: string): Promise<Artist> {
+  public async getArtist(id: string): Promise<Artist> {
     let result = await this.artistDao.getArtistModel(id).catch((err) => {
       throw new ServiceException(__filename, "getArtist", err);
     });
@@ -47,7 +52,7 @@ export class ArtistService {
     return this.artistMapper.toArtist(result);
   }
 
-  public async getSongFromArtist(this: ArtistService, id: string): Promise<Song[]> {
+  public async getSongFromArtist(id: string): Promise<Song[]> {
     return await this.artistDao
       .getSongModelFromArtist(id)
       .then((result) => result.map(data => this.songMapper.toSong(data)))
@@ -68,14 +73,14 @@ export class ArtistService {
     return result.map(data => this.albumMapper.toAlbum(data));
   }
 
-  public async createArtist(this: ArtistService, artist: Artist): Promise<string> {
+  public async createArtist(artist: Artist): Promise<string> {
     return await this.artistDao.createArtistModel(artist)
       .catch((err) => {
         throw new ServiceException(__filename, "createArtist", err);
       });
   }
 
-  public async findArtistByName(this: ArtistService, name: string): Promise<Artist[]> {
+  public async findArtistByName(name: string): Promise<Artist[]> {
     return await this.artistDao
       .findArtistModelByName(name)
       .then((result) => result.map(this.artistMapper.toArtist))
@@ -91,7 +96,7 @@ export class ArtistService {
       });
   }
 
-  public async getArtistsByMbidOrCreate(this: ArtistService, mbids: string[]): Promise<Artist[]> {
+  public async getArtistsByMbidOrCreate(mbids: string[]): Promise<Artist[]> {
     let artists = await this.artistDao.findArtistsByMbids(mbids)
       .then(results => results.map(this.artistMapper.toArtist))
       .catch((err) => {
@@ -108,7 +113,7 @@ export class ArtistService {
     return artists
   }
 
-  public async getArtistForMetadataGrabber(this: ArtistService): Promise<Artist[]> {
+  public async getArtistForMetadataGrabber(): Promise<Artist[]> {
     return await this.artistDao.getArtistModelForMetadataGrabber()
       .then(results => results.map(this.artistMapper.toArtist))
       .catch(err => {
@@ -116,18 +121,18 @@ export class ArtistService {
       })
   }
 
-  public async fetchArtistMetadata(this: ArtistService, artist: Artist): Promise<ArtistMetadata> {
+  public async fetchArtistMetadata(artist: Artist): Promise<ArtistMetadata> {
     return await this.musicBrainzApiAccess.fetchArtistMetadata(artist.mbid).catch((err) => {
       throw new ServiceException(__filename, "fetchArtistMetadata", err)
     })
   }
 
   constructor(
-    private musicBrainzApiAccess: MusicBrainzApiAccess,
-    private artistDao: ArtistDAO,
-    private albumMapper: AlbumMapper,
-    private songMapper: SongMapper,
-    private artistMapper: ArtistMapper,
-    private logger: Logger
+    @inject(MusicBrainzApiServiceToken) private musicBrainzApiAccess: MusicBrainzApiService,
+    @inject(ArtistDAOToken) private artistDao: ArtistDAO,
+    @inject(AlbumMapperToken) private albumMapper: AlbumMapper,
+    @inject(SongMapperToken) private songMapper: SongMapper,
+    @inject(ArtistMapperToken) private artistMapper: ArtistMapper,
+    @inject(LoggerToken) private logger: Logger
   ) { }
 }

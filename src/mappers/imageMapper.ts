@@ -12,11 +12,16 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document } from "mongoose"
-import { injectable } from "tsyringe"
+import { injectable, registry } from "tsyringe"
 import { Image } from "../models/image"
+import { ImageMapper, ImageMapperToken } from "./interfaces/imageMapper.inter"
 
 @injectable()
-export class ImageMapper {
+@registry([{
+    token: ImageMapperToken,
+    useClass: ImageMapperImpl
+}])
+export class ImageMapperImpl implements ImageMapper {
 
     public toImage(data: Image & Document<any, any, Image>): Image {
         let cleanedData: Image = {

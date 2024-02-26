@@ -12,14 +12,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document, Types } from "mongoose"
-import { ArtistDb } from "../access/database/models/interfaces/artistDb"
-import { injectable } from "tsyringe"
-import { ImageMapper } from "./imageMapper"
+import { inject, injectable, registry } from "tsyringe"
 import { Artist } from "../models/artist"
 import { Image } from "../models/image"
+import { ArtistDb } from "../DAO/models/interfaces/artistDb"
+import { ArtistMapper, ArtistMapperToken } from "./interfaces/artistMapper.inter"
+import { ImageMapper, ImageMapperToken } from "./interfaces/imageMapper.inter"
 
 @injectable()
-export class ArtistMapper {
+@registry([{
+    token: ArtistMapperToken,
+    useClass: ArtistMapperImpl
+}])
+export class ArtistMapperImpl implements ArtistMapper {
 
     public toArtist(data: Artist & Document<any, any, Artist>): Artist {
         let cleanedData: Artist = {
@@ -56,5 +61,5 @@ export class ArtistMapper {
         return cleanedData
     }
 
-    constructor(private imageMapper: ImageMapper) { }
+    constructor(@inject(ImageMapperToken) private imageMapper: ImageMapper) { }
 }

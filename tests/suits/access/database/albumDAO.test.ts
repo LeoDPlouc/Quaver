@@ -13,7 +13,7 @@
 
 import { cleanDatabase, cleanTestEnvironnement } from "../../../util"
 import { container } from "tsyringe"
-import { AlbumDAO } from "../../../../src/access/database/albumDAO"
+import { AlbumDAO } from "../../../../src/DAO/interfaces/albumDAO.inter"
 import { SongModel } from "../../../../src/access/database/models/songModel"
 import { AlbumMapper } from "../../../../src/mappers/albumMapper"
 import { DAOException } from "../../../../src/access/database/exceptions/DAOException"

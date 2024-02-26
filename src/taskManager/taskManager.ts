@@ -13,13 +13,13 @@
 
 import "reflect-metadata"
 import { Worker } from "worker_threads";
-import { connectToDb } from "../access/database/utils";
 import { TASK_MANAGER_PERIOD } from "../config/appConfig";
 import { CoverCleanerWorker } from "./workers/coverCleaner/coverCleaner";
 import { CoverGrabberWorker } from "./workers/coverGrabber/coverGrabber";
 import { MetadataGrabberWorker } from "./workers/metadataGrabber/metadataGrabber";
 import { SongCollectorWorker } from "./workers/songCollector/songCollector";
 import { container } from "tsyringe";
+import { connectToDb } from "../DAO/utils";
 
 function getWorker(path: string) {
   return new Worker(path, { env: { ...process.env, IS_PROC: "true" } });

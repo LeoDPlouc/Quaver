@@ -17,14 +17,19 @@ import mm from "mime-types";
 import { FileSystemException } from "../utils/exceptions/fileSystemException";
 import { ServiceException } from "./exceptions/serviceException";
 import { MimeLookupException } from "./exceptions/MimeLookupException";
-import { injectable, delay, inject } from "tsyringe";
-import { SongFileAccess } from "../access/file/songFile";
-import { Logger } from "../utils/logger";
-import { PathService } from "./pathService";
+import { injectable, delay, inject, registry } from "tsyringe";
+import { FileService, FileServiceToken } from "./interfaces/fileService.inter";
+import { SongFileService, SongFileServiceToken } from "./interfaces/songFileService.inter";
+import { PathService, PathServiceToken } from "./interfaces/pathService.inter";
+import { Logger, LoggerToken } from "../utils/interfaces/logger.inter";
 
 @injectable()
-export class FileService {
-  public async getAllFiles(this: FileService, folder: string): Promise<string[]> {
+@registry([{
+  token: FileServiceToken,
+  useClass: FileServiceImpl
+}])
+export class FileServiceImpl implements FileService {
+  public async getAllFiles(folder: string): Promise<string[]> {
     let allPaths: string[] = [];
 
     var paths = await fs.readdir(folder, { withFileTypes: true }).catch((err) => {
@@ -51,7 +56,7 @@ export class FileService {
     return allPaths;
   }
 
-  public isMusicFile(this: FileService, file: string): boolean {
+  public isMusicFile(file: string): boolean {
     try {
       return !!mm.lookup(path.extname(file)).match("audio")
     } catch (err) {
@@ -59,14 +64,14 @@ export class FileService {
     }
   }
 
-  public async getMetadataFromFile(this: FileService, songPath: string): Promise<SongData> {
+  public async getMetadataFromFile(songPath: string): Promise<SongData> {
     return await this.songFileAccess
       .getMetadataFromFile(songPath).catch((err) => {
         throw new ServiceException(__filename, "getMetadataFromFile", err);
       });
   }
 
-  public async checkDataDirectores(this: FileService): Promise<void> {
+  public async checkDataDirectores(): Promise<void> {
     try {
       let logsDir = this.pathService.getLogsPath()
       if (!(await fs.access(logsDir).then(_ => true).catch(_ => false))) {
@@ -85,8 +90,8 @@ export class FileService {
   }
 
   constructor(
-    private songFileAccess: SongFileAccess,
-    private logger: Logger,
-    private pathService: PathService
+    @inject(SongFileServiceToken) private songFileAccess: SongFileService,
+    @inject(PathServiceToken) private pathService: PathService,
+    @inject(LoggerToken) private logger: Logger,
   ) { }
 }

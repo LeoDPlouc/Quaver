@@ -12,18 +12,23 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Document, Types } from "mongoose"
-import { SongDb } from "../access/database/models/interfaces/songDb"
-import { SongDocument } from "../access/database/songDAO"
 import { SongDTO } from "../controllers/DTO/songDTO"
 import { Album } from "../models/album"
 import { Song } from "../models/song"
-import { injectable } from "tsyringe"
-import { AlbumMapper } from "./albumMapper"
-import { ArtistMapper } from "./artistMapper"
+import { inject, injectable, registry } from "tsyringe"
 import { Artist } from "../models/artist"
+import { SongDocument } from "../DAO/songDAO"
+import { SongDb } from "../DAO/models/interfaces/songDb"
+import { SongMapper, SongMapperToken } from "./interfaces/songMapper.inter"
+import { AlbumMapper, AlbumMapperToken } from "./interfaces/albumMapper.inter"
+import { ArtistMapper, ArtistMapperToken } from "./interfaces/artistMapper.inter"
 
 @injectable()
-export class SongMapper {
+@registry([{
+    token: SongMapperToken,
+    useClass: SongMapperImpl
+}])
+export class SongMapperImpl implements SongMapper {
 
     public toSong(data: SongDocument): Song {
         let cleanedData: Song = {
@@ -103,7 +108,7 @@ export class SongMapper {
     }
 
     constructor(
-        private albumMapper: AlbumMapper,
-        private artistMapper: ArtistMapper
+        @inject(AlbumMapperToken) private albumMapper: AlbumMapper,
+        @inject(ArtistMapperToken) private artistMapper: ArtistMapper
     ) { }
 }

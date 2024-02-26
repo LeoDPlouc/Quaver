@@ -15,11 +15,16 @@ import { Request } from "express";
 import { createLogger, format, transports } from "winston";
 import { DEBUG_LVL } from "../config/config";
 import { Exception } from "./Exception";
-import { container, injectable } from "tsyringe";
+import { container, injectable, registry } from "tsyringe";
 import { PathService } from "../service/pathService";
+import { Logger, LoggerToken } from "./interfaces/logger.inter";
 
 @injectable()
-export class Logger {
+@registry([{
+  token: LoggerToken,
+  useClass: LoggerImpl
+}])
+export class LoggerImpl implements Logger {
 
   private loggerStd = createLogger({
     transports: [new transports.Console()],
@@ -53,28 +58,28 @@ export class Logger {
     ),
   });
 
-  public error(this: Logger, exception: Exception) {
+  public error(exception: Exception) {
     this.loggerStd.error(`${exception.toString()}`);
     this.loggerFile.error(`${exception.toString()}`);
   }
 
-  public info(this: Logger, info: String, source: String) {
+  public info(info: String, source: String) {
     this.loggerStd.info(`[${source}] : ${info}`);
     this.loggerFile.info(`[${source}] : ${info}`);
   }
 
-  public logRequest(this: Logger, req: Request) {
+  public logRequest(req: Request) {
     this.loggerStd.info(`${req.ip} ${req.url}`);
     this.loggerFile.info(`${req.ip} ${req.url}`);
   }
 
-  public debug(this: Logger, debugLvl: number, info: String, source: String) {
+  public debug(debugLvl: number, info: String, source: String) {
     if (debugLvl <= DEBUG_LVL && DEBUG_LVL > 0 && debugLvl > 0) {
       this.loggerDebug.debug(`[${source}] ${info}`);
     }
   }
 
-  public debugError(this: Logger, debugLvl: number, exception: Exception) {
+  public debugError(debugLvl: number, exception: Exception) {
     if (debugLvl <= DEBUG_LVL && DEBUG_LVL > 0 && debugLvl > 0) {
       this.loggerDebug.debug(`[ERROR] ${exception.toString()}`);
     }

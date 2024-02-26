@@ -12,7 +12,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import request from "supertest";
-import { cleanDatabase, getOneAlbum } from "../../util";
+import { cleanDatabase } from "../../util";
 import app from '../../../src/app'
 import { AlbumModel } from "../../../src/access/database/models/albumModel";
 import { container } from "tsyringe";

@@ -41,3 +41,7 @@ export async function cleanDatabase() {
     await songModel.model.deleteMany()
     await imageModel.model.deleteMany()
 }
+
+export function injectMockLogger() {
+    container.register()
+}

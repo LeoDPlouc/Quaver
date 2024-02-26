@@ -14,29 +14,31 @@
 import { Router } from "express"
 import { protect } from "../middleware/authMiddleware"
 import { param } from "express-validator"
-import { getAlbumById, getAllAlbum, getSongFromAlbumById } from "../controllers/albumController"
+import { AlbumController } from "../controllers/albumController"
+import { container } from "tsyringe"
 
 const router = Router()
 
+const albumController = container.resolve(AlbumController)
 
 router.route("/")
     .get(
         protect,
-        getAllAlbum
+        albumController.getAllAlbum
     )
 
 router.route("/:id")
     .get(
         protect,
         param("id").not().equals("undefined").not().equals("null"),
-        getAlbumById
+        albumController.getAlbumById
     )
 
 router.route("/:id/songs")
     .get(
         protect,
         param("id").not().equals("undefined").not().equals("null"),
-        getSongFromAlbumById
+        albumController.getSongFromAlbumById
     )
 
 export = router

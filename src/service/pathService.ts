@@ -11,14 +11,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { injectable } from "tsyringe";
+import { injectable, registry } from "tsyringe";
 import path from "path";
 import { DATA_PATH } from "../config/config";
 import { FileSystemException } from "../utils/exceptions/fileSystemException";
+import { PathService, PathServiceToken } from "./interfaces/pathService.inter";
 
 @injectable()
-export class PathService {
-    public getImagesPath() {
+@registry([{
+    token: PathServiceToken,
+    useClass: PathServiceImpl
+}])
+export class PathServiceImpl implements PathService {
+    public getImagesPath(): string {
         try {
             return path.join(DATA_PATH, "images")
         } catch (err) {
@@ -26,7 +31,7 @@ export class PathService {
         }
     }
 
-    public getLogsPath() {
+    public getLogsPath(): string {
         try {
             return path.join(DATA_PATH, "logs")
         } catch (err) {
